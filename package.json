@@ -2,13 +2,14 @@
   "name": "phaser-kids-play",
   "version": "3.24.1",
   "description": "Phaser Kids Play Game",
-  "homepage": "https://github.com/TomazJunior/phaser-kids-play#readme",
-  "main": "index.js",
+  "homepage": "https://github.com/TomazJunior/phaser-kids-play",
+  "main": "index.html",
   "scripts": {
     "start": "webpack-dev-server --config webpack/webpack.dev.js --port 3000",
     "build": "webpack --config webpack/webpack.prod.js",
-    "bundle": "npm run build",
-    "serve": "serve dist"
+    "serve": "serve dist",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "keywords": [
     "Phaser",
@@ -34,6 +35,7 @@
   "devDependencies": {
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^5.1.1",
+    "gh-pages": "^2.0.1",
     "html-webpack-plugin": "^3.2.0",
     "serve": "^11.3.2",
     "ts-loader": "^5.4.5",

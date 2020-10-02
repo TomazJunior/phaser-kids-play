@@ -1,7 +1,13 @@
-export const BOX_SIZE = {
+export const BOX = {
     width: 64,
     height: 64,
-    scale: 2
+    scale: 2,
+    SKINS: {
+        DEFAULT: 6,
+        SELECTED: 9,
+        WRONG: 7,
+        RIGHT: 8
+    }
 }
 
 export const GAME = {

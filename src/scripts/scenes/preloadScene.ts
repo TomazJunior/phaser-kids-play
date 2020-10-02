@@ -6,6 +6,7 @@ export default class PreloadScene extends Phaser.Scene {
   }
 
   preload() {
+	this.load.image('background', 'assets/img/MlQA2U.jpg');
     this.load.spritesheet(SPRITE_NAME.SOKOBAN, 'assets/img/sokoban_tilesheet.png', {
       frameWidth: 64
 	})

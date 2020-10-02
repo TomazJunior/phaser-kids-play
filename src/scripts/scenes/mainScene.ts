@@ -24,6 +24,13 @@ export default class MainScene extends Phaser.Scene {
 
   create() {
     const { width, height } = this.scale
+    const background = this.add.image(width * 0.5, height * 0.5, 'background');
+    let scaleX = width / background.width
+    let scaleY = height / background.height
+    let scale = Math.max(scaleX, scaleY)
+
+    background.setScale(scale).setScrollFactor(0)
+
     this.player = new Player(this, width * 0.1, height * 0.95);
     this.player
     .on(PLAYER_CHAR_REACHED_BOX, this.handleReachedBox);

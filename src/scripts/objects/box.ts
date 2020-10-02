@@ -1,5 +1,5 @@
 import { PLAYER_TOUCHED_BOX } from "../events/events";
-import { BOX_SIZE } from "../utils/constants";
+import { BOX } from "../utils/constants";
 
 export default class Box extends Phaser.Physics.Arcade.Sprite
 {
@@ -7,12 +7,12 @@ export default class Box extends Phaser.Physics.Arcade.Sprite
   hiddenCharName: string
   opened = false
   constructor(scene: Phaser.Scene, x: number, y: number, itemType: number, container: Phaser.Physics.Arcade.StaticGroup, public id: number) {
-    super(scene, x, y, 'sokoban', 10);
+    super(scene, x, y, 'sokoban', BOX.SKINS.DEFAULT);
     this.itemType = itemType;
     container.add(this);
     
-    this.setSize(BOX_SIZE.width * BOX_SIZE.scale, BOX_SIZE.height / 1.5);
-    this.setScale(BOX_SIZE.scale);
+    this.setSize(BOX.width * BOX.scale, BOX.height / 1.5);
+    this.setScale(BOX.scale);
     
     this.setOffset(-32, 54);
         
@@ -28,20 +28,20 @@ export default class Box extends Phaser.Physics.Arcade.Sprite
   }
 
   reset() {
-    this.setFrame(10)
+    this.setFrame(BOX.SKINS.DEFAULT)
   }
 
   isSelected() {
-    this.setFrame(9)
+    this.setFrame(BOX.SKINS.SELECTED)
   }
 
   isWrongBox() {
-    this.setFrame(7)
+    this.setFrame(BOX.SKINS.WRONG)
   }
 
   isRightBox() {
     this.opened = true
-    this.setFrame(8)
+    this.setFrame(BOX.SKINS.RIGHT)
   }
 }
       
