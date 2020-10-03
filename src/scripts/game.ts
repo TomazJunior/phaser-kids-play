@@ -1,8 +1,8 @@
 import 'phaser'
 import MainScene from './scenes/mainScene'
 import PreloadScene from './scenes/preloadScene'
-import resize from './utils/resize';
-import { GAME } from './utils/constants';
+import resize from './utils/resize'
+import { GAME } from './utils/constants'
 
 
 const isLocalhost = Boolean(
@@ -28,7 +28,7 @@ const config: Phaser.Types.Core.GameConfig = {
   physics: {
     default: 'arcade',
     arcade: {
-      debug: isLocalhost,
+      debug: false && isLocalhost,
       gravity: { y: 0 }
     }
   }

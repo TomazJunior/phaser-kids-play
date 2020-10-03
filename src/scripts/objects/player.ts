@@ -20,7 +20,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       
     this.setCollideWorldBounds(true)
     this.active = false;
+    this.createAnimations()
     this.animation = PLAYER.ANIMATIONS.DOWN_IDLE;
+    this.play(this.animation, true)
+    
     scene.events.on('update', this.update, this)
   }
 
@@ -43,8 +46,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   update() {
-    this.play(this.animation, true)
     if (!this.active) return
+    this.play(this.animation, true)
     
     const speed = 200
     // offset to garantee player won't collide up/down with the boxes
@@ -107,5 +110,56 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       }
       return
     }
+  }
+
+  createAnimations() {
+    console.log('create animes')
+    this.scene.anims.create({
+			key: 'down-idle',
+			frames: [{ key: 'sokoban', frame: 52 }]
+		})
+
+		this.scene.anims.create({
+			key: 'down-walk',
+			frames: this.scene.anims.generateFrameNumbers('sokoban', { start: 52, end: 54 }),
+			frameRate: 10,
+			repeat: -1
+		})
+
+		this.scene.anims.create({
+			key: 'up-idle',
+			frames: [{ key: 'sokoban', frame: 55 }]
+		})
+
+		this.scene.anims.create({
+			key: 'up-walk',
+			frames: this.scene.anims.generateFrameNumbers('sokoban', { start: 55, end: 57 }),
+			frameRate: 10,
+			repeat: -1
+		})
+
+		this.scene.anims.create({
+			key: 'left-idle',
+			frames: [{ key: 'sokoban', frame: 81 }]
+		})
+
+		this.scene.anims.create({
+			key: 'left-walk',
+			frames: this.scene.anims.generateFrameNumbers('sokoban', { start: 81, end: 83 }),
+			frameRate: 10,
+			repeat: -1
+		})
+
+		this.scene.anims.create({
+			key: 'right-idle',
+			frames: [{ key: 'sokoban', frame: 78 }]
+		})
+
+		this.scene.anims.create({
+			key: 'right-walk',
+			frames: this.scene.anims.generateFrameNumbers('sokoban', { start: 78, end: 80 }),
+			frameRate: 10,
+			repeat: -1
+		})
   }
 }

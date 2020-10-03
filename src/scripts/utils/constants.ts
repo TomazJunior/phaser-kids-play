@@ -1,7 +1,7 @@
 export const BOX = {
     width: 64,
     height: 64,
-    scale: 2,
+    scale: 2.5,
     SKINS: {
         DEFAULT: 6,
         SELECTED: 9,
