@@ -8,6 +8,7 @@ export default class PreloadScene extends Phaser.Scene {
   preload() {
     this.load.image('start', 'assets/img/play-button.png')
     this.load.image('previous', 'assets/img/reply.png')
+    this.load.image('back', 'assets/img/rounded-back.png')
     this.load.image('refresh', 'assets/img/refresh.png')
     this.load.image('background', 'assets/img/MlQA2U.jpg')
     this.load.image('modalbg', 'assets/img/modalBg.png')
@@ -24,5 +25,6 @@ export default class PreloadScene extends Phaser.Scene {
 
   create() {
     this.scene.start('MenuScene')
+    // this.scene.start('MainScene')
   }
 }

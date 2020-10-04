@@ -5,6 +5,8 @@ import { HIDDEN_CHAR_REACHED_BOX, PLAYER_CHAR_REACHED_BOX, PLAYER_TOUCHED_BOX } 
 import { getAllSkins, getARandomSkinFrom, getRandomSkin } from '../utils/skinUtils'
 import { LEVELS, SKINS, SPRITE_NAME } from '../utils/constants'
 import { ModalDialog } from '../utils/modalDialog'
+import { Buttons, Sizer } from 'phaser3-rex-plugins/templates/ui/ui-components.js'
+import { createLabel } from '../utils/textUtil'
 
 export default class MainScene extends Phaser.Scene {
   boxes: Phaser.Physics.Arcade.StaticGroup
@@ -37,6 +39,25 @@ export default class MainScene extends Phaser.Scene {
     let scale = Math.max(scaleX, scaleY)
     background.setScale(scale).setScrollFactor(0)
 
+    const buttons = new Buttons(this, {
+      buttons: [createLabel(this, { content: '', icon: 'back' })],
+    })
+    
+    const group: Sizer = new Sizer(this, 50, 50)
+    group.add(buttons)
+    .layout()
+
+    buttons.on(
+      'button.click',
+      (button, groupName, index, pointer, event) => {
+        this.setToGameOverState()
+        this.time.delayedCall(200, () => {
+          this.scene.start('MenuScene')
+        })
+      },
+      this
+    )
+
     const initialPos = this.getInitialPlayerPosition()
     this.player = new Player(this, initialPos.x, initialPos.y)
     this.player.on(PLAYER_CHAR_REACHED_BOX, this.handleReachedBox)
@@ -65,11 +86,7 @@ export default class MainScene extends Phaser.Scene {
     })
 
     modalDialog.show((groupName: string, index: number) => {
-      if (this.gameover) return
-      this.gameover = true
-      this.player.active = false
-      this.player.visible = false
-      this.clearHiddenChars()
+      this.setToGameOverState()
 
       this.time.delayedCall(200, () => {
         if (index === 0) {
@@ -85,6 +102,14 @@ export default class MainScene extends Phaser.Scene {
 
   update() {
     if (this.gameover) return
+  }
+
+  setToGameOverState() {
+    if (this.gameover) return
+    this.gameover = true
+    this.player.active = false
+    this.player.visible = false
+    this.clearHiddenChars()
   }
 
   hiddenCharsAreReady(): boolean {

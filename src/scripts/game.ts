@@ -18,7 +18,6 @@ const isLocalhost = Boolean(
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  backgroundColor: '#ffffff',
   scale: {
     parent: 'phaser-game',
     mode: Phaser.Scale.NONE,
