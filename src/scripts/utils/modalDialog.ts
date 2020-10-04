@@ -1,4 +1,5 @@
-import { Dialog, Label, RoundRectangle } from 'phaser3-rex-plugins/templates/ui/ui-components.js'
+import { Dialog } from 'phaser3-rex-plugins/templates/ui/ui-components.js'
+import { createLabel } from './textUtil'
 
 export class ModalDialog{
   dialog: Dialog
@@ -18,7 +19,7 @@ export class ModalDialog{
       height: height * 0.5,
       background: this.scene.add.image(0, 0, 'modalbg').setOrigin(0.5),
       content: this.scene.add.bitmapText(0, 0, 'shortStack', content, 82),
-      actions: labels.map(labelConfig => this.createLabel(labelConfig)),
+      actions: labels.map(labelConfig => createLabel(this.scene, labelConfig)),
       space: {
         title: 25,
         content: 25,
@@ -56,25 +57,6 @@ export class ModalDialog{
     })
     .on('button.out', (button, groupName, index, pointer, event) => {
       button.getElement('background').setStrokeStyle()
-    })
-
-  }
-  private createLabel = (labelConfig: ModalDialogLabelConfig) => {
-    return new Label(this.scene, {
-      background: this.scene.add.existing(new RoundRectangle(this.scene, 0, 0, 0, 0, 20, 0x5e92f3)),
-      align: 'center',
-      text: this.scene.add.text(0, 0, labelConfig.content, {
-        fontFamily: 'AlloyInk',
-        fontSize: '46px',
-      }),
-      icon: labelConfig.icon ? this.scene.add.image(0,0, labelConfig.icon) : undefined,
-      space: {
-        icon: 20,
-        left: 10,
-        right: 10,
-        top: 10,
-        bottom: 10,
-      },
     })
   }
 }

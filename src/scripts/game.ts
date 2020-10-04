@@ -3,6 +3,7 @@ import MainScene from './scenes/mainScene'
 import PreloadScene from './scenes/preloadScene'
 import resize from './utils/resize'
 import { GAME } from './utils/constants'
+import MenuScene from './scenes/menuScene'
 
 
 const isLocalhost = Boolean(
@@ -24,7 +25,7 @@ const config: Phaser.Types.Core.GameConfig = {
     width: GAME.WIDTH,
     height: GAME.HEIGHT
   },
-  scene: [PreloadScene, MainScene],
+  scene: [PreloadScene, MenuScene, MainScene],
   physics: {
     default: 'arcade',
     arcade: {

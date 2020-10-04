@@ -8,9 +8,10 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
     x: number,
     y: number
   }
+  reachedBox = false
   gotToTheBoxCallback: () => void;
   
-  constructor(scene: Phaser.Scene, x: number, y: number, private skin: string) {
+  constructor(scene: Phaser.Scene, x: number, y: number, public skin: string) {
     super(scene, x, y, SPRITE_NAME.ROUND_ANIMALS, skin)
     scene.add.existing(this)
     scene.physics.add.existing(this)
@@ -30,11 +31,7 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
   update() {
     const speed = 300
     
-    if (!this.isWalking) return
-
-    const distance = Phaser.Math.Distance.Between(
-      this.x, this.y,
-      this.isGoingTo.x, this.isGoingTo.y)
+    if (!this.isWalking || !this.active) return
     
     const offset = 10;
 
@@ -57,6 +54,7 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
         }
       })
 
+      this.reachedBox = true
       this.emit(HIDDEN_CHAR_REACHED_BOX)
       return
     }

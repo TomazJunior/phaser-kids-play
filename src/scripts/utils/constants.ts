@@ -10,6 +10,12 @@ export const BOX = {
     }
 }
 
+export const LEVELS = [
+    {level: 1, from: 1, to: 5, hiddens: 1},
+    {level: 2, from: 6, to: 10, hiddens: 2},
+    {level: 3, from: 11, to: 15, hiddens: 3}
+]
+
 export const GAME = {
     WIDTH: 1280,
     HEIGHT: 720,

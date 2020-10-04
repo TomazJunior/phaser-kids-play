@@ -6,7 +6,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   isWalking = false
   isGoingTo: {
     x: number,
-    y: number
+    y: number,
+    initialPos: false
   }
   activeBox: Box
   animation: string
@@ -23,23 +24,28 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.createAnimations()
     this.animation = PLAYER.ANIMATIONS.DOWN_IDLE;
     this.play(this.animation, true)
-    
+
     scene.events.on('update', this.update, this)
   }
 
   goTo(box: Box) {
     if (!this.active) return
-    this.isWalking = true
     this.setActiveBox(box)
-    this.isGoingTo = {
+    this.setIsGoingTo({
       x: box.x - box.displayWidth, 
-      y: box.y - box.displayHeight / 2, 
-    }
+      y: box.y - box.displayHeight / 2,
+      initialPos: false
+    })
+  }
+
+  setIsGoingTo(pos: {x, y, initialPos}) {
+    this.isWalking = true
+    this.isGoingTo = pos
   }
 
   setActiveBox(box: Box) {
     if (this.activeBox) {
-      this.activeBox.reset()
+      this.activeBox.close()
     }
     this.activeBox = box
     this.activeBox.isSelected()
@@ -49,13 +55,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     if (!this.active) return
     this.play(this.animation, true)
     
-    const speed = 200
+    const speed = 350
     // offset to garantee player won't collide up/down with the boxes
     const offset = 10
 
     if (!this.isWalking) return
 
-    let {x, y} = this.isGoingTo;
+    let {x, y, initialPos} = this.isGoingTo;
     let distanceX = Math.trunc(this.x - x);
     let distanceY = Math.trunc(this.y - y);
     
@@ -63,10 +69,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       this.isWalking = false
       this.setVelocity(0, 0)
       this.animation = PLAYER.ANIMATIONS.DOWN_IDLE
-      this.emit(PLAYER_CHAR_REACHED_BOX, this.activeBox);
+      if (!initialPos) {
+        this.emit(PLAYER_CHAR_REACHED_BOX, this.activeBox);
+      }
       return
     }
-
+    
     if (this.body.blocked.up || this.body.blocked.down) {
       if (distanceX < 0) {
         this.setVelocity(speed, 0)
@@ -113,7 +121,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   createAnimations() {
-    console.log('create animes')
     this.scene.anims.create({
 			key: 'down-idle',
 			frames: [{ key: 'sokoban', frame: 52 }]

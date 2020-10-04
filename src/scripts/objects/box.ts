@@ -3,18 +3,16 @@ import { BOX } from "../utils/constants";
 
 export default class Box extends Phaser.Physics.Arcade.Sprite
 {
-  itemType: number
   hiddenCharName: string
   opened = false
-  constructor(scene: Phaser.Scene, x: number, y: number, itemType: number, container: Phaser.Physics.Arcade.StaticGroup, public id: number) {
+  constructor(scene: Phaser.Scene, x: number, y: number, container: Phaser.Physics.Arcade.StaticGroup, public id: number) {
     super(scene, x, y, 'sokoban', BOX.SKINS.DEFAULT);
-    this.itemType = itemType;
     container.add(this);
     
     this.setSize(BOX.width * BOX.scale, BOX.height / 1.5);
     this.setScale(BOX.scale);
     
-    this.setOffset(-32, 54);
+    this.setOffset(-48, 54);
         
     scene.add.existing(this)
 
@@ -28,14 +26,22 @@ export default class Box extends Phaser.Physics.Arcade.Sprite
   }
 
   reset() {
+    this.hiddenCharName = ''
+    this.close()
+  }
+
+  close() {
+    this.opened = false
     this.setFrame(BOX.SKINS.DEFAULT)
   }
 
   isSelected() {
+    this.opened = false
     this.setFrame(BOX.SKINS.SELECTED)
   }
 
   isWrongBox() {
+    this.opened = false
     this.setFrame(BOX.SKINS.WRONG)
   }
 
