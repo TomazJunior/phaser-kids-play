@@ -161,10 +161,13 @@ export default class MainScene extends Phaser.Scene {
   }
 
   getFreeBox(): Box {
-    const randomBoxPos = Math.floor(Math.random() * 8)
-    const box = <Box>this.boxes.children.getArray()[randomBoxPos]
-    if (!box.hiddenCharName) return box
-    return this.getFreeBox()
+    const availBoxes = this.getFreeBoxes()
+    const randomBoxPos = Math.floor(Math.random() * availBoxes.length)
+    return availBoxes[randomBoxPos]
+  }
+
+  getFreeBoxes(): Box[] {
+    return <Box[]>this.boxes.getChildren().filter((box: any) => !box.hiddenCharName)
   }
 
   getHiddenChar(skin: string): HiddenChar {
