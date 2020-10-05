@@ -7,6 +7,7 @@ import { LEVELS, SKINS, SPRITE_NAME } from '../utils/constants'
 import { ModalDialog } from '../utils/modalDialog'
 import { Buttons, Sizer } from 'phaser3-rex-plugins/templates/ui/ui-components.js'
 import { createLabel } from '../utils/textUtil'
+import ColoredText from '../compontents/coloredText'
 
 export default class MainScene extends Phaser.Scene {
   boxes: Phaser.Physics.Arcade.StaticGroup
@@ -19,6 +20,7 @@ export default class MainScene extends Phaser.Scene {
   gameover = false
   level = 1
   hiddenCharOnTheirPosition = false
+  levelText: ColoredText
   constructor() {
     super({ key: 'MainScene' })
   }
@@ -33,30 +35,9 @@ export default class MainScene extends Phaser.Scene {
 
   create() {
     const { width, height } = this.scale
-    const background = this.add.image(width * 0.5, height * 0.5, 'background')
-    let scaleX = width / background.width
-    let scaleY = height / background.height
-    let scale = Math.max(scaleX, scaleY)
-    background.setScale(scale).setScrollFactor(0)
 
-    const buttons = new Buttons(this, {
-      buttons: [createLabel(this, { content: '', icon: 'back' })],
-    })
-    
-    const group: Sizer = new Sizer(this, 50, 50)
-    group.add(buttons)
-    .layout()
-
-    buttons.on(
-      'button.click',
-      (button, groupName, index, pointer, event) => {
-        this.setToGameOverState()
-        this.time.delayedCall(200, () => {
-          this.scene.start('MenuScene')
-        })
-      },
-      this
-    )
+    this.createBackground()
+    this.createBackButton()
 
     const initialPos = this.getInitialPlayerPosition()
     this.player = new Player(this, initialPos.x, initialPos.y)
@@ -67,6 +48,11 @@ export default class MainScene extends Phaser.Scene {
     this.hiddenThumbChars = this.add.group()
     this.physics.add.collider(this.player, this.boxes, undefined, undefined, this)
     this.physics.add.collider(this.hiddenChars, this.boxes, undefined, undefined, this)
+
+    this.levelText = new ColoredText(this, width - 200, 20, `level ${this.level}`, {
+        fontFamily: 'AlloyInk',
+        fontSize: '48px',
+      })
 
     this.availableHiddenSkins = getAllSkins()
     this.createHiddenChars(this.level)
@@ -104,6 +90,36 @@ export default class MainScene extends Phaser.Scene {
     if (this.gameover) return
   }
 
+  createBackground() {
+    const { width, height } = this.scale
+    const background = this.add.image(width * 0.5, height * 0.5, 'background')
+    let scaleX = width / background.width
+    let scaleY = height / background.height
+    let scale = Math.max(scaleX, scaleY)
+    background.setScale(scale).setScrollFactor(0)
+  }
+
+  createBackButton() {
+    const buttons = new Buttons(this, {
+      buttons: [createLabel(this, { content: '', icon: 'back' })],
+    })
+    
+    const group: Sizer = new Sizer(this, 50, 50)
+    group.add(buttons)
+    .layout()
+
+    buttons.on(
+      'button.click',
+      (button, groupName, index, pointer, event) => {
+        this.setToGameOverState()
+        this.time.delayedCall(200, () => {
+          this.scene.start('MenuScene')
+        })
+      },
+      this
+    )
+  }
+
   setToGameOverState() {
     if (this.gameover) return
     this.gameover = true
@@ -135,6 +151,8 @@ export default class MainScene extends Phaser.Scene {
       this.showFinishGameDialog()
       return
     }
+
+    this.levelText.content = `level ${selectedLevel.level}`
 
     this.time.delayedCall(300, () => {
       this.resetBoxes()

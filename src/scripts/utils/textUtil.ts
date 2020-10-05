@@ -1,4 +1,4 @@
-import { Buttons, Label, RoundRectangle, Sizer } from 'phaser3-rex-plugins/templates/ui/ui-components.js'
+import { Label, RoundRectangle } from 'phaser3-rex-plugins/templates/ui/ui-components.js'
 
 export const createLabel = (scene: Phaser.Scene, labelConfig: ModalDialogLabelConfig) => {
   return new Label(scene, {
