@@ -7,7 +7,8 @@ import { LEVELS, SKINS, SPRITE_NAME } from '../utils/constants'
 import { ModalDialog } from '../utils/modalDialog'
 import { Buttons, Sizer } from 'phaser3-rex-plugins/templates/ui/ui-components.js'
 import { createLabel } from '../utils/textUtil'
-import ColoredText from '../compontents/coloredText'
+import ColoredText from '../ui/coloredText'
+import BigLevelText from '../ui/bigLevelText'
 
 export default class MainScene extends Phaser.Scene {
   boxes: Phaser.Physics.Arcade.StaticGroup
@@ -21,6 +22,7 @@ export default class MainScene extends Phaser.Scene {
   level = 1
   hiddenCharOnTheirPosition = false
   levelText: ColoredText
+  bigLevelText: BigLevelText
   constructor() {
     super({ key: 'MainScene' })
   }
@@ -50,9 +52,14 @@ export default class MainScene extends Phaser.Scene {
     this.physics.add.collider(this.hiddenChars, this.boxes, undefined, undefined, this)
 
     this.levelText = new ColoredText(this, width - 200, 20, `level ${this.level}`, {
-        fontFamily: 'AlloyInk',
-        fontSize: '48px',
-      })
+      fontFamily: 'AlloyInk',
+      fontSize: '48px',
+    })
+
+    this.bigLevelText = new BigLevelText(this, width * 0.5, height * 0.5, this.levelText.content, {
+      fontFamily: 'AlloyInk',
+      fontSize: '132px',
+    })
 
     this.availableHiddenSkins = getAllSkins()
     this.createHiddenChars(this.level)
@@ -103,10 +110,9 @@ export default class MainScene extends Phaser.Scene {
     const buttons = new Buttons(this, {
       buttons: [createLabel(this, { content: '', icon: 'back' })],
     })
-    
+
     const group: Sizer = new Sizer(this, 50, 50)
-    group.add(buttons)
-    .layout()
+    group.add(buttons).layout()
 
     buttons.on(
       'button.click',
@@ -139,28 +145,29 @@ export default class MainScene extends Phaser.Scene {
     return this.hiddenChars.getChildren().every((x: any) => x.visible)
   }
 
-  nextLevel = () => {
+  nextLevel = async (): Promise<void> => {
     if (!this.goToNextLevel()) {
       this.player.active = true
-      return
+      return Promise.resolve()
     }
 
     ++this.level
     const selectedLevel = LEVELS.find((levelConfig) => this.level >= levelConfig.from && this.level <= levelConfig.to)
     if (!selectedLevel) {
       this.showFinishGameDialog()
-      return
+      return Promise.resolve()
     }
-
     this.levelText.content = `level ${selectedLevel.level}`
+    await this.bigLevelText.updateContent(this.levelText.content)
 
-    this.time.delayedCall(300, () => {
+    this.time.delayedCall(500, () => {
       this.resetBoxes()
 
       this.player.setIsGoingTo({ ...this.getInitialPlayerPosition(), initialPos: true })
       this.createHiddenChars(selectedLevel.hiddens)
       this.player.active = true
     })
+    return Promise.resolve()
   }
 
   resetBoxes() {
@@ -281,9 +288,9 @@ export default class MainScene extends Phaser.Scene {
         alpha: 1,
         scale: 1,
         duration: 500,
-        onComplete: () => {
+        onComplete: async () => {
           hiddenChar.visible = true
-          this.nextLevel()
+          await this.nextLevel()
         },
       })
     }
