@@ -12,7 +12,7 @@ export default class MenuScene extends Phaser.Scene {
     let scale = Math.max(scaleX, scaleY)
     background.setScale(scale).setScrollFactor(0)
 
-    const title = this.add.bitmapText(width * 0.1, height * 0.5, 'shortStack', 'Game for kids', 82).setOrigin(0, 0)
+    const title = this.add.bitmapText(width * 0.1, height * 0.5, SPRITE_NAME.SHORT_STACK, 'Game for kids', 82).setOrigin(0, 0)
     const button = new Button(this, width * 0.1 + title.width, height * 0.5, {
       icon: SPRITE_NAME.WHITE_SHEET,
       iconFrame: 'right.png',

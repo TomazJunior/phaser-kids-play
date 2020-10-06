@@ -6,10 +6,6 @@ export default class PreloadScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('start', 'assets/img/play-button.png')
-    this.load.image('previous', 'assets/img/reply.png')
-    this.load.image('back', 'assets/img/rounded-back.png')
-    this.load.image('refresh', 'assets/img/refresh.png')
     this.load.image('background', 'assets/img/MlQA2U.jpg')
     this.load.image('modalbg', 'assets/img/modalBg.png')
     this.load.spritesheet(SPRITE_NAME.SOKOBAN, 'assets/img/sokoban_tilesheet.png', {
@@ -33,7 +29,7 @@ export default class PreloadScene extends Phaser.Scene {
       'assets/img/sheet_white2x.xml'
     )
     
-    this.load.bitmapFont('shortStack', 'assets/fonts/shortStack.png', 'assets/fonts/shortStack.xml')
+    this.load.bitmapFont(SPRITE_NAME.SHORT_STACK, 'assets/fonts/shortStack.png', 'assets/fonts/shortStack.xml')
   }
 
   create() {

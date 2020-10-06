@@ -35,7 +35,8 @@ export const SPRITE_NAME = {
     BLUE_SHEET: 'blueSheet',
     WHITE_SHEET: 'whiteSheet',
     ROUND_ANIMALS: 'round_animals',
-    SOKOBAN: 'sokoban'
+    SOKOBAN: 'sokoban',
+    SHORT_STACK: 'shortStack'
 }
 
 export enum SKINS {
