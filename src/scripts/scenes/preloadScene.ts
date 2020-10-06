@@ -20,6 +20,13 @@ export default class PreloadScene extends Phaser.Scene {
       'assets/img/round_nodetailsOutline.png',
       'assets/img/round_nodetailsOutline.xml'
     )
+
+    this.load.atlasXML(
+      SPRITE_NAME.BLUE_SHEET,
+      'assets/img/blueSheet.png',
+      'assets/img/blueSheet.xml'
+    )
+
     this.load.bitmapFont('shortStack', 'assets/fonts/shortStack.png', 'assets/fonts/shortStack.xml')
   }
 

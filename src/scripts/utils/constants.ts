@@ -32,6 +32,7 @@ export const PLAYER = {
 }
 
 export const SPRITE_NAME = {
+    BLUE_SHEET: 'blueSheet',
     ROUND_ANIMALS: 'round_animals',
     SOKOBAN: 'sokoban'
 }

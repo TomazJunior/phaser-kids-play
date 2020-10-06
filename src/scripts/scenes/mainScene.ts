@@ -5,8 +5,6 @@ import { HIDDEN_CHAR_REACHED_BOX, PLAYER_CHAR_REACHED_BOX, PLAYER_TOUCHED_BOX } 
 import { getAllSkins, getARandomSkinFrom, getRandomSkin } from '../utils/skinUtils'
 import { LEVELS, SKINS, SPRITE_NAME } from '../utils/constants'
 import { ModalDialog } from '../utils/modalDialog'
-import { Buttons, Sizer } from 'phaser3-rex-plugins/templates/ui/ui-components.js'
-import { createLabel } from '../utils/textUtil'
 import ColoredText from '../ui/coloredText'
 import BigLevelText from '../ui/bigLevelText'
 
@@ -63,6 +61,7 @@ export default class MainScene extends Phaser.Scene {
 
     this.availableHiddenSkins = getAllSkins()
     this.createHiddenChars(this.level)
+    // this.showFinishGameDialog()
   }
 
   showFinishGameDialog = () => {
@@ -107,23 +106,17 @@ export default class MainScene extends Phaser.Scene {
   }
 
   createBackButton() {
-    const buttons = new Buttons(this, {
-      buttons: [createLabel(this, { content: '', icon: 'back' })],
+    const container = this.add.container(10, 10)
+    const panel = this.add
+      .image(0, 0, SPRITE_NAME.BLUE_SHEET, 'blue_circle.png')
+      .setScale(2.5)
+      .setOrigin(0, 0)
+    const backButton = this.add.image(38, 42, 'start').setScale(0.8).setOrigin(0.5, 0.5).setAngle(180)
+
+    container.add(panel).add(backButton)
+    panel.setInteractive().on('pointerdown', (pointer, localX, localY, event) => {
+      this.scene.start('MenuScene')
     })
-
-    const group: Sizer = new Sizer(this, 50, 50)
-    group.add(buttons).layout()
-
-    buttons.on(
-      'button.click',
-      (button, groupName, index, pointer, event) => {
-        this.setToGameOverState()
-        this.time.delayedCall(200, () => {
-          this.scene.start('MenuScene')
-        })
-      },
-      this
-    )
   }
 
   setToGameOverState() {
