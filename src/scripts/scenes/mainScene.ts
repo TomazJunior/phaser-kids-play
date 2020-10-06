@@ -7,6 +7,7 @@ import { LEVELS, SKINS, SPRITE_NAME } from '../utils/constants'
 import { ModalDialog } from '../utils/modalDialog'
 import ColoredText from '../ui/coloredText'
 import BigLevelText from '../ui/bigLevelText'
+import { Button } from '../ui/button'
 
 export default class MainScene extends Phaser.Scene {
   boxes: Phaser.Physics.Arcade.StaticGroup
@@ -106,16 +107,12 @@ export default class MainScene extends Phaser.Scene {
   }
 
   createBackButton() {
-    const container = this.add.container(10, 10)
-    const panel = this.add
-      .image(0, 0, SPRITE_NAME.BLUE_SHEET, 'blue_circle.png')
-      .setScale(2.5)
-      .setOrigin(0, 0)
-    const backButton = this.add.image(38, 42, 'start').setScale(0.8).setOrigin(0.5, 0.5).setAngle(180)
-
-    container.add(panel).add(backButton)
-    panel.setInteractive().on('pointerdown', (pointer, localX, localY, event) => {
-      this.scene.start('MenuScene')
+    new Button(this, 10, 10, {
+      icon: SPRITE_NAME.WHITE_SHEET,
+      iconFrame: 'left.png',
+      onClick: () => {
+        this.scene.start('MenuScene')
+      },
     })
   }
 

@@ -10,3 +10,10 @@ declare interface ModalDialogLabelConfig {
     content: string,
     icon: string
 }
+
+declare interface ButtonConfig {
+    text?: string,
+    icon: string,
+    iconFrame?: string,
+    onClick: () => void
+}
