@@ -2,7 +2,7 @@ import Player from '../objects/player'
 import Box from '../objects/box'
 import HiddenChar from '../objects/hiddenChar'
 import { HIDDEN_CHAR_REACHED_BOX, PLAYER_CHAR_REACHED_BOX, PLAYER_TOUCHED_BOX } from '../events/events'
-import { getAllSkins, getARandomSkinFrom, getRandomSkin } from '../utils/skinUtils'
+import { getAllSkins, getARandomSkinFrom } from '../utils/skinUtils'
 import { LEVELS, SKINS, SPRITE_NAME } from '../utils/constants'
 import { ModalDialog } from '../utils/modalDialog'
 import ColoredText from '../ui/coloredText'
@@ -66,30 +66,26 @@ export default class MainScene extends Phaser.Scene {
   }
 
   showFinishGameDialog = () => {
-    const { width, height } = this.scale
-    const modalDialog = new ModalDialog(this)
-    modalDialog.create({
-      width,
-      height,
-      content: 'You Win!',
-      labels: [
-        { content: 'Home', icon: 'previous' },
-        { content: 'Restart', icon: 'refresh' },
+    const modalDialog = new ModalDialog(this, {
+      buttonConfigs: [
+        {
+          icon: SPRITE_NAME.WHITE_SHEET,
+          iconFrame: 'left.png',
+          text: 'Home',
+          onClick: () => {
+            this.scene.start('MenuScene')
+          },
+        },
+        {
+          icon: SPRITE_NAME.WHITE_SHEET,
+          iconFrame: 'return.png',
+          text: 'Restart',
+          onClick: () => {
+            this.scene.restart()
+          },
+        },
       ],
-    })
-
-    modalDialog.show((groupName: string, index: number) => {
-      this.setToGameOverState()
-
-      this.time.delayedCall(200, () => {
-        if (index === 0) {
-          // go home
-          this.scene.start('MenuScene')
-        } else if (index === 1) {
-          // restart game
-          this.scene.restart()
-        }
-      })
+      content: 'You Win!',
     })
   }
 

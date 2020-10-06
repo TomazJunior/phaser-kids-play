@@ -1,62 +1,30 @@
-import { Dialog } from 'phaser3-rex-plugins/templates/ui/ui-components.js'
-import { createLabel } from './textUtil'
+import { Button } from '../ui/button'
 
-export class ModalDialog{
-  dialog: Dialog
+export class ModalDialog extends Phaser.GameObjects.Container {
+  constructor(scene: Phaser.Scene, config: ModalDialogConfig) {
+    super(scene, scene.scale.width * 0.5, scene.scale.height * 0.5)
+    scene.add.existing(this)
+    
+    const offset = 15
+    const panel = scene.add.image(0, 0, 'modalbg').setScale(1.3, 1)
+    const title = scene.add
+      .text(0, -offset * 3.5, config.content, {
+        color: 'green',
+        fontFamily: 'AlloyInk',
+        fontSize: '96px',
+      }).setOrigin(0.5, 1)
+      
+    this.add(panel).add(title)
 
-  constructor(private scene: Phaser.Scene) {}
-
-  create(config: ModalDialogConfig) {
-    if (this.dialog) {
-      this.dialog.destroy()
-    }
-    const { width, height, content, labels } = config
-
-    this.dialog = new Dialog(this.scene, {
-      x: width * 0.5,
-      y: height * 0.5,
-      width: width * 0.5,
-      height: height * 0.5,
-      background: this.scene.add.image(0, 0, 'modalbg').setOrigin(0.5),
-      content: this.scene.add.bitmapText(0, 0, 'shortStack', content, 82),
-      actions: labels.map(labelConfig => createLabel(this.scene, labelConfig)),
-      space: {
-        title: 25,
-        content: 25,
-        action: 15,
-
-        left: 20,
-        right: 20,
-        top: 20,
-        bottom: 20,
-      },
-      align: {
-        actions: 'center', // 'center'|'left'|'right'
-      },
-      expand: {
-        content: false, // Content is a pure text object
-      },
-    })
-  }
-
-  show(onClickCallback: (groupName: string, index: number) => void) {
-    this.dialog
-    .layout()
-    .popUp(1000)
-    .on(
-      'button.click',
-      (button, groupName, index, pointer, event) => {
-        if(onClickCallback) {
-            onClickCallback(groupName, index)
-        }
-      },
-      this
-    )
-    .on('button.over', (button, groupName, index, pointer, event) => {
-      button.getElement('background').setStrokeStyle(1, 0xffffff)
-    })
-    .on('button.out', (button, groupName, index, pointer, event) => {
-      button.getElement('background').setStrokeStyle()
-    })
+    const initialPos = -40
+    let previousButton: Button
+    config.buttonConfigs.forEach((buttonConfig, i) => {
+      const x = !!previousButton ? previousButton.getBounds().width : initialPos
+      previousButton = new Button(scene, x, 0, {
+        ...buttonConfig,
+        parentWidth: panel.width
+      })
+      this.add(previousButton)
+    });
   }
 }
