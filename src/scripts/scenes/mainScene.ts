@@ -3,7 +3,7 @@ import Box from '../objects/box'
 import HiddenChar from '../objects/hiddenChar'
 import { HIDDEN_CHAR_REACHED_BOX, PLAYER_CHAR_REACHED_BOX, PLAYER_TOUCHED_BOX } from '../events/events'
 import { getAllSkins, getARandomSkinFrom } from '../utils/skinUtils'
-import { LEVELS, SKINS, SPRITE_NAME } from '../utils/constants'
+import { FONTS, LEVELS, SKINS, SPRITE_NAME } from '../utils/constants'
 import { ModalDialog } from '../utils/modalDialog'
 import ColoredText from '../ui/coloredText'
 import BigLevelText from '../ui/bigLevelText'
@@ -51,18 +51,17 @@ export default class MainScene extends Phaser.Scene {
     this.physics.add.collider(this.hiddenChars, this.boxes, undefined, undefined, this)
 
     this.levelText = new ColoredText(this, width - 200, 20, `level ${this.level}`, {
-      fontFamily: 'AlloyInk',
+      fontFamily: FONTS.ALLOY_INK,
       fontSize: '48px',
     })
 
     this.bigLevelText = new BigLevelText(this, width * 0.5, height * 0.5, this.levelText.content, {
-      fontFamily: 'AlloyInk',
+      fontFamily: FONTS.ALLOY_INK,
       fontSize: '132px',
     })
 
     this.availableHiddenSkins = getAllSkins()
     this.createHiddenChars(this.level)
-    // this.showFinishGameDialog()
   }
 
   showFinishGameDialog = () => {

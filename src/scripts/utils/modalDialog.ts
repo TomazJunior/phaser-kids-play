@@ -1,4 +1,5 @@
 import { Button } from '../ui/button'
+import { FONTS } from './constants'
 
 export class ModalDialog extends Phaser.GameObjects.Container {
   constructor(scene: Phaser.Scene, config: ModalDialogConfig) {
@@ -10,7 +11,7 @@ export class ModalDialog extends Phaser.GameObjects.Container {
     const title = scene.add
       .text(0, -offset * 3.5, config.content, {
         color: 'green',
-        fontFamily: 'AlloyInk',
+        fontFamily: FONTS.ALLOY_INK,
         fontSize: '96px',
       }).setOrigin(0.5, 1)
       
