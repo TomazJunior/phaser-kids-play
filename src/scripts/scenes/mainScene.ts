@@ -228,7 +228,7 @@ export default class MainScene extends Phaser.Scene {
     const y = 100
     
     let initialX = width * 0.1
-    let initialY = height * 0.15
+    let initialY = height * 0.1
 
     for (let i = 0; i < MAP.length; ++i) {
       const row = MAP[i]
