@@ -9,7 +9,7 @@ export default class Box extends Phaser.Physics.Arcade.Sprite
     super(scene, x, y, 'sokoban', BOX.SKINS.DEFAULT);
     container.add(this);
     
-    this.setSize(BOX.width * BOX.scale, BOX.height / 1.5);
+    this.setSize(BOX.width * BOX.scale, BOX.height );
     this.setScale(BOX.scale);
     
     this.setOffset(-48, 54);

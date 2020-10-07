@@ -3,7 +3,7 @@ import Box from '../objects/box'
 import HiddenChar from '../objects/hiddenChar'
 import { HIDDEN_CHAR_REACHED_BOX, PLAYER_CHAR_REACHED_BOX, PLAYER_TOUCHED_BOX } from '../events/events'
 import { getAllSkins, getARandomSkinFrom } from '../utils/skinUtils'
-import { FONTS, LEVELS, SKINS, SPRITE_NAME } from '../utils/constants'
+import { FONTS, LEVELS, MAP, SKINS, SPRITE_NAME } from '../utils/constants'
 import { ModalDialog } from '../utils/modalDialog'
 import ColoredText from '../ui/coloredText'
 import BigLevelText from '../ui/bigLevelText'
@@ -221,22 +221,24 @@ export default class MainScene extends Phaser.Scene {
   }
 
   createBoxes = () => {
+    const {width, height} = this.scale
     this.boxes = this.physics.add.staticGroup()
-    const { width } = this.scale
-    let xPer = 0.25
-    let y = 210
     let id = 0
-    const rows = 3
-    const cols = 3
+    const x = 200
+    const y = 100
+    
+    let initialX = width * 0.1
+    let initialY = height * 0.15
 
-    for (let row = 0; row < rows; ++row) {
-      for (let col = 0; col < cols; ++col) {
-        const box = new Box(this, width * xPer, y, this.boxes, ++id)
-        box.on(PLAYER_TOUCHED_BOX, this.handlePlayerGoToBox)
-        xPer += 0.25
+    for (let i = 0; i < MAP.length; ++i) {
+      const row = MAP[i]
+      for (let j = 0; j < row.length; ++j) {
+        const cell = row[j]
+        if (cell === 1) {
+          const box = new Box(this, initialX + x * j, initialY + y * i, this.boxes, ++id)
+          box.on(PLAYER_TOUCHED_BOX, this.handlePlayerGoToBox)
+        }
       }
-      xPer = 0.25
-      y += 250
     }
   }
 

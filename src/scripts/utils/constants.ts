@@ -16,6 +16,16 @@ export const LEVELS = [
     {level: 3, from: 11, to: 15, hiddens: 3}
 ]
 
+export const MAP = [
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 1, 0, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 1, 0, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 1, 0, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+]
+
 export const GAME = {
     WIDTH: 1280,
     HEIGHT: 720,
