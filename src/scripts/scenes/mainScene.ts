@@ -50,7 +50,7 @@ export default class MainScene extends Phaser.Scene {
     this.physics.add.collider(this.player, this.boxes, undefined, undefined, this)
     this.physics.add.collider(this.hiddenChars, this.boxes, undefined, undefined, this)
 
-    this.levelText = new ColoredText(this, width - 200, 20, `level ${this.level}`, {
+    this.levelText = new ColoredText(this, width - 270, 20, this.tutorialMode ? 'Tutorial' : `level ${this.level}`, {
       fontFamily: FONTS.ALLOY_INK,
       fontSize: '48px',
     })
@@ -62,10 +62,48 @@ export default class MainScene extends Phaser.Scene {
 
     this.availableHiddenSkins = getAllSkins()
     this.createHiddenChars(this.level)
+    this.startTutorialMode()
+  }
+
+  private get tutorialMode(): boolean {
+    return this.getFileStorageConfig().tutorialMode
+  }
+
+  private set tutorialMode(v: boolean) {
+    this.setFileStorageConfig({
+      ...this.getFileStorageConfig(),
+      tutorialMode: v,
+    })
+  }
+
+  getFileStorageConfig = (): FileStorageConfig => {
+    const value: any = localStorage.getItem('fileStorage')
+    if (!!value) {
+      return JSON.parse(value)
+    }
+    return {
+      tutorialMode: true,
+    }
+  }
+
+  setFileStorageConfig = (fileStorage: FileStorageConfig) => {
+    localStorage.setItem('fileStorage', JSON.stringify(fileStorage))
+  }
+
+  startTutorialMode = () => {
+    if (!this.tutorialMode) return null
+    const firstBox: Box = <Box>this.boxes.children.getArray()[0]
+    firstBox.toggleHelp()
+  }
+
+  finishTutorialMode = () => {
+    const firstBox: Box = <Box>this.boxes.children.getArray()[0]
+    firstBox.toggleHelp()
+    this.tutorialMode = false
   }
 
   showFinishGameDialog = () => {
-    const modalDialog = new ModalDialog(this, {
+    new ModalDialog(this, {
       buttonConfigs: [
         {
           icon: SPRITE_NAME.WHITE_SHEET,
@@ -84,7 +122,12 @@ export default class MainScene extends Phaser.Scene {
           },
         },
       ],
-      content: 'You Win!',
+      content: {
+        x: 0,
+        y: -50,
+        text: 'You Win!',
+        fontSize: '96px',
+      },
     })
   }
 
@@ -131,6 +174,10 @@ export default class MainScene extends Phaser.Scene {
   }
 
   nextLevel = async (): Promise<void> => {
+    if (this.tutorialMode) {
+      this.finishTutorialMode()
+    }
+
     if (!this.goToNextLevel()) {
       this.player.active = true
       return Promise.resolve()
@@ -198,7 +245,7 @@ export default class MainScene extends Phaser.Scene {
   getFreeBox(): Box {
     const availBoxes = this.getFreeBoxes()
     const randomBoxPos = Math.floor(Math.random() * availBoxes.length)
-    return availBoxes[randomBoxPos]
+    return availBoxes[this.tutorialMode ? 0 : randomBoxPos]
   }
 
   getFreeBoxes(): Box[] {
@@ -221,12 +268,12 @@ export default class MainScene extends Phaser.Scene {
   }
 
   createBoxes = () => {
-    const {width, height} = this.scale
+    const { width, height } = this.scale
     this.boxes = this.physics.add.staticGroup()
     let id = 0
     const x = 200
     const y = 100
-    
+
     let initialX = width * 0.1
     let initialY = height * 0.1
 

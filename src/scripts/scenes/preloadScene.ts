@@ -30,6 +30,8 @@ export default class PreloadScene extends Phaser.Scene {
       'assets/img/sheet_white2x.xml'
     )
     
+    this.load.image('finger-point', 'assets/img/finger-point-gesture.png')
+
     this.load.bitmapFont(FONTS.SHORT_STACK, 'assets/fonts/shortStack.png', 'assets/fonts/shortStack.xml')
   }
 
