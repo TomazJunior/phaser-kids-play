@@ -3,20 +3,21 @@ import Box from '../objects/box'
 import HiddenChar from '../objects/hiddenChar'
 import { HIDDEN_CHAR_REACHED_BOX, PLAYER_CHAR_REACHED_BOX, PLAYER_TOUCHED_BOX } from '../events/events'
 import { getAllSkins, getARandomSkinFrom } from '../utils/skinUtils'
-import { FONTS, LEVELS, MAP, SKINS, SPRITE_NAME } from '../utils/constants'
+import { FONTS, LEVELS, MAP, ANIMAL_SKINS, SPRITE_NAME } from '../utils/constants'
 import { ModalDialog } from '../utils/modalDialog'
 import ColoredText from '../ui/coloredText'
 import BigLevelText from '../ui/bigLevelText'
 import { Button } from '../ui/button'
+import HiddenThumbChars from '../objects/hiddenThumbChars'
 
 export default class MainScene extends Phaser.Scene {
   boxes: Phaser.Physics.Arcade.StaticGroup
   player: Player
   hiddenChars: Phaser.GameObjects.Group
-  hiddenThumbChars: Phaser.GameObjects.Group
+  hiddenThumbChars: HiddenThumbChars
   activeBox: Box
-  currentHiddenSkins: SKINS[]
-  availableHiddenSkins: SKINS[]
+  currentHiddenSkins: ANIMAL_SKINS[]
+  availableHiddenSkins: ANIMAL_SKINS[]
   gameover = false
   level = 1
   hiddenCharOnTheirPosition = false
@@ -46,7 +47,7 @@ export default class MainScene extends Phaser.Scene {
 
     this.createBoxes()
     this.hiddenChars = this.add.group()
-    this.hiddenThumbChars = this.add.group()
+    this.hiddenThumbChars = new HiddenThumbChars(this, width * 0.5, height * 0)
     this.physics.add.collider(this.player, this.boxes, undefined, undefined, this)
     this.physics.add.collider(this.hiddenChars, this.boxes, undefined, undefined, this)
 
@@ -60,8 +61,8 @@ export default class MainScene extends Phaser.Scene {
       fontSize: '132px',
     })
 
-    this.availableHiddenSkins = getAllSkins()
-    this.createHiddenChars(this.level)
+    const selectedLevel = this.getCurrentLevel()
+    this.createHiddenChars(selectedLevel ? selectedLevel.hiddens : 1)
     this.startTutorialMode()
   }
 
@@ -184,7 +185,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     ++this.level
-    const selectedLevel = LEVELS.find((levelConfig) => this.level >= levelConfig.from && this.level <= levelConfig.to)
+    const selectedLevel = this.getCurrentLevel()
     if (!selectedLevel) {
       this.showFinishGameDialog()
       return Promise.resolve()
@@ -202,37 +203,37 @@ export default class MainScene extends Phaser.Scene {
     return Promise.resolve()
   }
 
+  getCurrentLevel() {
+    return LEVELS.find((levelConfig) => this.level >= levelConfig.from && this.level <= levelConfig.to)
+  }
+
   resetBoxes() {
     this.boxes.getChildren().forEach((box: any) => box.reset())
   }
 
   clearHiddenChars() {
+    this.availableHiddenSkins = getAllSkins()
     this.hiddenCharOnTheirPosition = false
     this.currentHiddenSkins = []
 
     this.hiddenChars.getChildren().forEach((hiddenChar) => (hiddenChar.active = false))
     this.hiddenChars.clear(true, true)
-    this.hiddenThumbChars.clear(true, true)
+    this.hiddenThumbChars.clear()
   }
 
   createHiddenChars(numberOfHiddens: number) {
-    const { width, height } = this.scale
     this.clearHiddenChars()
-
+    
     for (let index = 0; index < numberOfHiddens; index++) {
       const hiddenSkin = getARandomSkinFrom(this.availableHiddenSkins)
       this.currentHiddenSkins.push(hiddenSkin)
-      this.hiddenThumbChars.add(
-        this.add
-          .sprite(width * 0.5 + 80 * index, 40, SPRITE_NAME.ROUND_ANIMALS, hiddenSkin)
-          .setOrigin(0.5)
-          .setScale(0.5)
-      )
       this.createHiddenChar(hiddenSkin, 1000 * (index + 1))
     }
+
+    this.hiddenThumbChars.createChars(this.currentHiddenSkins)
   }
 
-  createHiddenChar(hiddenSkin: string, delay: number) {
+  createHiddenChar(hiddenSkin: ANIMAL_SKINS | null, delay: number) {
     const { width, height } = this.scale
     this.time.delayedCall(delay, () => {
       const hiddenChar = new HiddenChar(this, width * 0.05, height * 0.1, hiddenSkin)
@@ -309,25 +310,31 @@ export default class MainScene extends Phaser.Scene {
 
   openBox = (box: Box) => {
     this.player.active = false
-    if (!box.hiddenCharName) {
-      box.isWrongBox()
+    const currentHiddenChar = this.hiddenThumbChars.getCurrentHiddenChar()
+    
+    if (!box.hiddenCharName || !box.isRightBox(currentHiddenChar)) {
+      box.wrongBox()
       this.closeBox(box)
-    } else {
-      box.isRightBox()
-      const hiddenChar: HiddenChar = this.getHiddenChar(box.hiddenCharName)
-      if (!hiddenChar) return
-      this.tweens.add({
-        targets: hiddenChar,
-        y: '-=50',
-        alpha: 1,
-        scale: 1,
-        duration: 500,
-        onComplete: async () => {
-          hiddenChar.visible = true
-          await this.nextLevel()
-        },
-      })
-    }
+      return
+    } 
+
+    box.openBox()
+    this.hiddenThumbChars.moveToNext(box.hiddenCharName)
+    
+    const hiddenChar: HiddenChar = this.getHiddenChar(box.hiddenCharName)
+    if (!hiddenChar) return
+    this.tweens.add({
+      targets: hiddenChar,
+      y: '-=50',
+      alpha: 1,
+      scale: 1,
+      duration: 500,
+      onComplete: async () => {
+        hiddenChar.visible = true
+        await this.nextLevel()
+      },
+    })
+    
   }
 
   closeBox = (box: Box) => {

@@ -1,8 +1,8 @@
 import { PLAYER_TOUCHED_BOX } from '../events/events'
-import { BOX, SPRITE_NAME } from '../utils/constants'
+import { ANIMAL_SKINS, BOX, IMAGE_NAME, SPRITE_NAME } from '../utils/constants'
 
 export default class Box extends Phaser.Physics.Arcade.Sprite {
-  hiddenCharName: string
+  hiddenCharName: ANIMAL_SKINS | null
   opened = false
   border: Phaser.GameObjects.Image
   fingerPoint: Phaser.GameObjects.Image
@@ -25,7 +25,7 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
 
     scene.add.existing(this)
 
-    this.fingerPoint = scene.add.image(x, y, 'finger-point').setScale(0.3).setOrigin(1, 0.3).setVisible(false)
+    this.fingerPoint = scene.add.image(x, y, IMAGE_NAME.FINGER_POINT).setScale(0.3).setOrigin(1, 0.3).setVisible(false)
 
     this.border = scene.add.image(x, y, SPRITE_NAME.SOKOBAN, 39)
     this.border.setScale(BOX.scale + 0.4)
@@ -55,12 +55,12 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
     }
   }
 
-  setHiddenCharName(name: string) {
+  setHiddenCharName(name: ANIMAL_SKINS | null) {
     this.hiddenCharName = name
   }
 
   reset() {
-    this.hiddenCharName = ''
+    this.hiddenCharName = null
     this.close()
   }
 
@@ -74,13 +74,17 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
     this.setFrame(BOX.SKINS.SELECTED)
   }
 
-  isWrongBox() {
+  wrongBox() {
     this.opened = false
     this.setFrame(BOX.SKINS.WRONG)
   }
 
-  isRightBox() {
+  openBox() {
     this.opened = true
     this.setFrame(BOX.SKINS.RIGHT)
+  }
+
+  isRightBox(skin: ANIMAL_SKINS | null): boolean {
+    return skin === this.hiddenCharName
   }
 }

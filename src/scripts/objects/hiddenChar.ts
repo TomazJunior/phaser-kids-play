@@ -1,6 +1,6 @@
 import Box from "./box";
 import { HIDDEN_CHAR_REACHED_BOX } from "../events/events";
-import { SPRITE_NAME } from "../utils/constants";
+import { ANIMAL_SKINS, SPRITE_NAME } from "../utils/constants";
 
 export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
   isWalking = false;
@@ -11,8 +11,8 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
   reachedBox = false
   gotToTheBoxCallback: () => void;
   
-  constructor(scene: Phaser.Scene, x: number, y: number, public skin: string) {
-    super(scene, x, y, SPRITE_NAME.ROUND_ANIMALS, skin)
+  constructor(scene: Phaser.Scene, x: number, y: number, public skin: ANIMAL_SKINS | null) {
+    super(scene, x, y, SPRITE_NAME.ROUND_ANIMALS, skin?.toString())
     scene.add.existing(this)
     scene.physics.add.existing(this)
     this.setScale(0.5)
