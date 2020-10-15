@@ -3,12 +3,13 @@ import Box from '../objects/box'
 import HiddenChar from '../objects/hiddenChar'
 import { HIDDEN_CHAR_REACHED_BOX, PLAYER_CHAR_REACHED_BOX, PLAYER_TOUCHED_BOX } from '../events/events'
 import { getAllSkins, getARandomSkinFrom } from '../utils/skinUtils'
-import { FONTS, LEVELS, MAP, ANIMAL_SKINS, SPRITE_NAME, SCORE_PER_HIDDEN_CHAR } from '../utils/constants'
+import { FONTS, LEVELS, MAP, ANIMAL_SKINS, SPRITE_NAME } from '../utils/constants'
 import { ModalDialog } from '../utils/modalDialog'
 import ColoredText from '../ui/coloredText'
 import BigLevelText from '../ui/bigLevelText'
 import { Button } from '../ui/button'
 import HiddenThumbChars from '../objects/hiddenThumbChars'
+import ScoreText from '../ui/scoreText'
 
 export default class MainScene extends Phaser.Scene {
   boxes: Phaser.Physics.Arcade.StaticGroup
@@ -20,10 +21,10 @@ export default class MainScene extends Phaser.Scene {
   availableHiddenSkins: ANIMAL_SKINS[]
   gameover = false
   level = 1
-  openedBoxes = 0
   hiddenCharOnTheirPosition = false
   levelText: ColoredText
   bigLevelText: BigLevelText
+  scoreText: ScoreText;
   constructor() {
     super({ key: 'MainScene' })
   }
@@ -34,7 +35,6 @@ export default class MainScene extends Phaser.Scene {
     this.currentHiddenSkins = []
     this.availableHiddenSkins = []
     this.hiddenCharOnTheirPosition = false
-    this.openedBoxes = 0
   }
 
   create() {
@@ -58,6 +58,8 @@ export default class MainScene extends Phaser.Scene {
       fontSize: '48px',
     })
 
+    this.scoreText = new ScoreText(this, width - 270, 70);
+
     this.bigLevelText = new BigLevelText(this, width * 0.5, height * 0.5, this.levelText.content, {
       fontFamily: FONTS.ALLOY_INK,
       fontSize: '132px',
@@ -66,8 +68,6 @@ export default class MainScene extends Phaser.Scene {
     const selectedLevel = this.getCurrentLevel()
     this.createHiddenChars(selectedLevel ? selectedLevel.hiddens : 1)
     this.startTutorialMode()
-
-    // this.showFinishGameDialog('You Win!', 'green')
   }
 
   private get tutorialMode(): boolean {
@@ -129,7 +129,7 @@ export default class MainScene extends Phaser.Scene {
       subContent: {
         x: 0,
         y: 10,
-        text: this.getScoreText(),
+        text: this.scoreText.text,
         color: 'blue',
         fontSize: '48px',
       },
@@ -138,10 +138,6 @@ export default class MainScene extends Phaser.Scene {
 
   update() {
     if (this.gameover) return
-  }
-
-  getScoreText() {
-    return `Score: ${this.openedBoxes * SCORE_PER_HIDDEN_CHAR}`
   }
 
   createBackground() {
@@ -328,7 +324,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     box.openBox()
-    this.openedBoxes++
+    this.scoreText.incScore()
     this.hiddenThumbChars.moveToNext(box.hiddenCharName)
 
     const hiddenChar: HiddenChar = this.getHiddenChar(box.hiddenCharName)

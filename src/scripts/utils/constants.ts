@@ -53,6 +53,7 @@ export const SPRITE_NAME = {
 }
 
 export const FONTS = {
+  PIXEL_FONT: 'pixelFont',
   SHORT_STACK: 'shortStack',
   ALLOY_INK: 'AlloyInk',
 }

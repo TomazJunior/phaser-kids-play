@@ -28,6 +28,11 @@ export default class ColoredText {
     return this
   }
 
+  public setDepth(depth: number) {
+    this.bbCodeText.setDepth(depth)
+    return this
+  }
+
   public get visible(): boolean {
     return this.bbCodeText.visible
   }

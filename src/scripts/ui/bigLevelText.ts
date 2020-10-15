@@ -7,6 +7,7 @@ export default class BigLevelText extends ColoredText {
     super(scene, x, y, content, style, false)
     this.previousValue = content
     this.setOrigin(0.5)
+    this.setDepth(1000)
   }
 
   public async updateContent(newValue: string) {
