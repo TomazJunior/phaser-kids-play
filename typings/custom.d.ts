@@ -1,12 +1,16 @@
 declare interface ModalDialogConfig {
-  content: {
-    text: string
-    fontSize: string,
-    x: number,
-    y: number
-  }
+  content: ModalDialogContentConfig,
+  subContent?: ModalDialogContentConfig,
   buttonConfigs: ButtonConfig[],
   onClose?: () => void
+}
+
+declare interface ModalDialogContentConfig {
+  text: string
+  fontSize: string,
+  color: string,
+  x: number,
+  y: number
 }
 
 declare interface ButtonConfig {

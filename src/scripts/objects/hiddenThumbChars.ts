@@ -60,7 +60,6 @@ export default class HiddenThumbChars extends Phaser.GameObjects.Container {
           duration: 1000
         })
       }
-      console.log('hiddenChar after', hiddenChar.x)
     })
   }
 

@@ -3,7 +3,7 @@ import Box from '../objects/box'
 import HiddenChar from '../objects/hiddenChar'
 import { HIDDEN_CHAR_REACHED_BOX, PLAYER_CHAR_REACHED_BOX, PLAYER_TOUCHED_BOX } from '../events/events'
 import { getAllSkins, getARandomSkinFrom } from '../utils/skinUtils'
-import { FONTS, LEVELS, MAP, ANIMAL_SKINS, SPRITE_NAME } from '../utils/constants'
+import { FONTS, LEVELS, MAP, ANIMAL_SKINS, SPRITE_NAME, SCORE_PER_HIDDEN_CHAR } from '../utils/constants'
 import { ModalDialog } from '../utils/modalDialog'
 import ColoredText from '../ui/coloredText'
 import BigLevelText from '../ui/bigLevelText'
@@ -20,6 +20,7 @@ export default class MainScene extends Phaser.Scene {
   availableHiddenSkins: ANIMAL_SKINS[]
   gameover = false
   level = 1
+  openedBoxes = 0
   hiddenCharOnTheirPosition = false
   levelText: ColoredText
   bigLevelText: BigLevelText
@@ -33,6 +34,7 @@ export default class MainScene extends Phaser.Scene {
     this.currentHiddenSkins = []
     this.availableHiddenSkins = []
     this.hiddenCharOnTheirPosition = false
+    this.openedBoxes = 0
   }
 
   create() {
@@ -64,6 +66,8 @@ export default class MainScene extends Phaser.Scene {
     const selectedLevel = this.getCurrentLevel()
     this.createHiddenChars(selectedLevel ? selectedLevel.hiddens : 1)
     this.startTutorialMode()
+
+    // this.showFinishGameDialog('You Win!', 'green')
   }
 
   private get tutorialMode(): boolean {
@@ -103,17 +107,9 @@ export default class MainScene extends Phaser.Scene {
     this.tutorialMode = false
   }
 
-  showFinishGameDialog = () => {
+  showFinishGameDialog = (text: string, color: string) => {
     new ModalDialog(this, {
       buttonConfigs: [
-        {
-          icon: SPRITE_NAME.WHITE_SHEET,
-          iconFrame: 'left.png',
-          text: 'Home',
-          onClick: () => {
-            this.scene.start('MenuScene')
-          },
-        },
         {
           icon: SPRITE_NAME.WHITE_SHEET,
           iconFrame: 'return.png',
@@ -126,14 +122,26 @@ export default class MainScene extends Phaser.Scene {
       content: {
         x: 0,
         y: -50,
-        text: 'You Win!',
+        text,
+        color,
         fontSize: '96px',
+      },
+      subContent: {
+        x: 0,
+        y: 10,
+        text: this.getScoreText(),
+        color: 'blue',
+        fontSize: '48px',
       },
     })
   }
 
   update() {
     if (this.gameover) return
+  }
+
+  getScoreText() {
+    return `Score: ${this.openedBoxes * SCORE_PER_HIDDEN_CHAR}`
   }
 
   createBackground() {
@@ -187,7 +195,7 @@ export default class MainScene extends Phaser.Scene {
     ++this.level
     const selectedLevel = this.getCurrentLevel()
     if (!selectedLevel) {
-      this.showFinishGameDialog()
+      this.showFinishGameDialog('You Win!', 'green')
       return Promise.resolve()
     }
     this.levelText.content = `level ${selectedLevel.level}`
@@ -223,7 +231,7 @@ export default class MainScene extends Phaser.Scene {
 
   createHiddenChars(numberOfHiddens: number) {
     this.clearHiddenChars()
-    
+
     for (let index = 0; index < numberOfHiddens; index++) {
       const hiddenSkin = getARandomSkinFrom(this.availableHiddenSkins)
       this.currentHiddenSkins.push(hiddenSkin)
@@ -311,16 +319,18 @@ export default class MainScene extends Phaser.Scene {
   openBox = (box: Box) => {
     this.player.active = false
     const currentHiddenChar = this.hiddenThumbChars.getCurrentHiddenChar()
-    
+
     if (!box.hiddenCharName || !box.isRightBox(currentHiddenChar)) {
       box.wrongBox()
       this.closeBox(box)
+      this.showFinishGameDialog('Game over', 'red')
       return
-    } 
+    }
 
     box.openBox()
+    this.openedBoxes++
     this.hiddenThumbChars.moveToNext(box.hiddenCharName)
-    
+
     const hiddenChar: HiddenChar = this.getHiddenChar(box.hiddenCharName)
     if (!hiddenChar) return
     this.tweens.add({
@@ -334,7 +344,6 @@ export default class MainScene extends Phaser.Scene {
         await this.nextLevel()
       },
     })
-    
   }
 
   closeBox = (box: Box) => {

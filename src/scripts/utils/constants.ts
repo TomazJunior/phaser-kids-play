@@ -1,3 +1,5 @@
+export const SCORE_PER_HIDDEN_CHAR = 10
+
 export const BOX = {
   width: 64,
   height: 64,
