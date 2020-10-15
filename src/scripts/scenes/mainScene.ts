@@ -129,7 +129,7 @@ export default class MainScene extends Phaser.Scene {
       subContent: {
         x: 0,
         y: 10,
-        text: this.scoreText.text,
+        text: `Score: ${this.scoreText.text}`,
         color: 'blue',
         fontSize: '48px',
       },
