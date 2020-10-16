@@ -30,7 +30,7 @@ export class ModalDialog extends Phaser.GameObjects.Container {
       this.add(subTitle)
     }
 
-    const initialPos = config.buttonConfigs.length === 1 ? (this.x - panel.width) * 2 : -40
+    const initialPos = config.buttonConfigs.length === 1 ? 40 : -40
     let previousButton: Button
     config.buttonConfigs.forEach((buttonConfig) => {
       const x = !!previousButton ? previousButton.getBounds().width : initialPos

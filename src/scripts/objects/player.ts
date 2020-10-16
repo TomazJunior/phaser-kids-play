@@ -11,6 +11,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   }
   activeBox: Box
   animation: string
+  walkingAudio: Phaser.Sound.BaseSound
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, 'player')
@@ -25,11 +26,16 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.animation = PLAYER.ANIMATIONS.DOWN_IDLE;
     this.play(this.animation, true)
 
+    this.walkingAudio = scene.sound.get('walking') || scene.sound.add('walking', { volume: 0.4, loop: true })
     scene.events.on('update', this.update, this)
   }
 
   goTo(box: Box) {
     if (!this.active) return
+
+    if (this.walkingAudio.isPlaying) this.walkingAudio.stop()
+    this.walkingAudio.play()
+
     this.setActiveBox(box)
     this.setIsGoingTo({
       x: box.x - box.displayWidth, 
@@ -70,6 +76,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       this.setVelocity(0, 0)
       this.animation = PLAYER.ANIMATIONS.DOWN_IDLE
       if (!initialPos) {
+        this.walkingAudio.stop()
         this.emit(PLAYER_CHAR_REACHED_BOX, this.activeBox);
       }
       return

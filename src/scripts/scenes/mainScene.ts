@@ -25,8 +25,8 @@ export default class MainScene extends Phaser.Scene {
   levelText: ColoredText
   bigLevelText: BigLevelText
   scoreText: ScoreText
-  findHiddenAudio: Phaser.Sound.BaseSound
   backgroundAudio: Phaser.Sound.BaseSound
+  clickOnBoxAudio: Phaser.Sound.BaseSound
   constructor() {
     super({ key: 'MainScene' })
   }
@@ -60,9 +60,11 @@ export default class MainScene extends Phaser.Scene {
       fontSize: '48px',
     })
 
-    this.findHiddenAudio = this.sound.add('find-hidden')
-    this.backgroundAudio = this.sound.add('background-sound', { volume: 0.4, loop: true })
+    
+    this.backgroundAudio = this.sound.get('background-sound') || this.sound.add('background-sound', { volume: 0.4, loop: true })
     this.backgroundAudio.play()
+
+    this.clickOnBoxAudio = this.sound.get('click-box') ||  this.sound.add('click-box')
     
     this.scoreText = new ScoreText(this, width - 270, 70);
 
@@ -172,6 +174,7 @@ export default class MainScene extends Phaser.Scene {
     this.player.active = false
     this.player.visible = false
     this.clearHiddenChars()
+    this.backgroundAudio.stop()
   }
 
   hiddenCharsAreReady(): boolean {
@@ -198,6 +201,7 @@ export default class MainScene extends Phaser.Scene {
     ++this.level
     const selectedLevel = this.getCurrentLevel()
     if (!selectedLevel) {
+      this.backgroundAudio.stop()
       this.showFinishGameDialog('You Win!', 'green')
       return Promise.resolve()
     }
@@ -303,6 +307,10 @@ export default class MainScene extends Phaser.Scene {
 
   handlePlayerGoToBox = (box: Box) => {
     if (!this.hiddenCharOnTheirPosition || box.opened) return
+
+    if (this.clickOnBoxAudio.isPlaying) this.clickOnBoxAudio.stop()
+    this.clickOnBoxAudio.play()
+
     this.player.goTo(box)
   }
 
@@ -332,7 +340,6 @@ export default class MainScene extends Phaser.Scene {
 
     box.openBox()
     this.scoreText.incScore()
-    this.findHiddenAudio.play()
     this.hiddenThumbChars.moveToNext(box.hiddenCharName)
 
     const hiddenChar: HiddenChar = this.getHiddenChar(box.hiddenCharName)

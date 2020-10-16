@@ -18,6 +18,7 @@ export const LEVELS = [
   { level: 3, from: 8, to: 10, hiddens: 3 },
   { level: 4, from: 11, to: 13, hiddens: 4 },
   { level: 5, from: 14, to: 15, hiddens: 5 },
+  { level: 5, from: 16, to: 18, hiddens: 6 },
 ]
 
 export const MAP = [

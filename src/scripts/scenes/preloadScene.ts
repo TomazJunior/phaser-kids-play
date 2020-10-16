@@ -38,7 +38,9 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.audio('click', 'assets/audio/click5.ogg');
     this.load.audio('find-hidden', 'assets/audio/find-hidden.wav');
     this.load.audio('next-level', 'assets/audio/next-level.wav');
-
+    this.load.audio('click-box', 'assets/audio/434756__notarget__wood-step-sample-1.wav')
+    this.load.audio('wrong-box', 'assets/audio/350984__cabled-mess__lose-c-03.wav')
+    this.load.audio('walking', 'assets/audio/443218__topschool__running.mp3')
     //TODO: add credits
     /*
     Two Pianos by Stefan Kartenberg (c) copyright 2018 Licensed under a Creative Commons Attribution (3.0) license. 

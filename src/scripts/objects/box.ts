@@ -7,6 +7,8 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
   border: Phaser.GameObjects.Image
   fingerPoint: Phaser.GameObjects.Image
   borderTween: Phaser.Tweens.Tween
+  clickOnWrongBoxAudio: Phaser.Sound.BaseSound
+  clickOnRightBoxAudio: Phaser.Sound.BaseSound
 
   constructor(
     scene: Phaser.Scene,
@@ -43,6 +45,9 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
     this.setInteractive().on('pointerdown', (pointer, localX, localY, event) => {
       this.emit(PLAYER_TOUCHED_BOX, this)
     })
+
+    this.clickOnWrongBoxAudio = scene.sound.get('wrong-box') || scene.sound.add('wrong-box')
+    this.clickOnRightBoxAudio = scene.sound.get('find-hidden') || scene.sound.add('find-hidden')
   }
 
   toggleHelp() {
@@ -75,11 +80,13 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
   }
 
   wrongBox() {
+    this.clickOnWrongBoxAudio.play()
     this.opened = false
     this.setFrame(BOX.SKINS.WRONG)
   }
 
   openBox() {
+    this.clickOnRightBoxAudio.play()
     this.opened = true
     this.setFrame(BOX.SKINS.RIGHT)
   }
