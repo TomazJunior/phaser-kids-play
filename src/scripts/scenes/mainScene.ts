@@ -26,7 +26,7 @@ export default class MainScene extends Phaser.Scene {
   bigLevelText: BigLevelText
   scoreText: ScoreText
   findHiddenAudio: Phaser.Sound.BaseSound
-  
+  backgroundAudio: Phaser.Sound.BaseSound
   constructor() {
     super({ key: 'MainScene' })
   }
@@ -61,6 +61,8 @@ export default class MainScene extends Phaser.Scene {
     })
 
     this.findHiddenAudio = this.sound.add('find-hidden')
+    this.backgroundAudio = this.sound.add('background-sound', { volume: 0.4, loop: true })
+    this.backgroundAudio.play()
     
     this.scoreText = new ScoreText(this, width - 270, 70);
 
@@ -158,6 +160,7 @@ export default class MainScene extends Phaser.Scene {
       icon: SPRITE_NAME.WHITE_SHEET,
       iconFrame: 'left.png',
       onClick: () => {
+        this.backgroundAudio.stop()
         this.scene.start('MenuScene')
       },
     })
