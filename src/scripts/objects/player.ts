@@ -34,8 +34,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     if (!this.active) return
 
     if (this.walkingAudio.isPlaying) this.walkingAudio.stop()
-    this.walkingAudio.play()
-
     this.setActiveBox(box)
     this.setIsGoingTo({
       x: box.x - box.displayWidth, 
@@ -45,6 +43,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   setIsGoingTo(pos: {x, y, initialPos}) {
+    this.walkingAudio.play()
     this.isWalking = true
     this.isGoingTo = pos
   }
@@ -76,9 +75,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       this.setVelocity(0, 0)
       this.animation = PLAYER.ANIMATIONS.DOWN_IDLE
       if (!initialPos) {
-        this.walkingAudio.stop()
         this.emit(PLAYER_CHAR_REACHED_BOX, this.activeBox);
       }
+      this.walkingAudio.stop()
       return
     }
     
