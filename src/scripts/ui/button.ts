@@ -5,6 +5,8 @@ export class Button extends Phaser.GameObjects.Container {
     super(scene, x, y)
     scene.add.existing(this)
 
+    
+    const clickAudio = scene.sound.get('click') || scene.sound.add('click')
     const offset = 15
     const initX = (config.parentWidth || 0) * 0.5
     const scale = config.scale || { x: 1.6, y: 2 }
@@ -31,6 +33,7 @@ export class Button extends Phaser.GameObjects.Container {
     }
 
     panel.setInteractive().on('pointerdown', () => {
+      clickAudio.play()
       config.onClick()
     })
   }

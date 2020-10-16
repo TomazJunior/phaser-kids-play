@@ -24,7 +24,9 @@ export default class MainScene extends Phaser.Scene {
   hiddenCharOnTheirPosition = false
   levelText: ColoredText
   bigLevelText: BigLevelText
-  scoreText: ScoreText;
+  scoreText: ScoreText
+  findHiddenAudio: Phaser.Sound.BaseSound
+  
   constructor() {
     super({ key: 'MainScene' })
   }
@@ -58,6 +60,8 @@ export default class MainScene extends Phaser.Scene {
       fontSize: '48px',
     })
 
+    this.findHiddenAudio = this.sound.add('find-hidden')
+    
     this.scoreText = new ScoreText(this, width - 270, 70);
 
     this.bigLevelText = new BigLevelText(this, width * 0.5, height * 0.5, this.levelText.content, {
@@ -325,6 +329,7 @@ export default class MainScene extends Phaser.Scene {
 
     box.openBox()
     this.scoreText.incScore()
+    this.findHiddenAudio.play()
     this.hiddenThumbChars.moveToNext(box.hiddenCharName)
 
     const hiddenChar: HiddenChar = this.getHiddenChar(box.hiddenCharName)

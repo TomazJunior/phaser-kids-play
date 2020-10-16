@@ -34,10 +34,14 @@ export default class PreloadScene extends Phaser.Scene {
 
     this.load.bitmapFont(FONTS.PIXEL_FONT, 'assets/fonts/pixelFont.png', 'assets/fonts/pixelFont.xml');
     this.load.bitmapFont(FONTS.SHORT_STACK, 'assets/fonts/shortStack.png', 'assets/fonts/shortStack.xml')
+
+    this.load.audio('click', 'assets/audio/click5.ogg');
+    this.load.audio('find-hidden', 'assets/audio/powerUp11.ogg');
+    this.load.audio('next-level', 'assets/audio/powerUp3.ogg');
   }
 
   create() {
-    this.scene.start('MenuScene')
-    // this.scene.start('MainScene')
+    // this.scene.start('MenuScene')
+    this.scene.start('MainScene')
   }
 }
