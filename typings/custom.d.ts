@@ -29,3 +29,11 @@ declare interface ButtonConfig {
 declare interface FileStorageConfig {
     tutorialMode: boolean
 }
+
+declare interface Window {
+  appConfig: any
+  device: any
+  StatusBar: any
+  cordova: any
+  plugins: any
+}

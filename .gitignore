@@ -3,4 +3,7 @@
 /.cache
 /.vscode
 /.gitconfig
+/www
+/platforms
+/plugins
 notes
