@@ -3,13 +3,15 @@ import Box from '../objects/box'
 import HiddenChar from '../objects/hiddenChar'
 import { HIDDEN_CHAR_REACHED_BOX, PLAYER_CHAR_REACHED_BOX, PLAYER_TOUCHED_BOX } from '../events/events'
 import { getAllSkins, getARandomSkinFrom } from '../utils/skinUtils'
-import { FONTS, LEVELS, MAP, ANIMAL_SKINS, SPRITE_NAME } from '../utils/constants'
+import { FONTS, LEVELS, MAP, ANIMAL_SKINS, SPRITE_NAME, BOX, TILES } from '../utils/constants'
 import { ModalDialog } from '../utils/modalDialog'
 import ColoredText from '../ui/coloredText'
 import BigLevelText from '../ui/bigLevelText'
 import { Button } from '../ui/button'
 import HiddenThumbChars from '../objects/hiddenThumbChars'
 import ScoreText from '../ui/scoreText'
+
+const INIT_Y = 37
 
 export default class MainScene extends Phaser.Scene {
   boxes: Phaser.Physics.Arcade.StaticGroup
@@ -43,13 +45,17 @@ export default class MainScene extends Phaser.Scene {
     const { width, height } = this.scale
 
     this.createBackground()
+    this.createTiles([TILES.DIRT, TILES.GRASS])
+
+    this.boxes = this.physics.add.staticGroup()
+    this.createTiles([TILES.BOX])
+
     this.createBackButton()
 
     const initialPos = this.getInitialPlayerPosition()
     this.player = new Player(this, initialPos.x, initialPos.y)
     this.player.on(PLAYER_CHAR_REACHED_BOX, this.handleReachedBox)
 
-    this.createBoxes()
     this.hiddenChars = this.add.group()
     this.hiddenThumbChars = new HiddenThumbChars(this, width * 0.5, height * 0)
     this.physics.add.collider(this.player, this.boxes, undefined, undefined, this)
@@ -60,13 +66,13 @@ export default class MainScene extends Phaser.Scene {
       fontSize: '48px',
     })
 
-    
-    this.backgroundAudio = this.sound.get('background-sound') || this.sound.add('background-sound', { volume: 0.4, loop: true })
+    this.backgroundAudio =
+      this.sound.get('background-sound') || this.sound.add('background-sound', { volume: 0.4, loop: true })
     this.backgroundAudio.play()
 
-    this.clickOnBoxAudio = this.sound.get('click-box') ||  this.sound.add('click-box')
-    
-    this.scoreText = new ScoreText(this, width - 270, 70);
+    this.clickOnBoxAudio = this.sound.get('click-box') || this.sound.add('click-box')
+
+    this.scoreText = new ScoreText(this, width - 270, 70)
 
     this.bigLevelText = new BigLevelText(this, width * 0.5, height * 0.5, this.levelText.content, {
       fontFamily: FONTS.ALLOY_INK,
@@ -155,6 +161,30 @@ export default class MainScene extends Phaser.Scene {
     let scaleY = height / background.height
     let scale = Math.max(scaleX, scaleY)
     background.setScale(scale).setScrollFactor(0)
+  }
+
+  createTiles(tiles: Array<TILES>) {
+    for (let i = 0; i < MAP.length; ++i) {
+      const row = MAP[i]
+      for (let j = 0; j < row.length; ++j) {
+        const cell = row[j]
+        if (tiles.includes(TILES.DIRT) && cell === TILES.DIRT) {
+          this.add.image(BOX.width / 2 + BOX.width * j, !i ? INIT_Y : INIT_Y + (BOX.height / 2) * i, 'dirt-block')
+        }
+        if (tiles.includes(TILES.BOX) && cell === TILES.BOX) {
+          const box = new Box(
+            this,
+            BOX.width / 2 + BOX.width * j,
+            !i ? INIT_Y : INIT_Y + (BOX.height / 2) * i,
+            this.boxes
+          )
+          box.on(PLAYER_TOUCHED_BOX, this.handlePlayerGoToBox)
+        }
+        if (tiles.includes(TILES.GRASS) && cell === TILES.GRASS) {
+          this.add.image(BOX.width / 2 + BOX.width * j, !i ? INIT_Y : INIT_Y + (BOX.height / 2) * i, 'grass-block')
+        }
+      }
+    }
   }
 
   createBackButton() {
@@ -283,28 +313,6 @@ export default class MainScene extends Phaser.Scene {
     }
   }
 
-  createBoxes = () => {
-    const { width, height } = this.scale
-    this.boxes = this.physics.add.staticGroup()
-    let id = 0
-    const x = 200
-    const y = 100
-
-    let initialX = width * 0.1
-    let initialY = height * 0.1
-
-    for (let i = 0; i < MAP.length; ++i) {
-      const row = MAP[i]
-      for (let j = 0; j < row.length; ++j) {
-        const cell = row[j]
-        if (cell === 1) {
-          const box = new Box(this, initialX + x * j, initialY + y * i, this.boxes, ++id)
-          box.on(PLAYER_TOUCHED_BOX, this.handlePlayerGoToBox)
-        }
-      }
-    }
-  }
-
   handlePlayerGoToBox = (box: Box) => {
     if (!this.hiddenCharOnTheirPosition || box.opened) return
 
@@ -316,6 +324,12 @@ export default class MainScene extends Phaser.Scene {
 
   handleHiddenCharReachedBox = () => {
     if (this.hiddenCharsAreReady()) {
+      this.boxes
+        .getChildren()
+        .filter((box: any) => !box.hiddenCharName)
+        .forEach((box: any) => {
+          box.close()
+        })
       this.hiddenCharOnTheirPosition = true
       this.player.active = true
     }

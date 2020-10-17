@@ -9,6 +9,7 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
     y: number
   }
   reachedBox = false
+  box: Box
   gotToTheBoxCallback: () => void;
   
   constructor(scene: Phaser.Scene, x: number, y: number, public skin: ANIMAL_SKINS | null) {
@@ -20,10 +21,11 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
   }
 
   goTo(box: Box) {
+    this.box = box
     this.isWalking = true;
     this.isGoingTo = {
       x: box.x, 
-      y: box.y - box.height 
+      y: box.y
     }
     box.setHiddenCharName(this.skin)
   }
@@ -51,6 +53,7 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
         duration: 500,
         onComplete: () => {
           this.visible = false;
+          this.box.close()
         }
       })
 

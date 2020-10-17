@@ -32,6 +32,12 @@ export default class PreloadScene extends Phaser.Scene {
     
     this.load.image('finger-point', 'assets/img/finger-point-gesture.png')
 
+    this.load.image('chest-closed', 'assets/img/chest-closed.png')
+    this.load.image('chest-opened', 'assets/img/chest-opened.png')
+    this.load.image('chest-lid', 'assets/img/chest-lid.png')
+    this.load.image('dirt-block', 'assets/img/dirt-block.png')
+    this.load.image('grass-block', 'assets/img/grass-block.png')
+
     this.load.bitmapFont(FONTS.PIXEL_FONT, 'assets/fonts/pixelFont.png', 'assets/fonts/pixelFont.xml');
     this.load.bitmapFont(FONTS.SHORT_STACK, 'assets/fonts/shortStack.png', 'assets/fonts/shortStack.xml')
 
@@ -48,9 +54,6 @@ export default class PreloadScene extends Phaser.Scene {
     Ft: Admiral Bob (admiralbob77)
     */
     this.load.audio('background-sound', 'assets/audio/two-pianos.mp3');
-
-    // this.load.audio('footstep01', 'assets/audio/footstep07.ogg');
-    // this.load.audio('footstep02', 'assets/audio/footstep08.ogg');
   }
 
   create() {

@@ -1,14 +1,12 @@
 export const SCORE_PER_HIDDEN_CHAR = 10
 
 export const BOX = {
-  width: 64,
-  height: 64,
-  scale: 2.5,
+  width: 101,
+  height: 171,
+  scale: 1,
   SKINS: {
-    DEFAULT: 6,
-    SELECTED: 9,
-    WRONG: 7,
-    RIGHT: 8,
+    OPENED: 'chest-opened',
+    CLOSED: 'chest-closed'
   },
 }
 
@@ -22,13 +20,18 @@ export const LEVELS = [
 ]
 
 export const MAP = [
-  [0, 0, 0, 0, 0, 0, 0],
-  [0, 1, 0, 1, 0, 1, 0],
-  [0, 0, 0, 0, 0, 0, 0],
-  [0, 1, 0, 1, 0, 1, 0],
-  [0, 0, 0, 0, 0, 0, 0],
-  [0, 1, 0, 1, 0, 1, 0],
-  [0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0],
+  [0, 0, 0, 2, 0, 0, 2, 0, 0, 2, 0, 0, 0, 0, 0],
+  [0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0],
+  [0, 0, 0, 2, 0, 0, 2, 0, 0, 2, 0, 0, 0, 0, 0],
+  [0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0],
+  [0, 0, 0, 2, 0, 0, 2, 0, 0, 2, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 ]
 
 export const GAME = {
@@ -51,6 +54,12 @@ export const SPRITE_NAME = {
   WHITE_SHEET: 'whiteSheet',
   ROUND_ANIMALS: 'round_animals',
   SOKOBAN: 'sokoban',
+}
+
+export enum TILES {
+  GRASS = 0,
+  BOX = 1,
+  DIRT = 2,
 }
 
 export const FONTS = {

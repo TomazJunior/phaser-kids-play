@@ -3,27 +3,26 @@ import { ANIMAL_SKINS, BOX, IMAGE_NAME, SPRITE_NAME } from '../utils/constants'
 
 export default class Box extends Phaser.Physics.Arcade.Sprite {
   hiddenCharName: ANIMAL_SKINS | null
-  opened = false
+  opened = true
   border: Phaser.GameObjects.Image
   fingerPoint: Phaser.GameObjects.Image
   borderTween: Phaser.Tweens.Tween
   clickOnWrongBoxAudio: Phaser.Sound.BaseSound
   clickOnRightBoxAudio: Phaser.Sound.BaseSound
-
+  shadow: Phaser.GameObjects.Sprite
   constructor(
     scene: Phaser.Scene,
     x: number,
     y: number,
-    container: Phaser.Physics.Arcade.StaticGroup,
-    public id: number
+    container: Phaser.Physics.Arcade.StaticGroup
   ) {
-    super(scene, x, y, SPRITE_NAME.SOKOBAN, BOX.SKINS.DEFAULT)
+    super(scene, x, y, BOX.SKINS.OPENED)
     container.add(this)
 
-    this.setSize(BOX.width * BOX.scale, BOX.height)
-    this.setScale(BOX.scale)
-
-    this.setOffset(-48, 54)
+    this.shadow = scene.add.sprite(x, y,  BOX.SKINS.CLOSED).setScale(1.2).setTint(0x000000).setAlpha(0.6).setVisible(false)
+    
+    this.setBodySize(BOX.width, 35)
+    this.setOffset(0, 135)
 
     scene.add.existing(this)
 
@@ -61,6 +60,7 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
   }
 
   setHiddenCharName(name: ANIMAL_SKINS | null) {
+    this.openBox(false)
     this.hiddenCharName = name
   }
 
@@ -70,25 +70,28 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
   }
 
   close() {
+    this.shadow.setVisible(false)
+    if (!this.opened) return
+
     this.opened = false
-    this.setFrame(BOX.SKINS.DEFAULT)
+    this.setTexture( BOX.SKINS.CLOSED)
   }
 
   isSelected() {
     this.opened = false
-    this.setFrame(BOX.SKINS.SELECTED)
+    this.shadow.setVisible(true)
   }
 
   wrongBox() {
     this.clickOnWrongBoxAudio.play()
     this.opened = false
-    this.setFrame(BOX.SKINS.WRONG)
+    this.shadow.setVisible(true)
   }
 
-  openBox() {
-    this.clickOnRightBoxAudio.play()
+  openBox(withSound = true) {
+    withSound && this.clickOnRightBoxAudio.play()
     this.opened = true
-    this.setFrame(BOX.SKINS.RIGHT)
+    this.setTexture( BOX.SKINS.OPENED)
   }
 
   isRightBox(skin: ANIMAL_SKINS | null): boolean {
