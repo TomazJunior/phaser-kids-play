@@ -32,9 +32,35 @@ const config: Phaser.Types.Core.GameConfig = {
   },
 }
 
+const onPause = (game: Phaser.Game) => {
+  if (!game) return
+  game.sound.pauseAll()
+}
+
+const onResume = (game: Phaser.Game) => {
+  if (!game) return
+  game.sound.resumeAll()
+}
+
 const onDeviceReady = () => {
+  document.addEventListener(
+    'pause',
+    () => {
+      onPause(game)
+    },
+    false
+  )
+
+  document.addEventListener(
+    'resume',
+    () => {
+      onResume(game)
+    },
+    false
+  )
+
   if (isAndroid()) {
-    window.plugins.insomnia.keepAwake(); // external plugin
+    window.plugins.insomnia.keepAwake()
   }
 
   const game = new Phaser.Game(config)
@@ -46,7 +72,13 @@ const onDeviceReady = () => {
 
 window.addEventListener('load', () => {
   if (isAndroid()) {
-    document.addEventListener('deviceready', onDeviceReady, false)
+    document.addEventListener(
+      'deviceready',
+      () => {
+        onDeviceReady()
+      },
+      true
+    )
   } else {
     onDeviceReady()
   }
