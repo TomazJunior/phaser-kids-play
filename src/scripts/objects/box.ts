@@ -10,15 +10,16 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
   clickOnWrongBoxAudio: Phaser.Sound.BaseSound
   clickOnRightBoxAudio: Phaser.Sound.BaseSound
   shadow: Phaser.GameObjects.Sprite
+  objectPosition: ObjectPosition
   constructor(
     scene: Phaser.Scene,
-    x: number,
-    y: number,
+    objectPosition: ObjectPosition,
     container: Phaser.Physics.Arcade.StaticGroup
   ) {
-    super(scene, x, y, BOX.SKINS.OPENED)
+    super(scene, objectPosition.x, objectPosition.y, BOX.SKINS.OPENED)
     container.add(this)
-
+    this.objectPosition  = objectPosition
+    const {x, y} = objectPosition
     this.shadow = scene.add.sprite(x, y,  BOX.SKINS.CLOSED).setScale(1.2).setTint(0x000000).setAlpha(0.6).setVisible(false)
     
     this.setBodySize(BOX.width, 35)

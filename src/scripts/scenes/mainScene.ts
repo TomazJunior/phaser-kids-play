@@ -10,6 +10,7 @@ import BigLevelText from '../ui/bigLevelText'
 import { Button } from '../ui/button'
 import HiddenThumbChars from '../objects/hiddenThumbChars'
 import ScoreText from '../ui/scoreText'
+import { GameMap } from '../objects/map'
 
 const INIT_Y = 37
 
@@ -29,6 +30,7 @@ export default class MainScene extends Phaser.Scene {
   scoreText: ScoreText
   backgroundAudio: Phaser.Sound.BaseSound
   clickOnBoxAudio: Phaser.Sound.BaseSound
+  gameMap: GameMap
   constructor() {
     super({ key: 'MainScene' })
   }
@@ -45,16 +47,20 @@ export default class MainScene extends Phaser.Scene {
     const { width, height } = this.scale
 
     this.createBackground()
-    this.createTiles([TILES.DIRT, TILES.GRASS])
+
+    this.gameMap = new GameMap(this, 0, 0)
+
+    const playerPosition = this.gameMap.getTilesPosition([TILES.PLAYER])[0]
+    this.player = new Player(this, playerPosition)
+    this.player.on(PLAYER_CHAR_REACHED_BOX, this.handleReachedBox)
 
     this.boxes = this.physics.add.staticGroup()
-    this.createTiles([TILES.BOX])
+    const boxesPosition = this.gameMap.getTilesPosition([TILES.BOX])
+    boxesPosition.forEach((pos) => {
+      new Box(this, pos, this.boxes).on(PLAYER_TOUCHED_BOX, this.handlePlayerGoToBox)
+    })
 
     this.createBackButton()
-
-    const initialPos = this.getInitialPlayerPosition()
-    this.player = new Player(this, initialPos.x, initialPos.y)
-    this.player.on(PLAYER_CHAR_REACHED_BOX, this.handleReachedBox)
 
     this.hiddenChars = this.add.group()
     this.hiddenThumbChars = new HiddenThumbChars(this, width * 0.5, height * 0)
@@ -163,30 +169,6 @@ export default class MainScene extends Phaser.Scene {
     background.setScale(scale).setScrollFactor(0)
   }
 
-  createTiles(tiles: Array<TILES>) {
-    for (let i = 0; i < MAP.length; ++i) {
-      const row = MAP[i]
-      for (let j = 0; j < row.length; ++j) {
-        const cell = row[j]
-        if (tiles.includes(TILES.DIRT) && cell === TILES.DIRT) {
-          this.add.image(BOX.width / 2 + BOX.width * j, !i ? INIT_Y : INIT_Y + (BOX.height / 2) * i, 'dirt-block')
-        }
-        if (tiles.includes(TILES.BOX) && cell === TILES.BOX) {
-          const box = new Box(
-            this,
-            BOX.width / 2 + BOX.width * j,
-            !i ? INIT_Y : INIT_Y + (BOX.height / 2) * i,
-            this.boxes
-          )
-          box.on(PLAYER_TOUCHED_BOX, this.handlePlayerGoToBox)
-        }
-        if (tiles.includes(TILES.GRASS) && cell === TILES.GRASS) {
-          this.add.image(BOX.width / 2 + BOX.width * j, !i ? INIT_Y : INIT_Y + (BOX.height / 2) * i, 'grass-block')
-        }
-      }
-    }
-  }
-
   createBackButton() {
     new Button(this, 10, 10, {
       icon: SPRITE_NAME.WHITE_SHEET,
@@ -241,7 +223,9 @@ export default class MainScene extends Phaser.Scene {
     this.time.delayedCall(500, () => {
       this.resetBoxes()
 
-      this.player.setIsGoingTo({ ...this.getInitialPlayerPosition(), initialPos: true })
+      const pathToGo = this.gameMap.getPathTo(this.player.objectPosition, { ...this.getInitialPlayerPosition() })
+      this.player.setIsGoingTo(pathToGo, true)
+
       this.createHiddenChars(selectedLevel.hiddens)
       this.player.active = true
     })
@@ -304,22 +288,19 @@ export default class MainScene extends Phaser.Scene {
     })
   }
 
-  getInitialPlayerPosition(): { x: number; y: number } {
-    const { width, height } = this.scale
-
-    return {
-      x: width * 0.1,
-      y: height * 0.9,
-    }
+  getInitialPlayerPosition(): ObjectPosition {
+    return this.gameMap.getTilesPosition([TILES.PLAYER])[0]
   }
 
   handlePlayerGoToBox = (box: Box) => {
     if (!this.hiddenCharOnTheirPosition || box.opened) return
 
+    const pathToGo = this.gameMap.getPathTo(this.player.objectPosition, box.objectPosition)
+
     if (this.clickOnBoxAudio.isPlaying) this.clickOnBoxAudio.stop()
     this.clickOnBoxAudio.play()
 
-    this.player.goTo(box)
+    this.player.goTo(box, pathToGo)
   }
 
   handleHiddenCharReachedBox = () => {

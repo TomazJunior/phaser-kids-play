@@ -13,6 +13,14 @@ declare interface ModalDialogContentConfig {
   y: number
 }
 
+declare interface ObjectPosition extends TilePosition{
+  x: number; y: number
+}
+
+declare interface TilePosition {
+  row: number, col: number
+}
+
 declare interface ButtonConfig {
   text?: string
   icon: string
