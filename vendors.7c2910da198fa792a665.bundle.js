@@ -6453,19 +6453,19 @@ t.exports={BitmapMaskPipeline:i(510),ForwardDiffuseLightPipeline:i(511),TextureT
  * @copyright    2019 Photon Storm Ltd.
  * @license      {@link https://github.com/photonstorm/phaser/blob/master/license.txt|MIT License}
  */
-var s=i(19),n=i(20);t.exports=function(t,e,i,r,o){var a=this.pipeline,h=a._tempMatrix1,l=a._tempMatrix2,u=a._tempMatrix3;t.setPipeline(a),l.applyITRS(e.x,e.y,e.rotation,e.scaleX,e.scaleY),h.copyFrom(r.matrix),o?(h.multiplyWithOffset(o,-r.scrollX*e.scrollFactorX,-r.scrollY*e.scrollFactorY),l.e=e.x,l.f=e.y):(l.e-=r.scrollX*e.scrollFactorX,l.f-=r.scrollY*e.scrollFactorY),h.multiply(l,u);var c=e._displayOriginX,d=e._displayOriginY,f=r.alpha*e.alpha;e.isFilled&&s(a,u,e,f,c,d),e.isStroked&&n(a,e,f,c,d)}},function(t,e,i){
+var s=i(20),n=i(21);t.exports=function(t,e,i,r,o){var a=this.pipeline,h=a._tempMatrix1,l=a._tempMatrix2,u=a._tempMatrix3;t.setPipeline(a),l.applyITRS(e.x,e.y,e.rotation,e.scaleX,e.scaleY),h.copyFrom(r.matrix),o?(h.multiplyWithOffset(o,-r.scrollX*e.scrollFactorX,-r.scrollY*e.scrollFactorY),l.e=e.x,l.f=e.y):(l.e-=r.scrollX*e.scrollFactorX,l.f-=r.scrollY*e.scrollFactorY),h.multiply(l,u);var c=e._displayOriginX,d=e._displayOriginY,f=r.alpha*e.alpha;e.isFilled&&s(a,u,e,f,c,d),e.isStroked&&n(a,e,f,c,d)}},function(t,e,i){
 /**
  * @author       Richard Davey <rich@photonstorm.com>
  * @copyright    2019 Photon Storm Ltd.
  * @license      {@link https://github.com/photonstorm/phaser/blob/master/license.txt|MIT License}
  */
-var s=i(21),n=i(22),r=Phaser.Renderer.Canvas.SetTransform;t.exports=function(t,e,i,o,a){var h=t.currentContext;if(r(t,h,e,o,a)){var l=e._displayOriginX,u=e._displayOriginY,c=e.pathData,d=c.length-1,f=c[0]-l,p=c[1]-u;h.beginPath(),h.moveTo(f,p),e.closePath||(d-=2);for(var g=2;g<d;g+=2){var v=c[g]-l,m=c[g+1]-u;h.lineTo(v,m)}h.closePath(),e.isFilled&&(s(h,e),h.fill()),e.isStroked&&(n(h,e),h.stroke()),h.restore()}}},function(t,e){
+var s=i(22),n=i(23),r=Phaser.Renderer.Canvas.SetTransform;t.exports=function(t,e,i,o,a){var h=t.currentContext;if(r(t,h,e,o,a)){var l=e._displayOriginX,u=e._displayOriginY,c=e.pathData,d=c.length-1,f=c[0]-l,p=c[1]-u;h.beginPath(),h.moveTo(f,p),e.closePath||(d-=2);for(var g=2;g<d;g+=2){var v=c[g]-l,m=c[g+1]-u;h.lineTo(v,m)}h.closePath(),e.isFilled&&(s(h,e),h.fill()),e.isStroked&&(n(h,e),h.stroke()),h.restore()}}},function(t,e){
 /**
  * @author       Richard Davey <rich@photonstorm.com>
  * @copyright    2019 Photon Storm Ltd.
  * @license      {@link https://github.com/photonstorm/phaser/blob/master/license.txt|MIT License}
  */
-var i=Phaser.Renderer.WebGL.Utils;t.exports=function(t,e,s,n,r){if(0!==e.width&&0!==e.height){var o=e.frame,a=o.width,h=o.height,l=i.getTintAppendFloatAlpha;this.pipeline.batchTexture(e,o.glTexture,a,h,e.x,e.y,a/e.style.resolution,h/e.style.resolution,e.scaleX,e.scaleY,e.rotation,e.flipX,e.flipY,e.scrollFactorX,e.scrollFactorY,e.displayOriginX,e.displayOriginY,0,0,a,h,l(e._tintTL,n.alpha*e._alphaTL),l(e._tintTR,n.alpha*e._alphaTR),l(e._tintBL,n.alpha*e._alphaBL),l(e._tintBR,n.alpha*e._alphaBR),e._isTinted&&e.tintFill,0,0,n,r)}}},function(t,e){t.exports=function(t,e,i,s,n){0!==e.width&&0!==e.height&&t.batchSprite(e,e.frame,s,n)}},,,,,,,function(t,e){
+var i=Phaser.Renderer.WebGL.Utils;t.exports=function(t,e,s,n,r){if(0!==e.width&&0!==e.height){var o=e.frame,a=o.width,h=o.height,l=i.getTintAppendFloatAlpha;this.pipeline.batchTexture(e,o.glTexture,a,h,e.x,e.y,a/e.style.resolution,h/e.style.resolution,e.scaleX,e.scaleY,e.rotation,e.flipX,e.flipY,e.scrollFactorX,e.scrollFactorY,e.displayOriginX,e.displayOriginY,0,0,a,h,l(e._tintTL,n.alpha*e._alphaTL),l(e._tintTR,n.alpha*e._alphaTR),l(e._tintBL,n.alpha*e._alphaBL),l(e._tintBR,n.alpha*e._alphaBR),e._isTinted&&e.tintFill,0,0,n,r)}}},function(t,e){t.exports=function(t,e,i,s,n){0!==e.width&&0!==e.height&&t.batchSprite(e,e.frame,s,n)}},,,,,,,,function(t,e){
 /**
  * @author       Richard Davey <rich@photonstorm.com>
  * @copyright    2019 Photon Storm Ltd.
