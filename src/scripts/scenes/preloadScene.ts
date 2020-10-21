@@ -35,6 +35,11 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('dirt-block', 'assets/img/dirt-block.png')
     this.load.image('grass-block', 'assets/img/grass-block.png')
 
+    this.load.image('stars-zero', 'assets/img/stars-zero.png')
+    this.load.image('stars-one', 'assets/img/stars-one.png')
+    this.load.image('stars-two', 'assets/img/stars-two.png')
+    this.load.image('stars-three', 'assets/img/stars-three.png')
+
     this.load.image('level-complete-dialog', 'assets/img/level-complete-dialog.png')
     this.load.image('big-frame-window', 'assets/img/big-frame-window.png')
     

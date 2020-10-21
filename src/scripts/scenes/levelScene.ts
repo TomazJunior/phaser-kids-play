@@ -1,5 +1,6 @@
 import { ButtonSmall } from '../ui/buttonSmall'
-import { BUTTON, FONTS, LEVELS } from '../utils/constants'
+import { BUTTON, BUTTON_PREFIX, FONTS, LEVELS } from '../utils/constants'
+import { getFileStorageConfig } from '../utils/fileStorage'
 
 export default class LevelScene extends Phaser.Scene {
   constructor() {
@@ -29,6 +30,7 @@ export default class LevelScene extends Phaser.Scene {
     background.setScale(scale).setScrollFactor(0)
   }
 
+  //TODO: move to a component UI
   createSelectLevelFrame() {
     const { width, height } = this.scale
     const frame = this.add.image(width * 0.5, height * 0.5, 'big-frame-window')
@@ -43,23 +45,53 @@ export default class LevelScene extends Phaser.Scene {
     const initialY = frame.y - 80
     let posX = initialX
     let posY = initialY
+
+    const fileStorageData: FileStorageConfig = getFileStorageConfig()
+
     LEVELS.forEach((level, index) => {
       if (index) {
-        posX += 100
+        posX += 150
       }
 
       if (posX - initialX > frame.displayWidth - 200) {
         posX = initialX
-        posY += 100
+        posY += 125
       }
 
-      new ButtonSmall(this, posX, posY, {
+      const levelFileData = fileStorageData.levels && fileStorageData.levels.find((lvl) => lvl.level === level.level)
+      const maxLevel = fileStorageData.levels.reduce((maxLevel, level) => {
+        return Math.max(maxLevel, level.level)
+      }, 1)
+
+      const button = new ButtonSmall(this, posX, posY, {
         name: BUTTON.EMPTY,
         onClick: () => {
           this.scene.start('MainScene', level)
         },
         text: level.level.toString(),
+        prefix: level.level > maxLevel ? BUTTON_PREFIX.BLOCKED : undefined,
+        scale: {
+          x: 0.6,
+          y: 0.6,
+        },
       })
+
+      //TODO: create constants
+      let stars = 'stars-zero'
+      if (levelFileData) {
+        switch (levelFileData.stars) {
+          case 3:
+            stars = 'stars-three'
+            break
+          case 2:
+            stars = 'stars-two'
+            break
+          case 1:
+            stars = 'stars-one'
+            break
+        }
+      }
+      this.add.image(button.x, button.y + button.displayHeight * 0.35, stars).setScale(0.2, 0.2)
     })
   }
 }

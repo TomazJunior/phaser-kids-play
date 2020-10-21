@@ -10,6 +10,7 @@ import ScoreText from '../ui/scoreText'
 import { GameMap } from '../objects/map'
 import { ButtonSmall } from '../ui/buttonSmall'
 import { LevelCompleteDialog } from '../ui/levelCompleteDialog'
+import { getFileStorageConfig, setLevel, setTutorialMode } from '../utils/fileStorage'
 
 const INIT_Y = 37
 
@@ -37,7 +38,7 @@ export default class MainScene extends Phaser.Scene {
   init(currentLevel: Level) {
     this.gameover = false
     this.level = !currentLevel ? this.getCurrentLevel(1) : { ...currentLevel }
-    this.round = this.level.from
+    this.round = 1
     this.currentHiddenSkins = []
     this.availableHiddenSkins = []
     this.hiddenCharOnTheirPosition = false
@@ -91,28 +92,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   private get tutorialMode(): boolean {
-    return this.getFileStorageConfig().tutorialMode
-  }
-
-  private set tutorialMode(istutorialMode: boolean) {
-    this.setFileStorageConfig({
-      ...this.getFileStorageConfig(),
-      tutorialMode: istutorialMode,
-    })
-  }
-
-  getFileStorageConfig = (): FileStorageConfig => {
-    const value: any = localStorage.getItem('fileStorage')
-    if (!!value) {
-      return JSON.parse(value)
-    }
-    return {
-      tutorialMode: true,
-    }
-  }
-
-  setFileStorageConfig = (fileStorage: FileStorageConfig) => {
-    localStorage.setItem('fileStorage', JSON.stringify(fileStorage))
+    return getFileStorageConfig().tutorialMode
   }
 
   startTutorialMode = () => {
@@ -124,7 +104,7 @@ export default class MainScene extends Phaser.Scene {
   finishTutorialMode = () => {
     const firstBox: Box = <Box>this.boxes.children.getArray()[0]
     firstBox.toggleHelp()
-    this.tutorialMode = false
+    setTutorialMode(false)
   }
 
   showFinishGameDialog = (text: string, playSound: boolean) => {
@@ -167,7 +147,7 @@ export default class MainScene extends Phaser.Scene {
       onClick: () => {
         this.goToLevelScene()
       },
-      name: BUTTON.LEFT
+      name: BUTTON.LEFT,
     }).setOrigin(0, 0)
   }
 
@@ -207,11 +187,13 @@ export default class MainScene extends Phaser.Scene {
     }
 
     ++this.round
-    if (this.round > this.level.to) {
+    if (this.round > this.level.rounds) {
       this.backgroundAudio.stop()
+      setLevel({ level: this.level.level, stars: 3 })
       this.showFinishGameDialog('You Win!', true)
       return Promise.resolve()
     }
+
     this.time.delayedCall(500, () => {
       this.resetBoxes()
 
@@ -321,6 +303,17 @@ export default class MainScene extends Phaser.Scene {
     if (!box.hiddenCharName || !box.isRightBox(currentHiddenChar)) {
       box.wrongBox()
       this.closeBox(box)
+      //TODO: move to constants/util
+      let stars = 0
+      if (this.round === 5) {
+        stars = 3
+      } else if (this.round > 3) {
+        stars = 2
+      } else if (this.round > 1) {
+        stars = 1
+      }
+
+      setLevel({ level: this.level.level, stars })
       this.showFinishGameDialog('Game over', false)
       return
     }

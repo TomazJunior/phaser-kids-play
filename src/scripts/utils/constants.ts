@@ -11,15 +11,15 @@ export const BOX = {
 }
 
 export const LEVELS: Array<Level> = [
-  { level: 1, from: 1, to: 2, hiddens: 1 },
-  { level: 2, from: 3, to: 7, hiddens: 2 },
-  { level: 3, from: 8, to: 10, hiddens: 3 },
-  { level: 4, from: 11, to: 13, hiddens: 4 },
-  { level: 5, from: 14, to: 15, hiddens: 5 },
-  { level: 6, from: 16, to: 18, hiddens: 6 },
-  { level: 7, from: 19, to: 21, hiddens: 7 },
-  { level: 8, from: 22, to: 24, hiddens: 8 },
-  { level: 9, from: 25, to: 27, hiddens: 9 },
+  { level: 1, rounds: 5, hiddens: 1 },
+  { level: 2, rounds: 5, hiddens: 2 },
+  { level: 3, rounds: 5, hiddens: 3 },
+  { level: 4, rounds: 5, hiddens: 4 },
+  { level: 5, rounds: 5, hiddens: 5 },
+  { level: 6, rounds: 5, hiddens: 6 },
+  { level: 7, rounds: 5, hiddens: 7 },
+  { level: 8, rounds: 5, hiddens: 8 },
+  { level: 9, rounds: 5, hiddens: 9 },
 ]
 
 export const MAP = [
@@ -87,8 +87,6 @@ export enum BUTTON {
 
 export enum BUTTON_PREFIX {
   BLOCKED = 'blocked',
-  CLICK = 'click',
-  HOVER = 'hover',
   NORMAL = 'normal',
 }
 

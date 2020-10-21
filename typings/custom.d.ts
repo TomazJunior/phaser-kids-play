@@ -10,6 +10,7 @@ declare interface TilePosition {
 declare interface ButtonConfig {
   text?: string
   name?: import('../src/scripts/utils/constants').BUTTON
+  prefix?:import('../src/scripts/utils/constants').BUTTON_PREFIX
   scale?: {
     x: number
     y: number
@@ -18,7 +19,13 @@ declare interface ButtonConfig {
 }
 
 declare interface FileStorageConfig {
-    tutorialMode: boolean
+    tutorialMode: boolean,
+    levels: Array<LevelFileStorageConfig>
+}
+
+declare interface LevelFileStorageConfig {
+  level: number,
+  stars: number
 }
 
 declare interface Window {
@@ -31,7 +38,6 @@ declare interface Window {
 
 declare interface Level {
   level: number
-  from: number
-  to: number
+  rounds: number
   hiddens: number
 }
