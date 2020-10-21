@@ -163,8 +163,11 @@ export default class MainScene extends Phaser.Scene {
   }
 
   createBackButton() {
-    new ButtonSmall(this, 10, 10, BUTTON.LEFT, () => {
-      this.goToLevelScene()
+    new ButtonSmall(this, 10, 10, {
+      onClick: () => {
+        this.goToLevelScene()
+      },
+      name: BUTTON.LEFT
     }).setOrigin(0, 0)
   }
 
@@ -209,7 +212,6 @@ export default class MainScene extends Phaser.Scene {
       this.showFinishGameDialog('You Win!', true)
       return Promise.resolve()
     }
-    
     this.time.delayedCall(500, () => {
       this.resetBoxes()
 

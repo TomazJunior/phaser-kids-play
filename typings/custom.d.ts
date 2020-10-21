@@ -1,3 +1,4 @@
+
 declare interface ObjectPosition extends TilePosition{
   x: number; y: number
 }
@@ -8,10 +9,7 @@ declare interface TilePosition {
 
 declare interface ButtonConfig {
   text?: string
-  icon: string
-  iconFrame?: string
-  parentWidth?: number
-  paddingX?: number
+  name?: import('../src/scripts/utils/constants').BUTTON
   scale?: {
     x: number
     y: number

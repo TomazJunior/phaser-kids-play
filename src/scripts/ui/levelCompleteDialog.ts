@@ -49,28 +49,25 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
       })
       .setOrigin(0.5, 0)
 
-    new ButtonSmall(
-      scene,
-      this.x - this.displayWidth * 0.4 + 40,
-      this.y + this.displayHeight * 0.3,
-      BUTTON.HOME,
-      () => {
+    new ButtonSmall(scene, this.x - this.displayWidth * 0.4 + 40, this.y + this.displayHeight * 0.3, {
+      name: BUTTON.HOME,
+      onClick: () => {
         onHomeClick()
-      }
-    ).setOrigin(0, 0)
+      },
+    }).setOrigin(0, 0)
 
-    new ButtonSmall(
-      scene,
-      this.x - 50,
-      this.y + this.displayHeight * 0.3,
-      BUTTON.LEVEL,
-      () => {
+    new ButtonSmall(scene, this.x - 50, this.y + this.displayHeight * 0.3, {
+      name: BUTTON.LEFT,
+      onClick: () => {
         onLevelClick()
-      }
-    ).setOrigin(0, 0)
+      },
+    }).setOrigin(0, 0)
 
-    new ButtonSmall(scene, this.x + this.displayWidth * 0.2, this.y + this.displayHeight * 0.3, BUTTON.RESTART, () => {
-      onRestartClick()
+    new ButtonSmall(scene, this.x + this.displayWidth * 0.2, this.y + this.displayHeight * 0.3, {
+      name: BUTTON.RESTART,
+      onClick: () => {
+        onRestartClick()
+      },
     }).setOrigin(0, 0)
 
     playSound && this.nextLevelAudio.play()

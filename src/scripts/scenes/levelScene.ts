@@ -12,8 +12,11 @@ export default class LevelScene extends Phaser.Scene {
   }
 
   createBackButton() {
-    new ButtonSmall(this, 10, 10, BUTTON.LEFT, () => {
-      this.scene.start('MenuScene')
+    new ButtonSmall(this, 10, 10, {
+      name: BUTTON.LEFT,
+      onClick: () => {
+        this.scene.start('MenuScene')
+      },
     }).setOrigin(0, 0)
   }
 
@@ -49,16 +52,14 @@ export default class LevelScene extends Phaser.Scene {
         posX = initialX
         posY += 100
       }
-      new ButtonSmall(
-        this,
-        posX,
-        posY,
-        BUTTON.EMPTY,
-        () => {
+
+      new ButtonSmall(this, posX, posY, {
+        name: BUTTON.EMPTY,
+        onClick: () => {
           this.scene.start('MainScene', level)
         },
-        level.level.toString()
-      )
+        text: level.level.toString(),
+      })
     })
   }
 }
