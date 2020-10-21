@@ -3,14 +3,14 @@ import Box from '../objects/box'
 import HiddenChar from '../objects/hiddenChar'
 import { HIDDEN_CHAR_REACHED_BOX, PLAYER_CHAR_REACHED_BOX, PLAYER_TOUCHED_BOX } from '../events/events'
 import { getAllSkins, getARandomSkinFrom } from '../utils/skinUtils'
-import { FONTS, LEVELS, MAP, ANIMAL_SKINS, SPRITE_NAME, BOX, TILES } from '../utils/constants'
-import { ModalDialog } from '../utils/modalDialog'
+import { FONTS, LEVELS, ANIMAL_SKINS, TILES, BUTTON } from '../utils/constants'
 import ColoredText from '../ui/coloredText'
 import BigLevelText from '../ui/bigLevelText'
-import { Button } from '../ui/button'
 import HiddenThumbChars from '../objects/hiddenThumbChars'
 import ScoreText from '../ui/scoreText'
 import { GameMap } from '../objects/map'
+import { ButtonSmall } from '../ui/buttonSmall'
+import { LevelCompleteDialog } from '../ui/levelCompleteDialog'
 
 const INIT_Y = 37
 
@@ -127,33 +127,22 @@ export default class MainScene extends Phaser.Scene {
     this.tutorialMode = false
   }
 
-  showFinishGameDialog = (text: string, color: string) => {
-    new ModalDialog(this, {
-      buttonConfigs: [
-        {
-          icon: SPRITE_NAME.WHITE_SHEET,
-          iconFrame: 'return.png',
-          text: 'Restart',
-          onClick: () => {
-            this.scene.restart()
-          },
-        },
-      ],
-      content: {
-        x: 0,
-        y: -50,
-        text,
-        color,
-        fontSize: '96px',
+  showFinishGameDialog = (text: string) => {
+    const { width, height } = this.scale
+    new LevelCompleteDialog(
+      this,
+      width * 0.5,
+      height * 0.5,
+      text,
+      this.scoreText.text,
+      () => {
+        this.backgroundAudio.stop()
+        this.scene.start('MenuScene')
       },
-      subContent: {
-        x: 0,
-        y: 10,
-        text: `Score: ${this.scoreText.text}`,
-        color: 'blue',
-        fontSize: '48px',
-      },
-    })
+      () => {
+        this.scene.restart()
+      }
+    )
   }
 
   update() {
@@ -170,14 +159,10 @@ export default class MainScene extends Phaser.Scene {
   }
 
   createBackButton() {
-    new Button(this, 10, 10, {
-      icon: SPRITE_NAME.WHITE_SHEET,
-      iconFrame: 'left.png',
-      onClick: () => {
-        this.backgroundAudio.stop()
-        this.scene.start('MenuScene')
-      },
-    })
+    new ButtonSmall(this, 10, 10, BUTTON.LEFT, () => {
+      this.backgroundAudio.stop()
+      this.scene.start('MenuScene')
+    }).setOrigin(0, 0)
   }
 
   setToGameOverState() {
@@ -214,7 +199,7 @@ export default class MainScene extends Phaser.Scene {
     const selectedLevel = this.getCurrentLevel()
     if (!selectedLevel) {
       this.backgroundAudio.stop()
-      this.showFinishGameDialog('You Win!', 'green')
+      this.showFinishGameDialog('You Win!')
       return Promise.resolve()
     }
     this.levelText.content = `level ${selectedLevel.level}`
@@ -329,7 +314,7 @@ export default class MainScene extends Phaser.Scene {
     if (!box.hiddenCharName || !box.isRightBox(currentHiddenChar)) {
       box.wrongBox()
       this.closeBox(box)
-      this.showFinishGameDialog('Game over', 'red')
+      this.showFinishGameDialog('Game over')
       return
     }
 

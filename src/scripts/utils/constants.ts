@@ -73,6 +73,20 @@ export enum IMAGE_NAME {
   FINGER_POINT = 'finger-point',
 }
 
+export enum BUTTON {
+  LEFT = 'left-button',
+  BIG_FRAME = 'big-frame-button',
+  RESTART = 'restart-button',
+  HOME = 'home-button'
+}
+
+export enum BUTTON_PREFIX {
+  BLOCKED = 'blocked',
+  CLICK = 'click',
+  HOVER = 'hover',
+  NORMAL = 'normal',
+}
+
 export enum ANIMAL_SKINS {
   BEAR = 'bear.png',
   BUFFALO = 'buffalo.png',

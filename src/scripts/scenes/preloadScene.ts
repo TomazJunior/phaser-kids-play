@@ -1,5 +1,5 @@
 import ProgressBar from '../ui/progressBar'
-import { FONTS, SPRITE_NAME } from '../utils/constants'
+import { BUTTON, BUTTON_PREFIX, FONTS, SPRITE_NAME } from '../utils/constants'
 
 export default class PreloadScene extends Phaser.Scene {
   progressBar: ProgressBar
@@ -35,6 +35,9 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('dirt-block', 'assets/img/dirt-block.png')
     this.load.image('grass-block', 'assets/img/grass-block.png')
 
+
+    this.load.image('level-complete-dialog', 'assets/img/level-complete-dialog.png')
+
     this.load.bitmapFont(FONTS.PIXEL_FONT, 'assets/fonts/pixelFont.png', 'assets/fonts/pixelFont.xml')
     this.load.bitmapFont(FONTS.SHORT_STACK, 'assets/fonts/shortStack.png', 'assets/fonts/shortStack.xml')
 
@@ -44,6 +47,10 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.audio('click-box', 'assets/audio/434756__notarget__wood-step-sample-1.wav')
     this.load.audio('wrong-box', 'assets/audio/350984__cabled-mess__lose-c-03.wav')
     this.load.audio('walking', 'assets/audio/430708__juandamb__running.wav')
+
+    //buttons
+    this.loadImageStates()
+
     //TODO: add credits
     /*
     Two Pianos by Stefan Kartenberg (c) copyright 2018 Licensed under a Creative Commons Attribution (3.0) license. 
@@ -55,6 +62,16 @@ export default class PreloadScene extends Phaser.Scene {
     this.loadAssetsProgress()
   }
 
+  loadImageStates() {
+    Object.keys(BUTTON).forEach((key) => {
+      Object.keys(BUTTON_PREFIX).forEach((prefix) => {
+        const buttonKey = `${BUTTON[key]}-${BUTTON_PREFIX[prefix]}`
+        console.log('`${key}-${prefix}`', buttonKey)
+        this.load.image(buttonKey, `assets/img/${buttonKey}.png`)
+      })
+    })
+  }
+
   loadAssetsProgress = () => {
     this.load.on('progress', this.progressBar.updateValue)
     // this.load.on('fileprogress', (file) => {
@@ -62,6 +79,7 @@ export default class PreloadScene extends Phaser.Scene {
     // })
     this.load.on('complete', () => {
       this.scene.start('MenuScene')
+      // this.scene.start('MainScene')
     })
   }
 

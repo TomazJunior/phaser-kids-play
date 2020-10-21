@@ -1,18 +1,3 @@
-declare interface ModalDialogConfig {
-  content: ModalDialogContentConfig,
-  subContent?: ModalDialogContentConfig,
-  buttonConfigs: ButtonConfig[],
-  onClose?: () => void
-}
-
-declare interface ModalDialogContentConfig {
-  text: string
-  fontSize: string,
-  color: string,
-  x: number,
-  y: number
-}
-
 declare interface ObjectPosition extends TilePosition{
   x: number; y: number
 }
