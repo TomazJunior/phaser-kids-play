@@ -35,9 +35,9 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('dirt-block', 'assets/img/dirt-block.png')
     this.load.image('grass-block', 'assets/img/grass-block.png')
 
-
     this.load.image('level-complete-dialog', 'assets/img/level-complete-dialog.png')
-
+    this.load.image('big-frame-window', 'assets/img/big-frame-window.png')
+    
     this.load.bitmapFont(FONTS.PIXEL_FONT, 'assets/fonts/pixelFont.png', 'assets/fonts/pixelFont.xml')
     this.load.bitmapFont(FONTS.SHORT_STACK, 'assets/fonts/shortStack.png', 'assets/fonts/shortStack.xml')
 
@@ -78,6 +78,7 @@ export default class PreloadScene extends Phaser.Scene {
     //   console.log(file.src)
     // })
     this.load.on('complete', () => {
+      // this.scene.start('LevelScene')
       this.scene.start('MenuScene')
       // this.scene.start('MainScene')
     })

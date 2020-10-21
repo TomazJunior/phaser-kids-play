@@ -10,13 +10,16 @@ export const BOX = {
   },
 }
 
-export const LEVELS = [
+export const LEVELS: Array<Level> = [
   { level: 1, from: 1, to: 2, hiddens: 1 },
   { level: 2, from: 3, to: 7, hiddens: 2 },
   { level: 3, from: 8, to: 10, hiddens: 3 },
   { level: 4, from: 11, to: 13, hiddens: 4 },
   { level: 5, from: 14, to: 15, hiddens: 5 },
-  { level: 5, from: 16, to: 18, hiddens: 6 },
+  { level: 6, from: 16, to: 18, hiddens: 6 },
+  { level: 7, from: 19, to: 21, hiddens: 7 },
+  { level: 8, from: 22, to: 24, hiddens: 8 },
+  { level: 9, from: 25, to: 27, hiddens: 9 },
 ]
 
 export const MAP = [
@@ -77,7 +80,9 @@ export enum BUTTON {
   LEFT = 'left-button',
   BIG_FRAME = 'big-frame-button',
   RESTART = 'restart-button',
-  HOME = 'home-button'
+  HOME = 'home-button',
+  EMPTY = 'empty-button',
+  LEVEL = 'level-button'
 }
 
 export enum BUTTON_PREFIX {

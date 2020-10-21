@@ -5,7 +5,6 @@ import { HIDDEN_CHAR_REACHED_BOX, PLAYER_CHAR_REACHED_BOX, PLAYER_TOUCHED_BOX } 
 import { getAllSkins, getARandomSkinFrom } from '../utils/skinUtils'
 import { FONTS, LEVELS, ANIMAL_SKINS, TILES, BUTTON } from '../utils/constants'
 import ColoredText from '../ui/coloredText'
-import BigLevelText from '../ui/bigLevelText'
 import HiddenThumbChars from '../objects/hiddenThumbChars'
 import ScoreText from '../ui/scoreText'
 import { GameMap } from '../objects/map'
@@ -23,10 +22,10 @@ export default class MainScene extends Phaser.Scene {
   currentHiddenSkins: ANIMAL_SKINS[]
   availableHiddenSkins: ANIMAL_SKINS[]
   gameover = false
-  level = 1
+  level: Level
+  round: number
   hiddenCharOnTheirPosition = false
   levelText: ColoredText
-  bigLevelText: BigLevelText
   scoreText: ScoreText
   backgroundAudio: Phaser.Sound.BaseSound
   clickOnBoxAudio: Phaser.Sound.BaseSound
@@ -35,9 +34,10 @@ export default class MainScene extends Phaser.Scene {
     super({ key: 'MainScene' })
   }
 
-  init() {
+  init(currentLevel: Level) {
     this.gameover = false
-    this.level = 1
+    this.level = !currentLevel ? this.getCurrentLevel(1) : { ...currentLevel }
+    this.round = this.level.from
     this.currentHiddenSkins = []
     this.availableHiddenSkins = []
     this.hiddenCharOnTheirPosition = false
@@ -67,10 +67,16 @@ export default class MainScene extends Phaser.Scene {
     this.physics.add.collider(this.player, this.boxes, undefined, undefined, this)
     this.physics.add.collider(this.hiddenChars, this.boxes, undefined, undefined, this)
 
-    this.levelText = new ColoredText(this, width - 270, 20, this.tutorialMode ? 'Tutorial' : `level ${this.level}`, {
-      fontFamily: FONTS.ALLOY_INK,
-      fontSize: '48px',
-    })
+    this.levelText = new ColoredText(
+      this,
+      width - 270,
+      20,
+      this.tutorialMode ? 'Tutorial' : `level ${this.level.level}`,
+      {
+        fontFamily: FONTS.ALLOY_INK,
+        fontSize: '48px',
+      }
+    )
 
     this.backgroundAudio =
       this.sound.get('background-sound') || this.sound.add('background-sound', { volume: 0.4, loop: true })
@@ -80,13 +86,7 @@ export default class MainScene extends Phaser.Scene {
 
     this.scoreText = new ScoreText(this, width - 270, 70)
 
-    this.bigLevelText = new BigLevelText(this, width * 0.5, height * 0.5, this.levelText.content, {
-      fontFamily: FONTS.ALLOY_INK,
-      fontSize: '132px',
-    })
-
-    const selectedLevel = this.getCurrentLevel()
-    this.createHiddenChars(selectedLevel ? selectedLevel.hiddens : 1)
+    this.createHiddenChars(this.level.hiddens)
     this.startTutorialMode()
   }
 
@@ -94,10 +94,10 @@ export default class MainScene extends Phaser.Scene {
     return this.getFileStorageConfig().tutorialMode
   }
 
-  private set tutorialMode(v: boolean) {
+  private set tutorialMode(istutorialMode: boolean) {
     this.setFileStorageConfig({
       ...this.getFileStorageConfig(),
-      tutorialMode: v,
+      tutorialMode: istutorialMode,
     })
   }
 
@@ -127,7 +127,7 @@ export default class MainScene extends Phaser.Scene {
     this.tutorialMode = false
   }
 
-  showFinishGameDialog = (text: string) => {
+  showFinishGameDialog = (text: string, playSound: boolean) => {
     const { width, height } = this.scale
     new LevelCompleteDialog(
       this,
@@ -135,12 +135,16 @@ export default class MainScene extends Phaser.Scene {
       height * 0.5,
       text,
       this.scoreText.text,
+      playSound,
       () => {
         this.backgroundAudio.stop()
         this.scene.start('MenuScene')
       },
       () => {
         this.scene.restart()
+      },
+      () => {
+        this.goToLevelScene()
       }
     )
   }
@@ -160,9 +164,13 @@ export default class MainScene extends Phaser.Scene {
 
   createBackButton() {
     new ButtonSmall(this, 10, 10, BUTTON.LEFT, () => {
-      this.backgroundAudio.stop()
-      this.scene.start('MenuScene')
+      this.goToLevelScene()
     }).setOrigin(0, 0)
+  }
+
+  goToLevelScene() {
+    this.backgroundAudio.stop()
+    this.scene.start('LevelScene')
   }
 
   setToGameOverState() {
@@ -195,30 +203,27 @@ export default class MainScene extends Phaser.Scene {
       return Promise.resolve()
     }
 
-    ++this.level
-    const selectedLevel = this.getCurrentLevel()
-    if (!selectedLevel) {
+    ++this.round
+    if (this.round > this.level.to) {
       this.backgroundAudio.stop()
-      this.showFinishGameDialog('You Win!')
+      this.showFinishGameDialog('You Win!', true)
       return Promise.resolve()
     }
-    this.levelText.content = `level ${selectedLevel.level}`
-    await this.bigLevelText.updateContent(this.levelText.content)
-
+    
     this.time.delayedCall(500, () => {
       this.resetBoxes()
 
       const pathToGo = this.gameMap.getPathTo(this.player.objectPosition, { ...this.getInitialPlayerPosition() })
       this.player.setIsGoingTo(pathToGo, true)
 
-      this.createHiddenChars(selectedLevel.hiddens)
+      this.createHiddenChars(this.level.hiddens)
       this.player.active = true
     })
     return Promise.resolve()
   }
 
-  getCurrentLevel() {
-    return LEVELS.find((levelConfig) => this.level >= levelConfig.from && this.level <= levelConfig.to)
+  getCurrentLevel(level): Level {
+    return LEVELS.find((levelConfig) => level === levelConfig.level) || LEVELS[0]
   }
 
   resetBoxes() {
@@ -314,7 +319,7 @@ export default class MainScene extends Phaser.Scene {
     if (!box.hiddenCharName || !box.isRightBox(currentHiddenChar)) {
       box.wrongBox()
       this.closeBox(box)
-      this.showFinishGameDialog('Game over')
+      this.showFinishGameDialog('Game over', false)
       return
     }
 

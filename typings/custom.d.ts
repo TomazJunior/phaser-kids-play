@@ -30,3 +30,10 @@ declare interface Window {
   cordova: any
   plugins: any
 }
+
+declare interface Level {
+  level: number
+  from: number
+  to: number
+  hiddens: number
+}

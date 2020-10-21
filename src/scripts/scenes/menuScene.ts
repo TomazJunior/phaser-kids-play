@@ -15,7 +15,8 @@ export default class MenuScene extends Phaser.Scene {
     const title = this.add.bitmapText(width * 0.5, height * 0.3, FONTS.SHORT_STACK, 'Game for kids', 150).setOrigin(0.5, 0.5)
 
     new ButtonBig(this, width * 0.5, title.y + title.height, "START", () => {
-      this.scene.start('MainScene')
+      // this.scene.start('MainScene')
+      this.scene.start('LevelScene')
     }).setOrigin(0.5, 0.5)
   }
 }
