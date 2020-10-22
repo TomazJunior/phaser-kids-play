@@ -60,7 +60,10 @@ export default class LevelScene extends Phaser.Scene {
 
       const levelFileData = fileStorageData.levels && fileStorageData.levels.find((lvl) => lvl.level === level.level)
       const maxLevel = fileStorageData.levels.reduce((maxLevel, level) => {
-        return Math.max(maxLevel, level.level)
+        if (level.stars) {
+          maxLevel = Math.max(maxLevel, level.level + 1)
+        }
+        return maxLevel
       }, 1)
 
       const button = new ButtonSmall(this, posX, posY, {

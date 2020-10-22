@@ -37,7 +37,11 @@ export default class MainScene extends Phaser.Scene {
 
   init(currentLevel: Level) {
     this.gameover = false
-    this.level = !currentLevel ? this.getCurrentLevel(1) : { ...currentLevel }
+    if (!currentLevel?.level) {
+      this.level = this.getLevel(1)
+    } else {
+      this.level = { ...currentLevel }
+    }
     this.round = 1
     this.currentHiddenSkins = []
     this.availableHiddenSkins = []
@@ -105,27 +109,62 @@ export default class MainScene extends Phaser.Scene {
     const firstBox: Box = <Box>this.boxes.children.getArray()[0]
     firstBox.toggleHelp()
     setTutorialMode(false)
+    this.levelText.content = `level ${this.level.level}`
   }
 
-  showFinishGameDialog = (text: string, playSound: boolean) => {
+  showFinishGameDialog = (text: string, finishedLevel: boolean) => {
     const { width, height } = this.scale
+    const restartButtonConfig: ButtonConfig = {
+      name: BUTTON.RESTART,
+      onClick: () => {
+        this.scene.restart()
+      },
+    }
+    const currentLevel = { ...this.level }
+    const nextLevelExists = this.isLevelExist(currentLevel.level + 1)
+    
+    const nextLevelButtonConfig: ButtonConfig = {
+      name: BUTTON.RIGHT,
+      onClick: () => {
+        if (nextLevelExists) {
+          this.scene.restart(this.getLevel(currentLevel.level + 1))
+        }
+      },
+    }
+    const levelSceneButtonConfig: ButtonConfig = {
+      name: BUTTON.LEVEL,
+      onClick: () => {
+        this.goToLevelScene()
+      },
+    }
+
+    let secondButtonConfig: ButtonConfig
+    let thirdButtonConfig: ButtonConfig
+
+    if (finishedLevel) {
+      secondButtonConfig = nextLevelExists ? levelSceneButtonConfig : {...levelSceneButtonConfig, visible: false}
+      thirdButtonConfig = nextLevelExists ? nextLevelButtonConfig : levelSceneButtonConfig
+    } else {
+      secondButtonConfig = this.round > 1 ? restartButtonConfig : levelSceneButtonConfig
+      thirdButtonConfig = this.round > 1 ? nextLevelButtonConfig : restartButtonConfig
+    }
+
     new LevelCompleteDialog(
       this,
       width * 0.5,
       height * 0.5,
       text,
       this.scoreText.text,
-      playSound,
-      () => {
-        this.backgroundAudio.stop()
-        this.scene.start('MenuScene')
+      finishedLevel,
+      {
+        name: BUTTON.HOME,
+        onClick: () => {
+          this.backgroundAudio.stop()
+          this.scene.start('MenuScene')
+        },
       },
-      () => {
-        this.scene.restart()
-      },
-      () => {
-        this.goToLevelScene()
-      }
+      secondButtonConfig,
+      thirdButtonConfig
     )
   }
 
@@ -172,7 +211,7 @@ export default class MainScene extends Phaser.Scene {
     )
   }
 
-  goToNextLevel(): boolean {
+  shouldGoToNextLevel(): boolean {
     return this.hiddenChars.getChildren().every((x: any) => x.visible)
   }
 
@@ -181,7 +220,7 @@ export default class MainScene extends Phaser.Scene {
       this.finishTutorialMode()
     }
 
-    if (!this.goToNextLevel()) {
+    if (!this.shouldGoToNextLevel()) {
       this.player.active = true
       return Promise.resolve()
     }
@@ -206,8 +245,14 @@ export default class MainScene extends Phaser.Scene {
     return Promise.resolve()
   }
 
-  getCurrentLevel(level): Level {
-    return LEVELS.find((levelConfig) => level === levelConfig.level) || LEVELS[0]
+  isLevelExist(level): boolean{
+    return LEVELS.find((levelConfig) => level === levelConfig.level) !== undefined
+  }
+
+  getLevel(level): Level{
+    const levelFound = LEVELS.find((levelConfig) => level === levelConfig.level)
+    if (!levelFound) throw new Error(`level ${level} not found`)
+    return levelFound
   }
 
   resetBoxes() {

@@ -1,4 +1,4 @@
-import { BUTTON, FONTS } from '../utils/constants'
+import { FONTS } from '../utils/constants'
 import { ButtonSmall } from './buttonSmall'
 
 export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
@@ -11,9 +11,9 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
     title: string,
     score: string,
     playSound: boolean,
-    onHomeClick: () => void,
-    onRestartClick: () => void,
-    onLevelClick: () => void
+    firstButton: ButtonConfig,
+    secondButton: ButtonConfig,
+    thirdButton: ButtonConfig
   ) {
     super(scene, x, y, 'level-complete-dialog')
     scene.add.existing(this)
@@ -49,26 +49,19 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
       })
       .setOrigin(0.5, 0)
 
-    new ButtonSmall(scene, this.x - this.displayWidth * 0.4 + 40, this.y + this.displayHeight * 0.3, {
-      name: BUTTON.HOME,
-      onClick: () => {
-        onHomeClick()
-      },
-    }).setOrigin(0, 0)
+    new ButtonSmall(
+      scene,
+      this.x - this.displayWidth * 0.4 + 40,
+      this.y + this.displayHeight * 0.3,
+      firstButton
+    ).setOrigin(0, 0)
 
-    new ButtonSmall(scene, this.x - 50, this.y + this.displayHeight * 0.3, {
-      name: BUTTON.LEFT,
-      onClick: () => {
-        onLevelClick()
-      },
-    }).setOrigin(0, 0)
+    new ButtonSmall(scene, this.x - 50, this.y + this.displayHeight * 0.3, secondButton).setOrigin(0, 0)
 
-    new ButtonSmall(scene, this.x + this.displayWidth * 0.2, this.y + this.displayHeight * 0.3, {
-      name: BUTTON.RESTART,
-      onClick: () => {
-        onRestartClick()
-      },
-    }).setOrigin(0, 0)
+    new ButtonSmall(scene, this.x + this.displayWidth * 0.2, this.y + this.displayHeight * 0.3, thirdButton).setOrigin(
+      0,
+      0
+    )
 
     playSound && this.nextLevelAudio.play()
   }

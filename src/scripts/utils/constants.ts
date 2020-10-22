@@ -82,7 +82,8 @@ export enum BUTTON {
   RESTART = 'restart-button',
   HOME = 'home-button',
   EMPTY = 'empty-button',
-  LEVEL = 'level-button'
+  LEVEL = 'level-button',
+  RIGHT = 'right-button'
 }
 
 export enum BUTTON_PREFIX {

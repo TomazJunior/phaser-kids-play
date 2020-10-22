@@ -15,6 +15,7 @@ declare interface ButtonConfig {
     x: number
     y: number
   }
+  visible?: boolean
   onClick: () => void
 }
 
