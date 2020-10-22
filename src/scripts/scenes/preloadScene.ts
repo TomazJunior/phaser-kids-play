@@ -12,7 +12,6 @@ export default class PreloadScene extends Phaser.Scene {
     this.progressBar = new ProgressBar(this, width * 0.4, height * 0.5)
 
     this.load.image('background', 'assets/img/background.png')
-    this.load.image('modalbg', 'assets/img/modalBg.png')
     this.load.spritesheet(SPRITE_NAME.SOKOBAN, 'assets/img/sokoban_tilesheet.png', {
       frameWidth: 64,
     })
@@ -22,10 +21,6 @@ export default class PreloadScene extends Phaser.Scene {
       'assets/img/round_nodetailsOutline.png',
       'assets/img/round_nodetailsOutline.xml'
     )
-
-    this.load.atlasXML(SPRITE_NAME.BLUE_SHEET, 'assets/img/blueSheet.png', 'assets/img/blueSheet.xml')
-
-    this.load.atlasXML(SPRITE_NAME.WHITE_SHEET, 'assets/img/sheet_white2x.png', 'assets/img/sheet_white2x.xml')
 
     this.load.image('finger-point', 'assets/img/finger-point-gesture.png')
 
@@ -44,7 +39,6 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('big-frame-window', 'assets/img/big-frame-window.png')
     
     this.load.bitmapFont(FONTS.PIXEL_FONT, 'assets/fonts/pixelFont.png', 'assets/fonts/pixelFont.xml')
-    this.load.bitmapFont(FONTS.SHORT_STACK, 'assets/fonts/shortStack.png', 'assets/fonts/shortStack.xml')
 
     this.load.audio('click', 'assets/audio/click5.ogg')
     this.load.audio('find-hidden', 'assets/audio/find-hidden.wav')
@@ -52,7 +46,6 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.audio('click-box', 'assets/audio/434756__notarget__wood-step-sample-1.wav')
     this.load.audio('wrong-box', 'assets/audio/350984__cabled-mess__lose-c-03.wav')
     this.load.audio('walking', 'assets/audio/430708__juandamb__running.wav')
-
     //buttons
     this.loadImageStates()
 

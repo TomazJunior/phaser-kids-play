@@ -53,8 +53,6 @@ export const PLAYER = {
 }
 
 export const SPRITE_NAME = {
-  BLUE_SHEET: 'blueSheet',
-  WHITE_SHEET: 'whiteSheet',
   ROUND_ANIMALS: 'round_animals',
   SOKOBAN: 'sokoban',
 }
@@ -68,7 +66,6 @@ export enum TILES {
 
 export const FONTS = {
   PIXEL_FONT: 'pixelFont',
-  SHORT_STACK: 'shortStack',
   ALLOY_INK: 'AlloyInk',
 }
 
