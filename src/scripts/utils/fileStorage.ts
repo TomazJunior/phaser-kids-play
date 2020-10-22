@@ -10,11 +10,16 @@ const initialFileStorageConfig: FileStorageConfig = {
 }
 
 export const getFileStorageConfig = (): FileStorageConfig => {
-  const value: any = localStorage.getItem(FILE_STORAGE_KEY)
-  if (!!value) {
-    return JSON.parse(value)
+  try {
+    const value: any = localStorage.getItem(FILE_STORAGE_KEY)
+    let parsed = {}
+    if (!!value) {
+      parsed = JSON.parse(value)
+    }
+    return { ...initialFileStorageConfig, ...parsed }
+  } catch (error) {
+    return { ...initialFileStorageConfig }
   }
-  return { ...initialFileStorageConfig }
 }
 
 export const setTutorialMode = (istutorialMode: boolean) => {
