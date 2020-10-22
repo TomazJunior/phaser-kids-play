@@ -1,13 +1,16 @@
+import BackgroundParallax from '../ui/backgroundParallax'
 import { ButtonSmall } from '../ui/buttonSmall'
 import { BUTTON, BUTTON_PREFIX, FONTS, LEVELS } from '../utils/constants'
 import { getFileStorageConfig } from '../utils/fileStorage'
 
 export default class LevelScene extends Phaser.Scene {
+  background: BackgroundParallax
+
   constructor() {
     super({ key: 'LevelScene' })
   }
   create() {
-    this.createBackground()
+    this.background = new BackgroundParallax(this, false)
     this.createSelectLevelFrame()
     this.createBackButton()
   }
@@ -19,15 +22,6 @@ export default class LevelScene extends Phaser.Scene {
         this.scene.start('MenuScene')
       },
     }).setOrigin(0, 0)
-  }
-
-  createBackground() {
-    const { width, height } = this.scale
-    const background = this.add.image(width * 0.5, height * 0.5, 'background')
-    let scaleX = width / background.width
-    let scaleY = height / background.height
-    let scale = Math.max(scaleX, scaleY)
-    background.setScale(scale).setScrollFactor(0)
   }
 
   //TODO: move to a component UI

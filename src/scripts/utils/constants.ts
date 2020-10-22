@@ -1,5 +1,5 @@
 export const SCORE_PER_HIDDEN_CHAR = 10
-
+export const GAME_NAME = 'Find them all'
 export const BOX = {
   width: 101,
   height: 171,

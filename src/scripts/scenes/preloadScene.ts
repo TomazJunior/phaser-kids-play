@@ -11,7 +11,7 @@ export default class PreloadScene extends Phaser.Scene {
     const { width, height } = this.scale
     this.progressBar = new ProgressBar(this, width * 0.4, height * 0.5)
 
-    this.load.image('background', 'assets/img/MlQA2U.jpg')
+    this.load.image('background', 'assets/img/background.png')
     this.load.image('modalbg', 'assets/img/modalBg.png')
     this.load.spritesheet(SPRITE_NAME.SOKOBAN, 'assets/img/sokoban_tilesheet.png', {
       frameWidth: 64,

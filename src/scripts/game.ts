@@ -23,7 +23,7 @@ const config: Phaser.Types.Core.GameConfig = {
     width: GAME.WIDTH,
     height: GAME.HEIGHT,
   },
-  scene: [PreloadScene, LevelScene, MenuScene, MainScene],
+  scene: [PreloadScene, MenuScene, LevelScene, MainScene],
   physics: {
     default: 'arcade',
     arcade: {
