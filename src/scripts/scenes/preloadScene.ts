@@ -37,15 +37,15 @@ export default class PreloadScene extends Phaser.Scene {
 
     this.load.image('level-complete-dialog', 'assets/img/level-complete-dialog.png')
     this.load.image('big-frame-window', 'assets/img/big-frame-window.png')
-    
+
     this.load.bitmapFont(FONTS.PIXEL_FONT, 'assets/fonts/pixelFont.png', 'assets/fonts/pixelFont.xml')
 
-    this.load.audio('click', 'assets/audio/click5.ogg')
-    this.load.audio('find-hidden', 'assets/audio/find-hidden.wav')
-    this.load.audio('next-level', 'assets/audio/next-level.wav')
-    this.load.audio('click-box', 'assets/audio/434756__notarget__wood-step-sample-1.wav')
-    this.load.audio('wrong-box', 'assets/audio/350984__cabled-mess__lose-c-03.wav')
-    this.load.audio('walking', 'assets/audio/430708__juandamb__running.wav')
+    this.load.audio('click', 'assets/audio/click5.mp3')
+    this.load.audio('find-hidden', 'assets/audio/find-hidden.mp3')
+    this.load.audio('next-level', 'assets/audio/next-level.mp3')
+    this.load.audio('click-box', 'assets/audio/434756_notarget_wood-step-sample-1.mp3')
+    this.load.audio('wrong-box', 'assets/audio/350984__cabled-mess__lose-c-03.mp3')
+    this.load.audio('walking', 'assets/audio/430708_juandamb_running.mp3')
     //buttons
     this.loadImageStates()
 
