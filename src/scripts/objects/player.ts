@@ -1,6 +1,7 @@
 import Box from './box'
 import { PLAYER_CHAR_REACHED_BOX } from '../events/events'
-import { PLAYER } from '../utils/constants'
+import { PLAYER, SOUNDS } from '../utils/constants'
+import { getOrAddAudio, playSound } from '../utils/audioUtil'
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
   isWalking = false
@@ -30,21 +31,20 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.play(this.animation, true)
     this.pathToGo = []
 
-    this.walkingAudio = scene.sound.get('walking') || scene.sound.add('walking', { volume: 0.4, loop: true })
+    this.walkingAudio = getOrAddAudio(scene, SOUNDS.WALKING, { volume: 0.4, loop: true })
     scene.events.on('update', this.update, this)
   }
 
   goTo(box: Box, pathToGo: Array<ObjectPosition>) {
-    if (!this.active) return
-
     if (this.walkingAudio.isPlaying) this.walkingAudio.stop()
+    if (!this.active) return
 
     this.setActiveBox(box)
     this.setIsGoingTo(pathToGo, false)
   }
 
   setIsGoingTo(pathToGo: Array<ObjectPosition>, initialPos) {
-    this.walkingAudio.play()
+    playSound(this.scene, this.walkingAudio)
     this.isWalking = true
     this.pathToGo = pathToGo
     this.goToNextPosition(initialPos)
@@ -59,8 +59,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   update() {
-    // return
-    if (!this.active) return
+    if (!this.active) {
+      if (this.walkingAudio.isPlaying) this.walkingAudio.stop()
+      return
+    }
     this.play(this.animation, true)
 
     const speed = 350
@@ -116,7 +118,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       this.animation = PLAYER.ANIMATIONS.DOWN_IDLE
       this.setVelocity(0, 0)
     }
-
   }
 
   createAnimations() {
@@ -171,7 +172,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
   private goToNextPosition = (initialPos) => {
     const moviment = this.pathToGo.shift()
-    
+
     if (moviment) {
       this.objectPosition = moviment
       this.isGoingTo = {

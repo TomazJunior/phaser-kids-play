@@ -3,7 +3,7 @@ import Box from '../objects/box'
 import HiddenChar from '../objects/hiddenChar'
 import { HIDDEN_CHAR_REACHED_BOX, PLAYER_CHAR_REACHED_BOX, PLAYER_TOUCHED_BOX } from '../events/events'
 import { getAllSkins, getARandomSkinFrom } from '../utils/skinUtils'
-import { FONTS, LEVELS, ANIMAL_SKINS, TILES, BUTTON } from '../utils/constants'
+import { FONTS, LEVELS, ANIMAL_SKINS, TILES, BUTTON, SOUNDS } from '../utils/constants'
 import ColoredText from '../ui/coloredText'
 import HiddenThumbChars from '../objects/hiddenThumbChars'
 import ScoreText from '../ui/scoreText'
@@ -11,6 +11,7 @@ import { GameMap } from '../objects/map'
 import { ButtonSmall } from '../ui/buttonSmall'
 import { LevelCompleteDialog } from '../ui/levelCompleteDialog'
 import { getFileStorageConfig, setLevel, setTutorialMode } from '../utils/fileStorage'
+import { getOrAddAudio, playSound } from '../utils/audioUtil'
 
 const INIT_Y = 37
 
@@ -48,7 +49,58 @@ export default class MainScene extends Phaser.Scene {
     this.hiddenCharOnTheirPosition = false
   }
 
+  handleLoseFocus = () => {
+    // assuming a Paused scene that has a pause modal
+    if (this.scene.isActive('PauseScene')) {
+      return
+    }
+
+    // show Paused scene only if Main scene is active
+    if (!this.scene.isActive('MainScene')) {
+      return
+    }
+
+    // stop all sounds and main scene
+    this.scene.pause('MainScene')
+    this.sound.pauseAll()
+
+    this.scene.run('PauseScene', <PauseSceneConfig>{
+      onResume: this.resumePausedScene,
+      onHome: () => {
+        this.resumePausedScene()
+        this.goToMenuScene()
+      },
+      onRestart: () => {
+        this.resumePausedScene()
+        this.restartScene()
+      },
+    })
+  }
+
+  restartScene = (level?: Level) => {
+    this.setToGameOverState(() => {
+      this.scene.restart(level)
+    })
+  }
+
+  resumePausedScene = () => {
+    this.scene.stop('PauseScene')
+    this.scene.resume('MainScene')
+    this.sound.resumeAll()
+  }
+
   create() {
+    this.sound.pauseOnBlur = false
+    this.game.events.on(Phaser.Core.Events.BLUR, () => {
+      this.handleLoseFocus()
+    })
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        return
+      }
+      this.handleLoseFocus()
+    })
+
     const { width, height } = this.scale
 
     this.createBackground()
@@ -83,11 +135,10 @@ export default class MainScene extends Phaser.Scene {
       }
     )
 
-    this.backgroundAudio =
-      this.sound.get('background-sound') || this.sound.add('background-sound', { volume: 0.4, loop: true })
-    this.backgroundAudio.play()
+    this.backgroundAudio = getOrAddAudio(this, SOUNDS.BACKGROUND, { volume: 0.4, loop: true })
+    playSound(this, this.backgroundAudio)
 
-    this.clickOnBoxAudio = this.sound.get('click-box') || this.sound.add('click-box')
+    this.clickOnBoxAudio = getOrAddAudio(this, SOUNDS.CLICK_BOX)
 
     this.scoreText = new ScoreText(this, width - 270, 70)
 
@@ -113,21 +164,22 @@ export default class MainScene extends Phaser.Scene {
   }
 
   showFinishGameDialog = (text: string, finishedLevel: boolean) => {
+    
     const { width, height } = this.scale
     const restartButtonConfig: ButtonConfig = {
       name: BUTTON.RESTART,
       onClick: () => {
-        this.scene.restart()
+        this.restartScene()
       },
     }
     const currentLevel = { ...this.level }
     const nextLevelExists = this.isLevelExist(currentLevel.level + 1)
-    
+
     const nextLevelButtonConfig: ButtonConfig = {
       name: BUTTON.RIGHT,
       onClick: () => {
         if (nextLevelExists) {
-          this.scene.restart(this.getLevel(currentLevel.level + 1))
+          this.restartScene(this.getLevel(currentLevel.level + 1))
         }
       },
     }
@@ -142,30 +194,29 @@ export default class MainScene extends Phaser.Scene {
     let thirdButtonConfig: ButtonConfig
 
     if (finishedLevel) {
-      secondButtonConfig = nextLevelExists ? levelSceneButtonConfig : {...levelSceneButtonConfig, visible: false}
+      secondButtonConfig = nextLevelExists ? levelSceneButtonConfig : { ...levelSceneButtonConfig, visible: false }
       thirdButtonConfig = nextLevelExists ? nextLevelButtonConfig : levelSceneButtonConfig
     } else {
       secondButtonConfig = this.round > 1 ? restartButtonConfig : levelSceneButtonConfig
       thirdButtonConfig = this.round > 1 ? nextLevelButtonConfig : restartButtonConfig
     }
 
-    new LevelCompleteDialog(
-      this,
-      width * 0.5,
-      height * 0.5,
-      text,
-      this.scoreText.text,
-      finishedLevel,
-      {
-        name: BUTTON.HOME,
-        onClick: () => {
-          this.backgroundAudio.stop()
-          this.scene.start('MenuScene')
+    this.setToGameOverState(() => {
+      new LevelCompleteDialog(
+        this,
+        width * 0.5,
+        height * 0.5,
+        text,
+        this.scoreText.text,
+        finishedLevel,
+        {
+          name: BUTTON.HOME,
+          onClick: this.goToMenuScene,
         },
-      },
-      secondButtonConfig,
-      thirdButtonConfig
-    )
+        secondButtonConfig,
+        thirdButtonConfig
+      )
+    })
   }
 
   update() {
@@ -190,18 +241,32 @@ export default class MainScene extends Phaser.Scene {
     }).setOrigin(0, 0)
   }
 
-  goToLevelScene() {
-    this.backgroundAudio.stop()
-    this.scene.start('LevelScene')
+  goToMenuScene = () => {
+    this.setToGameOverState(() => {
+      this.scene.stop('MainScene')
+      this.backgroundAudio.stop()
+      this.scene.start('MenuScene')
+    })
   }
 
-  setToGameOverState() {
-    if (this.gameover) return
-    this.gameover = true
-    this.player.active = false
-    this.player.visible = false
-    this.clearHiddenChars()
-    this.backgroundAudio.stop()
+  goToLevelScene() {
+    this.setToGameOverState(() => {
+      this.backgroundAudio.stop()
+      this.scene.start('LevelScene')
+    })
+  }
+
+  setToGameOverState(cb: () => void) {
+    if (!this.gameover) {
+      this.gameover = true
+      this.player.active = false
+      this.player.visible = false
+      this.clearHiddenChars()
+      this.backgroundAudio.stop()
+    }
+    this.time.delayedCall(100, () => {
+      cb()
+    })
   }
 
   hiddenCharsAreReady(): boolean {
@@ -245,11 +310,11 @@ export default class MainScene extends Phaser.Scene {
     return Promise.resolve()
   }
 
-  isLevelExist(level): boolean{
+  isLevelExist(level: number): boolean {
     return LEVELS.find((levelConfig) => level === levelConfig.level) !== undefined
   }
 
-  getLevel(level): Level{
+  getLevel(level: number): Level {
     const levelFound = LEVELS.find((levelConfig) => level === levelConfig.level)
     if (!levelFound) throw new Error(`level ${level} not found`)
     return levelFound
@@ -317,7 +382,7 @@ export default class MainScene extends Phaser.Scene {
     const pathToGo = this.gameMap.getPathTo(this.player.objectPosition, box.objectPosition)
 
     if (this.clickOnBoxAudio.isPlaying) this.clickOnBoxAudio.stop()
-    this.clickOnBoxAudio.play()
+    playSound(this, this.clickOnBoxAudio)
 
     this.player.goTo(box, pathToGo)
   }

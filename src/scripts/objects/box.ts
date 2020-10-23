@@ -1,5 +1,6 @@
 import { PLAYER_TOUCHED_BOX } from '../events/events'
-import { ANIMAL_SKINS, BOX, IMAGE_NAME, SPRITE_NAME } from '../utils/constants'
+import { getOrAddAudio, playSound } from '../utils/audioUtil'
+import { ANIMAL_SKINS, BOX, IMAGE_NAME, SOUNDS, SPRITE_NAME } from '../utils/constants'
 
 export default class Box extends Phaser.Physics.Arcade.Sprite {
   hiddenCharName: ANIMAL_SKINS | null
@@ -46,8 +47,8 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
       this.emit(PLAYER_TOUCHED_BOX, this)
     })
 
-    this.clickOnWrongBoxAudio = scene.sound.get('wrong-box') || scene.sound.add('wrong-box')
-    this.clickOnRightBoxAudio = scene.sound.get('find-hidden') || scene.sound.add('find-hidden')
+    this.clickOnWrongBoxAudio = getOrAddAudio(scene, SOUNDS.WRONG_BOX)
+    this.clickOnRightBoxAudio = getOrAddAudio(scene, SOUNDS.FIND_HIDDEN)
   }
 
   toggleHelp() {
@@ -84,13 +85,13 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
   }
 
   wrongBox() {
-    this.clickOnWrongBoxAudio.play()
+    playSound(this.scene, this.clickOnWrongBoxAudio)
     this.opened = false
     this.shadow.setVisible(true)
   }
 
   openBox(withSound = true) {
-    withSound && this.clickOnRightBoxAudio.play()
+    withSound && playSound(this.scene, this.clickOnRightBoxAudio)
     this.opened = true
     this.setTexture( BOX.SKINS.OPENED)
   }

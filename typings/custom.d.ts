@@ -8,13 +8,20 @@ declare interface TilePosition {
 }
 
 declare interface ButtonConfig {
-  text?: string
+  text?: {
+    title?: string,
+    fontSize?: string,
+    padding?: {
+      x?: number,
+      y?: number
+    }
+  },
   name?: import('../src/scripts/utils/constants').BUTTON
   prefix?:import('../src/scripts/utils/constants').BUTTON_PREFIX
   scale?: {
     x: number
     y: number
-  }
+  },
   visible?: boolean
   onClick: () => void
 }
@@ -41,4 +48,10 @@ declare interface Level {
   level: number
   rounds: number
   hiddens: number
+}
+
+declare interface PauseSceneConfig {
+  onHome: () => void
+  onResume: () => void
+  onRestart: () => void
 }

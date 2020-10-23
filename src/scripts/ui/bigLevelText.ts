@@ -1,3 +1,5 @@
+import { getOrAddAudio, playSound } from '../utils/audioUtil'
+import { SOUNDS } from '../utils/constants'
 import ColoredText from './coloredText'
 
 export default class BigLevelText extends ColoredText {
@@ -7,7 +9,7 @@ export default class BigLevelText extends ColoredText {
   constructor(scene: Phaser.Scene, x: number, y: number, content: string, style: any) {
     super(scene, x, y, content, style, false)
     this.previousValue = content
-    this.nextLevelAudio = scene.sound.get('next-level') || scene.sound.add('next-level')
+    this.nextLevelAudio = getOrAddAudio(scene, SOUNDS.NEXT_LEVEL)
     this.setOrigin(0.5)
     this.setDepth(1000)
   }
@@ -16,7 +18,7 @@ export default class BigLevelText extends ColoredText {
     return new Promise((resolve, reject) => {
       this.content = newValue
       if (this.previousValue !== this.content) {
-        this.nextLevelAudio.play()
+        playSound(this.scene, this.nextLevelAudio)
         this.visible = true
         this.scene.tweens.add({
           targets: this.bbCodeText,

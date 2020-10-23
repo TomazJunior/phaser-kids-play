@@ -1,4 +1,5 @@
-import { FONTS } from '../utils/constants'
+import { getOrAddAudio, playSound } from '../utils/audioUtil'
+import { FONTS, SOUNDS } from '../utils/constants'
 import { ButtonSmall } from './buttonSmall'
 
 export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
@@ -10,14 +11,14 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
     y: number,
     title: string,
     score: string,
-    playSound: boolean,
+    shouldPlaySound: boolean,
     firstButton: ButtonConfig,
     secondButton: ButtonConfig,
     thirdButton: ButtonConfig
   ) {
     super(scene, x, y, 'level-complete-dialog')
     scene.add.existing(this)
-    this.nextLevelAudio = scene.sound.get('next-level') || scene.sound.add('next-level')
+    this.nextLevelAudio = getOrAddAudio(scene, SOUNDS.NEXT_LEVEL)
 
     const textTitle = this.scene.add
       .text(this.x, this.y - this.displayHeight * 0.5 + 20, 'Level Complete', {
@@ -63,6 +64,6 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
       0
     )
 
-    playSound && this.nextLevelAudio.play()
+    shouldPlaySound && playSound(this.scene, this.nextLevelAudio)
   }
 }

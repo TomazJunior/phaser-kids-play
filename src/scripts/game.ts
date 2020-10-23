@@ -6,6 +6,7 @@ import { GAME } from './utils/constants'
 import MenuScene from './scenes/menuScene'
 import { isAndroid } from './utils/device'
 import LevelScene from './scenes/levelScene'
+import PauseScene from './scenes/pauseScene'
 
 const isLocalhost = Boolean(
   window.location.hostname === 'localhost' ||
@@ -23,7 +24,7 @@ const config: Phaser.Types.Core.GameConfig = {
     width: GAME.WIDTH,
     height: GAME.HEIGHT,
   },
-  scene: [PreloadScene, MenuScene, LevelScene, MainScene],
+  scene: [PreloadScene, PauseScene, MenuScene, LevelScene, MainScene],
   physics: {
     default: 'arcade',
     arcade: {

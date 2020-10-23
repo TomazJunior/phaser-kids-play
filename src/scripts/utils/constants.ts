@@ -69,6 +69,16 @@ export const FONTS = {
   ALLOY_INK: 'AlloyInk',
 }
 
+export enum SOUNDS {
+  CLICK = 'click',
+  BACKGROUND = 'background-sound',
+  FIND_HIDDEN = 'find-hidden',
+  NEXT_LEVEL = 'next-level',
+  CLICK_BOX = 'click-box',
+  WRONG_BOX = 'wrong-box',
+  WALKING = 'walking'
+}
+
 export enum IMAGE_NAME {
   FINGER_POINT = 'finger-point',
 }
@@ -80,7 +90,8 @@ export enum BUTTON {
   HOME = 'home-button',
   EMPTY = 'empty-button',
   LEVEL = 'level-button',
-  RIGHT = 'right-button'
+  RIGHT = 'right-button',
+  SOUND = 'sound-button'
 }
 
 export enum BUTTON_PREFIX {

@@ -24,7 +24,6 @@ export default class LevelScene extends Phaser.Scene {
     }).setOrigin(0, 0)
   }
 
-  //TODO: move to a component UI
   createSelectLevelFrame() {
     const { width, height } = this.scale
     const frame = this.add.image(width * 0.5, height * 0.5, 'big-frame-window')
@@ -65,7 +64,9 @@ export default class LevelScene extends Phaser.Scene {
         onClick: () => {
           this.scene.start('MainScene', level)
         },
-        text: level.level.toString(),
+        text: {
+          title: level.level.toString()
+        },
         prefix: level.level > maxLevel ? BUTTON_PREFIX.BLOCKED : undefined,
         scale: {
           x: 0.6,

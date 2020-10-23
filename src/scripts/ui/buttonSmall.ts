@@ -1,4 +1,5 @@
-import { BUTTON_PREFIX, FONTS } from '../utils/constants'
+import { getOrAddAudio, playSound } from '../utils/audioUtil'
+import { BUTTON_PREFIX, FONTS, SOUNDS } from '../utils/constants'
 
 export class ButtonSmall extends Phaser.GameObjects.Sprite {
   group: Phaser.Physics.Arcade.StaticGroup
@@ -15,13 +16,13 @@ export class ButtonSmall extends Phaser.GameObjects.Sprite {
       this.setScale(0.5, 0.5)
     }
 
-    const clickAudio = scene.sound.get('click') || scene.sound.add('click')
+    const clickAudio = getOrAddAudio(scene, SOUNDS.CLICK)
 
-    if (config.text) {
+    if (config.text?.title) {
       const text = this.scene.add
-        .text(x, y - 5, config.text, {
+        .text(x, y - 5, config.text.title, {
           fontFamily: FONTS.ALLOY_INK,
-          fontSize: '48px',
+          fontSize: config.text.fontSize || '48px',
         })
         .setOrigin(0.5, 0.5)
       this.group.add(text)
@@ -33,7 +34,7 @@ export class ButtonSmall extends Phaser.GameObjects.Sprite {
 
     this.setInteractive().on('pointerdown', () => {
       if (this.texture.key.endsWith(BUTTON_PREFIX.BLOCKED)) return
-      clickAudio.play()
+      playSound(scene, clickAudio)
       config.onClick()
     })
   }

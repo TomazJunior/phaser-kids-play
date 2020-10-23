@@ -1,5 +1,5 @@
 import ProgressBar from '../ui/progressBar'
-import { BUTTON, BUTTON_PREFIX, FONTS, SPRITE_NAME } from '../utils/constants'
+import { BUTTON, BUTTON_PREFIX, FONTS, SOUNDS, SPRITE_NAME } from '../utils/constants'
 
 export default class PreloadScene extends Phaser.Scene {
   progressBar: ProgressBar
@@ -37,15 +37,16 @@ export default class PreloadScene extends Phaser.Scene {
 
     this.load.image('level-complete-dialog', 'assets/img/level-complete-dialog.png')
     this.load.image('big-frame-window', 'assets/img/big-frame-window.png')
+    this.load.image('small-frame-window', 'assets/img/small-frame-window.png')
 
     this.load.bitmapFont(FONTS.PIXEL_FONT, 'assets/fonts/pixelFont.png', 'assets/fonts/pixelFont.xml')
 
-    this.load.audio('click', 'assets/audio/click5.mp3')
-    this.load.audio('find-hidden', 'assets/audio/find-hidden.mp3')
-    this.load.audio('next-level', 'assets/audio/next-level.mp3')
-    this.load.audio('click-box', 'assets/audio/434756_notarget_wood-step-sample-1.mp3')
-    this.load.audio('wrong-box', 'assets/audio/350984__cabled-mess__lose-c-03.mp3')
-    this.load.audio('walking', 'assets/audio/430708_juandamb_running.mp3')
+    this.load.audio(SOUNDS.CLICK, 'assets/audio/click5.mp3')
+    this.load.audio(SOUNDS.FIND_HIDDEN, 'assets/audio/find-hidden.mp3')
+    this.load.audio(SOUNDS.NEXT_LEVEL, 'assets/audio/next-level.mp3')
+    this.load.audio(SOUNDS.CLICK_BOX, 'assets/audio/434756_notarget_wood-step-sample-1.mp3')
+    this.load.audio(SOUNDS.WRONG_BOX, 'assets/audio/350984__cabled-mess__lose-c-03.mp3')
+    this.load.audio(SOUNDS.WALKING, 'assets/audio/430708_juandamb_running.mp3')
     //buttons
     this.loadImageStates()
 
@@ -55,7 +56,7 @@ export default class PreloadScene extends Phaser.Scene {
     http://dig.ccmixter.org/files/JeffSpeed68/57454 
     Ft: Admiral Bob (admiralbob77)
     */
-    this.load.audio('background-sound', 'assets/audio/two-pianos.mp3')
+    this.load.audio(SOUNDS.BACKGROUND, 'assets/audio/two-pianos.mp3')
 
     this.loadAssetsProgress()
   }
@@ -64,7 +65,6 @@ export default class PreloadScene extends Phaser.Scene {
     Object.keys(BUTTON).forEach((key) => {
       Object.keys(BUTTON_PREFIX).forEach((prefix) => {
         const buttonKey = `${BUTTON[key]}-${BUTTON_PREFIX[prefix]}`
-        console.log('`${key}-${prefix}`', buttonKey)
         this.load.image(buttonKey, `assets/img/${buttonKey}.png`)
       })
     })
