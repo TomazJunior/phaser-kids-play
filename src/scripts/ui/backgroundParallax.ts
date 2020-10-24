@@ -3,7 +3,7 @@ import { FONTS, GAME, GAME_NAME } from '../utils/constants'
 export default class BackgroundParallax extends Phaser.GameObjects.TileSprite {
   private _title: Phaser.GameObjects.Text
 
-  constructor(scene: Phaser.Scene, showTitle: boolean = true) {
+  constructor(scene: Phaser.Scene, private showTitle: boolean = true, private enableParallax: boolean = true) {
     super(scene, 0, 0, GAME.WIDTH, GAME.HEIGHT, 'background')
     this.scene.add.existing(this)
     this.setOrigin(0)
@@ -36,7 +36,9 @@ export default class BackgroundParallax extends Phaser.GameObjects.TileSprite {
   }
 
   update() {
-    this.tilePositionX += 5;
+    if (this.enableParallax) {
+      this.tilePositionX += 5;
+    }
   }
   
   public get title() : Phaser.GameObjects.Text {

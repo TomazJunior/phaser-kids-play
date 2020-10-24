@@ -20,7 +20,7 @@ export default class PauseScene extends Phaser.Scene {
     const { width, height } = this.scale
     this.scene.bringToTop()
 
-    // TODO: blur the background on pause
+    new BackgroundParallax(this, false, false)
 
     const frame = this.add.image(width * 0.5, height * 0.5, 'small-frame-window').setOrigin(0.5, 0.5)
 
