@@ -54,46 +54,6 @@ export default class MainScene extends Phaser.Scene {
     this.hiddenCharOnTheirPosition = false
   }
 
-  handleLoseFocus = () => {
-    // assuming a Paused scene that has a pause modal
-    if (this.scene.isActive('PauseScene')) {
-      return
-    }
-
-    // show Paused scene only if Main scene is active
-    if (!this.scene.isActive('MainScene')) {
-      return
-    }
-
-    // stop all sounds and main scene
-    this.scene.pause('MainScene')
-    this.sound.pauseAll()
-
-    this.scene.run('PauseScene', <PauseSceneConfig>{
-      onResume: this.resumePausedScene,
-      onHome: () => {
-        this.resumePausedScene()
-        this.goToMenuScene()
-      },
-      onRestart: () => {
-        this.resumePausedScene()
-        this.restartScene()
-      },
-    })
-  }
-
-  restartScene = (level?: Level) => {
-    this.setToGameOverState(() => {
-      this.scene.restart(level)
-    })
-  }
-
-  resumePausedScene = () => {
-    this.scene.stop('PauseScene')
-    this.scene.resume('MainScene')
-    this.sound.resumeAll()
-  }
-
   create() {
     this.sound.pauseOnBlur = false
     this.game.events.on(Phaser.Core.Events.BLUR, () => {
@@ -160,6 +120,46 @@ export default class MainScene extends Phaser.Scene {
     return !getTutorialSeen(this.level.level)
   }
 
+  handleLoseFocus = () => {
+    // assuming a Paused scene that has a pause modal
+    if (this.scene.isActive('PauseScene')) {
+      return
+    }
+
+    // show Paused scene only if Main scene is active
+    if (!this.scene.isActive('MainScene')) {
+      return
+    }
+
+    // stop all sounds and main scene
+    this.scene.pause('MainScene')
+    this.sound.pauseAll()
+
+    this.scene.run('PauseScene', <PauseSceneConfig>{
+      onResume: this.resumePausedScene,
+      onHome: () => {
+        this.resumePausedScene()
+        this.goToMenuScene()
+      },
+      onRestart: () => {
+        this.resumePausedScene()
+        this.restartScene()
+      },
+    })
+  }
+
+  restartScene = (level?: Level) => {
+    this.setToGameOverState(() => {
+      this.scene.restart(level)
+    })
+  }
+
+  resumePausedScene = () => {
+    this.scene.stop('PauseScene')
+    this.scene.resume('MainScene')
+    this.sound.resumeAll()
+  }
+
   tryToFinishTutorialMode = () => {
     if (!this.shouldGoToNextLevel()) {
       return
@@ -168,7 +168,7 @@ export default class MainScene extends Phaser.Scene {
     this.levelText.content = `level ${this.level.level}`
   }
 
-  showFinishGameDialog = (text: string, finishedLevel: boolean) => {
+  showFinishGameDialog = (text: string, finishedLevel: boolean, stars: number) => {
     const { width, height } = this.scale
     const restartButtonConfig: ButtonConfig = {
       name: BUTTON.RESTART,
@@ -211,7 +211,7 @@ export default class MainScene extends Phaser.Scene {
         width * 0.5,
         height * 0.5,
         text,
-        this.scoreText.text,
+        finishedLevel ? '3 / 3': `${stars} / 3`,
         finishedLevel,
         {
           name: BUTTON.HOME,
@@ -299,7 +299,7 @@ export default class MainScene extends Phaser.Scene {
     if (this.round > this.level.rounds) {
       this.backgroundAudio.stop()
       setLevel({ level: this.level.level, stars: 3 })
-      this.showFinishGameDialog('You Win!', true)
+      this.showFinishGameDialog('You Win!', true, 3)
       return Promise.resolve()
     }
 
@@ -430,7 +430,7 @@ export default class MainScene extends Phaser.Scene {
     }
   }
 
-  openBox = (box: Box) => {
+  openBox = async (box: Box) => {
     this.player.active = false
     const currentHiddenChar = this.hiddenThumbChars.getCurrentHiddenChar()
 
@@ -448,8 +448,10 @@ export default class MainScene extends Phaser.Scene {
           stars = 1
         }
 
+        await this.showMissedHidden()
+
         setLevel({ level: this.level.level, stars })
-        this.showFinishGameDialog('Game over', false)
+        this.showFinishGameDialog('Game over', false, stars)
       }
       return
     }
@@ -471,6 +473,35 @@ export default class MainScene extends Phaser.Scene {
         await this.nextLevel()
       },
     })
+  }
+
+  showMissedHidden = async (): Promise<void> => {
+    const delay = 500
+    return new Promise((resolve, reject) => {
+      const missedHiddenChars: Array<ANIMAL_SKINS> = this.hiddenThumbChars.getHiddenChars(true)
+      const totalDelay = delay + delay * missedHiddenChars.length
+      missedHiddenChars.forEach((hiddenCharName: ANIMAL_SKINS, index: number) => {
+        this.time.delayedCall(delay * index, () => {
+          const hiddenChar: HiddenChar = this.getHiddenChar(hiddenCharName)
+          this.tweens.add({
+            targets: hiddenChar,
+            y: '-=50',
+            alpha: 1,
+            scale: 1,
+            duration: 500,
+            onComplete: async () => {
+              hiddenChar.visible = true
+              this.time.delayedCall(totalDelay - delay * index, () => {
+                hiddenChar.visible = false
+              })
+            },
+          })
+        })
+      })
+      this.time.delayedCall(totalDelay, () => {
+        resolve()
+      })
+    })    
   }
 
   closeBox = (box: Box) => {

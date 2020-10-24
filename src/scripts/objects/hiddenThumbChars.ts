@@ -40,6 +40,18 @@ export default class HiddenThumbChars extends Phaser.GameObjects.Container {
       return getSkin((<Phaser.GameObjects.Sprite>found).frame.name)
   }
 
+  getHiddenChars(onlyVisible: boolean): Array<ANIMAL_SKINS> {
+    return this.group.getChildren().filter((hiddenChar: any) => {
+      if (onlyVisible) {
+        return hiddenChar.visible === true
+      } else {
+        return true
+      }
+    }).map((hiddenChar: any) => {
+      return hiddenChar.frame.name
+    })
+  }
+
   moveToNext(skin: ANIMAL_SKINS) {
     this.group.getChildren().forEach((hiddenChar: any) => {
 
