@@ -51,8 +51,8 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
     this.clickOnRightBoxAudio = getOrAddAudio(scene, SOUNDS.FIND_HIDDEN)
   }
 
-  toggleHelp() {
-    this.border.visible = !this.border.visible
+  toggleHelp(enable: boolean) {
+    this.border.visible = enable
     this.fingerPoint.setVisible(this.border.visible)
     if (this.border.visible) {
       this.borderTween.resume()
@@ -70,6 +70,7 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
     this.shadow.setVisible(false)
     this.hiddenCharName = null
     this.openBox(false)
+    this.toggleHelp(false)
   }
 
   close() {

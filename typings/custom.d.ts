@@ -29,13 +29,18 @@ declare interface ButtonConfig {
 
 declare interface FileStorageConfig {
   sound: boolean,
-  tutorialMode: boolean
+  tutorials: Array<TutorialFileStorageConfig>
   levels: Array<LevelFileStorageConfig>
 }
 
 declare interface LevelFileStorageConfig {
   level: number
   stars: number
+}
+
+declare interface TutorialFileStorageConfig {
+  level: number
+  seen: boolean
 }
 
 declare interface Window {

@@ -1,7 +1,12 @@
 import Player from '../objects/player'
 import Box from '../objects/box'
 import HiddenChar from '../objects/hiddenChar'
-import { HIDDEN_CHAR_REACHED_BOX, PLAYER_CHAR_REACHED_BOX, PLAYER_TOUCHED_BOX } from '../events/events'
+import {
+  HIDDEN_CHAR_REACHED_BOX,
+  HIDDEN_THUMB_CHAR_MOVED_TO_NEXT,
+  PLAYER_CHAR_REACHED_BOX,
+  PLAYER_TOUCHED_BOX,
+} from '../events/events'
 import { getAllSkins, getARandomSkinFrom } from '../utils/skinUtils'
 import { FONTS, LEVELS, ANIMAL_SKINS, TILES, BUTTON, SOUNDS } from '../utils/constants'
 import ColoredText from '../ui/coloredText'
@@ -10,7 +15,7 @@ import ScoreText from '../ui/scoreText'
 import { GameMap } from '../objects/map'
 import { ButtonSmall } from '../ui/buttonSmall'
 import { LevelCompleteDialog } from '../ui/levelCompleteDialog'
-import { getFileStorageConfig, setLevel, setTutorialMode } from '../utils/fileStorage'
+import { getTutorialSeen, setLevel, setTutorialSeen } from '../utils/fileStorage'
 import { getOrAddAudio, playSound } from '../utils/audioUtil'
 
 const INIT_Y = 37
@@ -121,6 +126,7 @@ export default class MainScene extends Phaser.Scene {
 
     this.hiddenChars = this.add.group()
     this.hiddenThumbChars = new HiddenThumbChars(this, width * 0.5, height * 0)
+
     this.physics.add.collider(this.player, this.boxes, undefined, undefined, this)
     this.physics.add.collider(this.hiddenChars, this.boxes, undefined, undefined, this)
 
@@ -128,7 +134,7 @@ export default class MainScene extends Phaser.Scene {
       this,
       width - 270,
       20,
-      this.tutorialMode ? 'Tutorial' : `level ${this.level.level}`,
+      this.isInTutorialMode ? 'Tutorial' : `level ${this.level.level}`,
       {
         fontFamily: FONTS.ALLOY_INK,
         fontSize: '48px',
@@ -143,23 +149,22 @@ export default class MainScene extends Phaser.Scene {
     this.scoreText = new ScoreText(this, width - 270, 70)
 
     this.createHiddenChars(this.level.hiddens)
-    this.startTutorialMode()
+    this.hiddenThumbChars.on(HIDDEN_THUMB_CHAR_MOVED_TO_NEXT, (data) => {
+      if (!this.isInTutorialMode) return
+      this.toggleHelpBox(data?.previous, false)
+      this.toggleHelpBox(data?.current, true)
+    })
   }
 
-  private get tutorialMode(): boolean {
-    return getFileStorageConfig().tutorialMode
+  private get isInTutorialMode(): boolean {
+    return !getTutorialSeen(this.level.level)
   }
 
-  startTutorialMode = () => {
-    if (!this.tutorialMode) return null
-    const firstBox: Box = <Box>this.boxes.children.getArray()[0]
-    firstBox.toggleHelp()
-  }
-
-  finishTutorialMode = () => {
-    const firstBox: Box = <Box>this.boxes.children.getArray()[0]
-    firstBox.toggleHelp()
-    setTutorialMode(false)
+  tryToFinishTutorialMode = () => {
+    if (!this.shouldGoToNextLevel()) {
+      return
+    }
+    setTutorialSeen(this.level.level, true)
     this.levelText.content = `level ${this.level.level}`
   }
 
@@ -281,8 +286,8 @@ export default class MainScene extends Phaser.Scene {
   }
 
   nextLevel = async (): Promise<void> => {
-    if (this.tutorialMode) {
-      this.finishTutorialMode()
+    if (this.isInTutorialMode) {
+      this.tryToFinishTutorialMode()
     }
 
     if (!this.shouldGoToNextLevel()) {
@@ -365,7 +370,7 @@ export default class MainScene extends Phaser.Scene {
   getFreeBox(): Box {
     const availBoxes = this.getFreeBoxes()
     const randomBoxPos = Math.floor(Math.random() * availBoxes.length)
-    return availBoxes[this.tutorialMode ? 0 : randomBoxPos]
+    return availBoxes[this.isInTutorialMode ? 0 : randomBoxPos]
   }
 
   getFreeBoxes(): Box[] {
@@ -399,6 +404,11 @@ export default class MainScene extends Phaser.Scene {
         this.closeBoxes()
         this.hiddenCharOnTheirPosition = true
         this.player.active = true
+
+        const currentHiddenChar = this.hiddenThumbChars.getCurrentHiddenChar()
+        if (currentHiddenChar) {
+          this.toggleHelpBox(currentHiddenChar, true)
+        }
       })
     }
   }
@@ -409,6 +419,17 @@ export default class MainScene extends Phaser.Scene {
     })
   }
 
+  toggleHelpBox(hiddenChar: string, enable: boolean) {
+    if (this.isInTutorialMode && hiddenChar) {
+      const box: Box = <Box>this.boxes.children.getArray().find((box: any) => {
+        return box.hiddenCharName === hiddenChar
+      })
+      if (box) {
+        box.toggleHelp(enable)
+      }
+    }
+  }
+
   openBox = (box: Box) => {
     this.player.active = false
     const currentHiddenChar = this.hiddenThumbChars.getCurrentHiddenChar()
@@ -416,18 +437,20 @@ export default class MainScene extends Phaser.Scene {
     if (!box.hiddenCharName || !box.isRightBox(currentHiddenChar)) {
       box.wrongBox()
       this.closeBox(box)
-      //TODO: move to constants/util
-      let stars = 0
-      if (this.round === 5) {
-        stars = 3
-      } else if (this.round > 3) {
-        stars = 2
-      } else if (this.round > 1) {
-        stars = 1
-      }
+      if (!this.isInTutorialMode) {
+        // TODO: move to constants/util
+        let stars = 0
+        if (this.round === 5) {
+          stars = 3
+        } else if (this.round > 3) {
+          stars = 2
+        } else if (this.round > 1) {
+          stars = 1
+        }
 
-      setLevel({ level: this.level.level, stars })
-      this.showFinishGameDialog('Game over', false)
+        setLevel({ level: this.level.level, stars })
+        this.showFinishGameDialog('Game over', false)
+      }
       return
     }
 
