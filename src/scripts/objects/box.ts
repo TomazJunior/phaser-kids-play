@@ -55,6 +55,9 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
     this.border.visible = enable
     this.fingerPoint.setVisible(this.border.visible)
     if (this.border.visible) {
+      if (!this.borderTween.hasStarted) {
+        this.borderTween.restart()
+      }
       this.borderTween.resume()
     } else {
       this.borderTween.pause()
