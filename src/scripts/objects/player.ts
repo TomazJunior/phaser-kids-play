@@ -20,8 +20,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     super(scene, objectPosition.x, objectPosition.y, 'player')
     scene.add.existing(this)
     scene.physics.add.existing(this)
-
-    this.setScale(1.5).setOffset(16, 16)
+    this.setDepth(10)
+    this.body.setSize(16, 16)
+    this.setScale(1.5).setOffset(25, 42)
 
     this.objectPosition = objectPosition
     this.setCollideWorldBounds(true)

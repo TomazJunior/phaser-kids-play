@@ -164,7 +164,6 @@ export default class MainScene extends Phaser.Scene {
   }
 
   showFinishGameDialog = (text: string, finishedLevel: boolean) => {
-    
     const { width, height } = this.scale
     const restartButtonConfig: ButtonConfig = {
       name: BUTTON.RESTART,

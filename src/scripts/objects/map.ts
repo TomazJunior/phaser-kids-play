@@ -29,7 +29,7 @@ export class GameMap {
   }
 
   public getPathTo = (origin: ObjectPosition, target: ObjectPosition): Array<ObjectPosition> => {
-    const collidable: Array<Phaser.Math.Vector2> = this.getTilesPosition([TILES.DIRT, TILES.BOX]).map((pos) => {
+    const collidable: Array<Phaser.Math.Vector2> = this.getTilesPosition([TILES.BOX]).map((pos) => {
       return new Phaser.Math.Vector2(pos.col, pos.row)
     })
     
