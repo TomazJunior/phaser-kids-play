@@ -1,6 +1,7 @@
 const FILE_STORAGE_KEY = 'fileStorage'
 const initialFileStorageConfig: FileStorageConfig = {
   tutorialMode: true,
+  sound: true,
   levels: [
     {
       level: 1,
@@ -27,6 +28,17 @@ export const setTutorialMode = (istutorialMode: boolean) => {
     ...getFileStorageConfig(),
     tutorialMode: istutorialMode,
   })
+}
+
+export const setSoundEnabled = (isSoundEnabled: boolean) => {
+  setFileStorageConfig({
+    ...getFileStorageConfig(),
+    sound: isSoundEnabled,
+  })
+}
+
+export const isSoundEnabled = (): boolean => {
+  return getFileStorageConfig().sound
 }
 
 export const setLevel = (level: LevelFileStorageConfig) => {

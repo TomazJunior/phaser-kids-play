@@ -99,6 +99,10 @@ export enum BUTTON_PREFIX {
   NORMAL = 'normal',
 }
 
+export enum BUTTON_PREFIX_EXTRA {
+  INACTIVE = 'inactive'
+}
+
 export enum ANIMAL_SKINS {
   BEAR = 'bear.png',
   BUFFALO = 'buffalo.png',

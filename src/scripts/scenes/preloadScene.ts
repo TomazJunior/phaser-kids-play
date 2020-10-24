@@ -1,5 +1,7 @@
 import ProgressBar from '../ui/progressBar'
-import { BUTTON, BUTTON_PREFIX, FONTS, SOUNDS, SPRITE_NAME } from '../utils/constants'
+import { changeSoundState } from '../utils/audioUtil'
+import { BUTTON, BUTTON_PREFIX, BUTTON_PREFIX_EXTRA, FONTS, SOUNDS, SPRITE_NAME } from '../utils/constants'
+import { isSoundEnabled } from '../utils/fileStorage'
 
 export default class PreloadScene extends Phaser.Scene {
   progressBar: ProgressBar
@@ -48,7 +50,7 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.audio(SOUNDS.WRONG_BOX, 'assets/audio/350984__cabled-mess__lose-c-03.mp3')
     this.load.audio(SOUNDS.WALKING, 'assets/audio/430708_juandamb_running.mp3')
     //buttons
-    this.loadImageStates()
+    this.loadImageButtons()
 
     //TODO: add credits
     /*
@@ -61,13 +63,14 @@ export default class PreloadScene extends Phaser.Scene {
     this.loadAssetsProgress()
   }
 
-  loadImageStates() {
+  loadImageButtons() {
     Object.keys(BUTTON).forEach((key) => {
       Object.keys(BUTTON_PREFIX).forEach((prefix) => {
         const buttonKey = `${BUTTON[key]}-${BUTTON_PREFIX[prefix]}`
         this.load.image(buttonKey, `assets/img/${buttonKey}.png`)
       })
     })
+    this.load.image(`${BUTTON.SOUND}-${BUTTON_PREFIX_EXTRA.INACTIVE}`, `assets/img/${BUTTON.SOUND}-${BUTTON_PREFIX_EXTRA.INACTIVE}.png`)
   }
 
   loadAssetsProgress = () => {
@@ -82,5 +85,7 @@ export default class PreloadScene extends Phaser.Scene {
     })
   }
 
-  create() {}
+  create() {
+    changeSoundState(this, isSoundEnabled())
+  }
 }

@@ -1,38 +1,40 @@
-
-declare interface ObjectPosition extends TilePosition{
-  x: number; y: number
+declare interface ObjectPosition extends TilePosition {
+  x: number
+  y: number
 }
 
 declare interface TilePosition {
-  row: number, col: number
+  row: number
+  col: number
 }
 
 declare interface ButtonConfig {
   text?: {
-    title?: string,
-    fontSize?: string,
+    title?: string
+    fontSize?: string
     padding?: {
-      x?: number,
+      x?: number
       y?: number
     }
-  },
+  }
   name?: import('../src/scripts/utils/constants').BUTTON
-  prefix?:import('../src/scripts/utils/constants').BUTTON_PREFIX
+  prefix?: import('../src/scripts/utils/constants').BUTTON_PREFIX | import('../src/scripts/utils/constants').BUTTON_PREFIX_EXTRA
   scale?: {
     x: number
     y: number
-  },
+  }
   visible?: boolean
   onClick: () => void
 }
 
 declare interface FileStorageConfig {
-    tutorialMode: boolean,
-    levels: Array<LevelFileStorageConfig>
+  sound: boolean,
+  tutorialMode: boolean
+  levels: Array<LevelFileStorageConfig>
 }
 
 declare interface LevelFileStorageConfig {
-  level: number,
+  level: number
   stars: number
 }
 
