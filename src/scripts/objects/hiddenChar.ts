@@ -53,7 +53,6 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
         duration: 500,
         onComplete: () => {
           this.visible = false;
-          this.box.close()
         }
       })
 

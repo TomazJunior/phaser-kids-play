@@ -4,7 +4,7 @@ import { ButtonSmall } from './buttonSmall'
 
 export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
   private nextLevelAudio: Phaser.Sound.BaseSound
-
+  private group: Phaser.Physics.Arcade.StaticGroup
   constructor(
     scene: Phaser.Scene,
     x: number,
@@ -12,12 +12,14 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
     title: string,
     score: string,
     shouldPlaySound: boolean,
-    firstButton: ButtonConfig,
-    secondButton: ButtonConfig,
-    thirdButton: ButtonConfig
+    firstButtonConfig: ButtonConfig,
+    secondButtonConfig: ButtonConfig,
+    thirdButtonConfig: ButtonConfig
   ) {
     super(scene, x, y, 'level-complete-dialog')
     scene.add.existing(this)
+    this.group = this.scene.physics.add.staticGroup()
+
     this.nextLevelAudio = getOrAddAudio(scene, SOUNDS.NEXT_LEVEL)
 
     const textTitle = this.scene.add
@@ -50,20 +52,38 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
       })
       .setOrigin(0.5, 0)
 
-    new ButtonSmall(
+    const firstButton = new ButtonSmall(
       scene,
       this.x - this.displayWidth * 0.4 + 40,
       this.y + this.displayHeight * 0.3,
-      firstButton
+      firstButtonConfig
     ).setOrigin(0, 0)
 
-    new ButtonSmall(scene, this.x - 50, this.y + this.displayHeight * 0.3, secondButton).setOrigin(0, 0)
+    const secondButton = new ButtonSmall(
+      scene,
+      this.x - 50,
+      this.y + this.displayHeight * 0.3,
+      secondButtonConfig
+    ).setOrigin(0, 0)
 
-    new ButtonSmall(scene, this.x + this.displayWidth * 0.2, this.y + this.displayHeight * 0.3, thirdButton).setOrigin(
-      0,
-      0
-    )
+    const thridButton = new ButtonSmall(
+      scene,
+      this.x + this.displayWidth * 0.2,
+      this.y + this.displayHeight * 0.3,
+      thirdButtonConfig
+    ).setOrigin(0, 0)
 
     shouldPlaySound && playSound(this.scene, this.nextLevelAudio)
+
+    this.group
+      .add(this)
+      .add(textTitle)
+      .add(middleTitleShadow)
+      .add(middleTitle)
+      .add(textScore)
+      .add(firstButton)
+      .add(secondButton)
+      .add(thridButton)
+      .setDepth(20)
   }
 }

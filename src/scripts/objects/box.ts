@@ -67,8 +67,9 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
   }
 
   reset() {
+    this.shadow.setVisible(false)
     this.hiddenCharName = null
-    this.close()
+    this.openBox(false)
   }
 
   close() {
@@ -76,7 +77,7 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
     if (!this.opened) return
 
     this.opened = false
-    this.setTexture( BOX.SKINS.CLOSED)
+    this.setTexture(BOX.SKINS.CLOSED)
   }
 
   isSelected() {
@@ -93,7 +94,7 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
   openBox(withSound = true) {
     withSound && playSound(this.scene, this.clickOnRightBoxAudio)
     this.opened = true
-    this.setTexture( BOX.SKINS.OPENED)
+    this.setTexture(BOX.SKINS.OPENED)
   }
 
   isRightBox(skin: ANIMAL_SKINS | null): boolean {

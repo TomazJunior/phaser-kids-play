@@ -256,14 +256,15 @@ export default class MainScene extends Phaser.Scene {
   }
 
   setToGameOverState(cb: () => void) {
-    if (!this.gameover) {
-      this.gameover = true
-      this.player.active = false
-      this.player.visible = false
-      this.clearHiddenChars()
-      this.backgroundAudio.stop()
-    }
-    this.time.delayedCall(100, () => {
+    this.time.delayedCall(300, () => {
+      if (!this.gameover) {
+        this.gameover = true
+        this.player.active = false
+        this.player.visible = false
+        this.clearHiddenChars()
+        this.closeBoxes()
+        this.backgroundAudio.stop()
+      }
       cb()
     })
   }
@@ -321,6 +322,12 @@ export default class MainScene extends Phaser.Scene {
 
   resetBoxes() {
     this.boxes.getChildren().forEach((box: any) => box.reset())
+  }
+
+  closeBoxes() {
+    this.boxes.getChildren().forEach((box: any) => {
+      box.close()
+    })
   }
 
   clearHiddenChars() {
@@ -388,14 +395,11 @@ export default class MainScene extends Phaser.Scene {
 
   handleHiddenCharReachedBox = () => {
     if (this.hiddenCharsAreReady()) {
-      this.boxes
-        .getChildren()
-        .filter((box: any) => !box.hiddenCharName)
-        .forEach((box: any) => {
-          box.close()
-        })
-      this.hiddenCharOnTheirPosition = true
-      this.player.active = true
+      this.time.delayedCall(500, () => {
+        this.closeBoxes()
+        this.hiddenCharOnTheirPosition = true
+        this.player.active = true
+      })
     }
   }
 
