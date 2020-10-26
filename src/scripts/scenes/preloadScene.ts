@@ -1,12 +1,12 @@
 import ProgressBar from '../ui/progressBar'
 import { changeSoundState } from '../utils/audioUtil'
-import { BUTTON, BUTTON_PREFIX, BUTTON_PREFIX_EXTRA, FONTS, SOUNDS, SPRITE_NAME } from '../utils/constants'
+import { BUTTON, BUTTON_PREFIX, BUTTON_PREFIX_EXTRA, FONTS, SCENES, SOUNDS, SPRITE_NAME } from '../utils/constants'
 import { isSoundEnabled } from '../utils/fileStorage'
 
 export default class PreloadScene extends Phaser.Scene {
   progressBar: ProgressBar
   constructor() {
-    super({ key: 'PreloadScene' })
+    super({ key: SCENES.PRELOAD_SCENE })
   }
 
   preload() {
@@ -46,8 +46,8 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.audio(SOUNDS.CLICK, 'assets/audio/click5.mp3')
     this.load.audio(SOUNDS.FIND_HIDDEN, 'assets/audio/find-hidden.mp3')
     this.load.audio(SOUNDS.NEXT_LEVEL, 'assets/audio/next-level.mp3')
-    this.load.audio(SOUNDS.CLICK_BOX, 'assets/audio/434756_notarget_wood-step-sample-1.mp3')
-    this.load.audio(SOUNDS.WRONG_BOX, 'assets/audio/350984__cabled-mess__lose-c-03.mp3')
+    this.load.audio(SOUNDS.CLICK_TARGET, 'assets/audio/434756_notarget_wood-step-sample-1.mp3')
+    this.load.audio(SOUNDS.WRONG_TARGET, 'assets/audio/350984__cabled-mess__lose-c-03.mp3')
     this.load.audio(SOUNDS.WALKING, 'assets/audio/430708_juandamb_running.mp3')
     //buttons
     this.loadImageButtons()
@@ -79,9 +79,9 @@ export default class PreloadScene extends Phaser.Scene {
     //   console.log(file.src)
     // })
     this.load.on('complete', () => {
-      // this.scene.start('LevelScene')
-      this.scene.start('MenuScene')
-      // this.scene.start('MainScene')
+      // this.scene.start(SCENES.LEVEL_SCENE)
+      this.scene.start(SCENES.MENU_SCENE)
+      // this.scene.start(SCENES.MAIN_SCENE)
     })
   }
 

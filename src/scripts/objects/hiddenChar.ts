@@ -1,5 +1,4 @@
-import Box from "./box";
-import { HIDDEN_CHAR_REACHED_BOX } from "../events/events";
+import { HIDDEN_CHAR_REACHED_TARGET } from "../events/events";
 import { ANIMAL_SKINS, SPRITE_NAME } from "../utils/constants";
 
 export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
@@ -8,8 +7,8 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
     x: number,
     y: number
   }
-  reachedBox = false
-  box: Box
+  reachedTarget = false
+  target: TargetInterface
   gotToTheBoxCallback: () => void;
   
   constructor(scene: Phaser.Scene, x: number, y: number, public skin: ANIMAL_SKINS | null) {
@@ -20,14 +19,14 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
     scene.events.on('update', this.update, this);
   }
 
-  goTo(box: Box) {
-    this.box = box
+  goTo(target: TargetInterface) {
+    this.target = target
     this.isWalking = true;
     this.isGoingTo = {
-      x: box.x, 
-      y: box.y
+      x: target.x, 
+      y: target.y
     }
-    box.setHiddenCharName(this.skin)
+    target.setHiddenCharName(this.skin)
   }
 
   update() {
@@ -56,8 +55,8 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
         }
       })
 
-      this.reachedBox = true
-      this.emit(HIDDEN_CHAR_REACHED_BOX)
+      this.reachedTarget = true
+      this.emit(HIDDEN_CHAR_REACHED_TARGET)
       return
     }
     this.angle += 1;

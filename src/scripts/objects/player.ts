@@ -1,30 +1,31 @@
-import Box from './box'
-import { PLAYER_CHAR_REACHED_BOX } from '../events/events'
+import { PLAYER_CHAR_REACHED_TARGET } from '../events/events'
 import { PLAYER, SOUNDS } from '../utils/constants'
 import { getOrAddAudio, playSound } from '../utils/audioUtil'
 
-export default class Player extends Phaser.Physics.Arcade.Sprite {
+export default abstract class Player extends Phaser.Physics.Arcade.Sprite implements PlayerInterface {
   isWalking = false
   isGoingTo: {
     x: number
     y: number
     initialPos: false
   }
-  activeBox: Box
+  activeTarget: TargetInterface
   animation: string
   walkingAudio: Phaser.Sound.BaseSound
   objectPosition: ObjectPosition
   pathToGo: Array<ObjectPosition>
 
-  constructor(scene: Phaser.Scene, objectPosition: ObjectPosition) {
-    super(scene, objectPosition.x, objectPosition.y, 'player')
+  constructor(
+    scene: Phaser.Scene,
+    objectPosition: ObjectPosition,
+    texture: string | Phaser.Textures.Texture,
+    frame?: string | number | undefined
+  ) {
+    super(scene, objectPosition.x, objectPosition.y, texture, frame)
     scene.add.existing(this)
+    this.objectPosition = objectPosition
     scene.physics.add.existing(this)
     this.setDepth(10)
-    this.body.setSize(16, 16)
-    this.setScale(1.5).setOffset(25, 42)
-
-    this.objectPosition = objectPosition
     this.setCollideWorldBounds(true)
     this.active = false
     this.createAnimations()
@@ -36,27 +37,29 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     scene.events.on('update', this.update, this)
   }
 
-  goTo(box: Box, pathToGo: Array<ObjectPosition>) {
-    if (this.walkingAudio.isPlaying) this.walkingAudio.stop()
-    if (!this.active) return
+  protected abstract createAnimations()
 
-    this.setActiveBox(box)
-    this.setIsGoingTo(pathToGo, false)
-  }
-
-  setIsGoingTo(pathToGo: Array<ObjectPosition>, initialPos) {
+  public setIsGoingTo(pathToGo: Array<ObjectPosition>, initialPos) {
     playSound(this.scene, this.walkingAudio)
     this.isWalking = true
     this.pathToGo = pathToGo
     this.goToNextPosition(initialPos)
   }
 
-  setActiveBox(box: Box) {
-    if (this.activeBox) {
-      this.activeBox.close()
+  public goTo(target: TargetInterface, pathToGo: Array<ObjectPosition>) {
+    if (this.walkingAudio.isPlaying) this.walkingAudio.stop()
+    if (!this.active) return
+
+    this.setActiveBox(target)
+    this.setIsGoingTo(pathToGo, false)
+  }
+
+  setActiveBox(box: TargetInterface) {
+    if (this.activeTarget) {
+      this.activeTarget.close()
     }
-    this.activeBox = box
-    this.activeBox.isSelected()
+    this.activeTarget = box
+    this.activeTarget.isSelected()
   }
 
   update() {
@@ -91,7 +94,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.setVelocity(0, 0)
         this.animation = PLAYER.ANIMATIONS.DOWN_IDLE
         if (!initialPos) {
-          this.emit(PLAYER_CHAR_REACHED_BOX, this.activeBox)
+          this.emit(PLAYER_CHAR_REACHED_TARGET, this.activeTarget)
         }
         this.walkingAudio.stop()
       }
@@ -119,56 +122,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       this.animation = PLAYER.ANIMATIONS.DOWN_IDLE
       this.setVelocity(0, 0)
     }
-  }
-
-  createAnimations() {
-    this.scene.anims.create({
-      key: 'down-idle',
-      frames: [{ key: 'sokoban', frame: 52 }],
-    })
-
-    this.scene.anims.create({
-      key: 'down-walk',
-      frames: this.scene.anims.generateFrameNumbers('sokoban', { start: 52, end: 54 }),
-      frameRate: 10,
-      repeat: -1,
-    })
-
-    this.scene.anims.create({
-      key: 'up-idle',
-      frames: [{ key: 'sokoban', frame: 55 }],
-    })
-
-    this.scene.anims.create({
-      key: 'up-walk',
-      frames: this.scene.anims.generateFrameNumbers('sokoban', { start: 55, end: 57 }),
-      frameRate: 10,
-      repeat: -1,
-    })
-
-    this.scene.anims.create({
-      key: 'left-idle',
-      frames: [{ key: 'sokoban', frame: 81 }],
-    })
-
-    this.scene.anims.create({
-      key: 'left-walk',
-      frames: this.scene.anims.generateFrameNumbers('sokoban', { start: 81, end: 83 }),
-      frameRate: 10,
-      repeat: -1,
-    })
-
-    this.scene.anims.create({
-      key: 'right-idle',
-      frames: [{ key: 'sokoban', frame: 78 }],
-    })
-
-    this.scene.anims.create({
-      key: 'right-walk',
-      frames: this.scene.anims.generateFrameNumbers('sokoban', { start: 78, end: 80 }),
-      frameRate: 10,
-      repeat: -1,
-    })
   }
 
   private goToNextPosition = (initialPos) => {

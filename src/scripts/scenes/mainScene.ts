@@ -1,14 +1,10 @@
-import Player from '../objects/player'
-import Box from '../objects/box'
 import HiddenChar from '../objects/hiddenChar'
 import {
-  HIDDEN_CHAR_REACHED_BOX,
+  HIDDEN_CHAR_REACHED_TARGET,
   HIDDEN_THUMB_CHAR_MOVED_TO_NEXT,
-  PLAYER_CHAR_REACHED_BOX,
-  PLAYER_TOUCHED_BOX,
 } from '../events/events'
 import { getAllSkins, getARandomSkinFrom } from '../utils/skinUtils'
-import { FONTS, LEVELS, ANIMAL_SKINS, TILES, BUTTON, SOUNDS } from '../utils/constants'
+import { FONTS, ANIMAL_SKINS, BUTTON, SOUNDS, SCENES } from '../utils/constants'
 import ColoredText from '../ui/coloredText'
 import HiddenThumbChars from '../objects/hiddenThumbChars'
 import ScoreText from '../ui/scoreText'
@@ -17,36 +13,41 @@ import { ButtonSmall } from '../ui/buttonSmall'
 import { LevelCompleteDialog } from '../ui/levelCompleteDialog'
 import { getTutorialSeen, setLevel, setTutorialSeen } from '../utils/fileStorage'
 import { getOrAddAudio, playSound } from '../utils/audioUtil'
-
-const INIT_Y = 37
+import { getGameWorld, getLevel, isLevelExist } from '../utils/worldUtil'
 
 export default class MainScene extends Phaser.Scene {
-  boxes: Phaser.Physics.Arcade.StaticGroup
-  player: Player
+  targets: Phaser.Physics.Arcade.StaticGroup
+  player: PlayerInterface
   hiddenChars: Phaser.GameObjects.Group
   hiddenThumbChars: HiddenThumbChars
-  activeBox: Box
   currentHiddenSkins: ANIMAL_SKINS[]
   availableHiddenSkins: ANIMAL_SKINS[]
   gameover = false
+  currentWorld: GameWorld
   level: Level
   round: number
   hiddenCharOnTheirPosition = false
   levelText: ColoredText
   scoreText: ScoreText
   backgroundAudio: Phaser.Sound.BaseSound
-  clickOnBoxAudio: Phaser.Sound.BaseSound
+  clickOnTargetAudio: Phaser.Sound.BaseSound
   gameMap: GameMap
   constructor() {
-    super({ key: 'MainScene' })
+    super({ key: SCENES.MAIN_SCENE })
   }
 
-  init(currentLevel: Level) {
+  init(config: MainSceneConfig) {
     this.gameover = false
-    if (!currentLevel?.level) {
-      this.level = this.getLevel(1)
+    if (!config.gameWorld?.name) {
+      this.currentWorld = getGameWorld()
     } else {
-      this.level = { ...currentLevel }
+      this.currentWorld = { ...config.gameWorld }
+    }
+
+    if (!config.level?.level) {
+      this.level = getLevel(this.currentWorld.levels, 1)
+    } else {
+      this.level = { ...config.level }
     }
     this.round = 1
     this.currentHiddenSkins = []
@@ -70,25 +71,19 @@ export default class MainScene extends Phaser.Scene {
 
     this.createBackground()
 
-    this.gameMap = new GameMap(this, 0, 0)
+    this.gameMap = new GameMap(this, 0, 0, this.currentWorld)
+    this.player = this.gameMap.createPlayer(this.handleReachedTarget)
 
-    const playerPosition = this.gameMap.getTilesPosition([TILES.PLAYER])[0]
-    this.player = new Player(this, playerPosition)
-    this.player.on(PLAYER_CHAR_REACHED_BOX, this.handleReachedBox)
-
-    this.boxes = this.physics.add.staticGroup()
-    const boxesPosition = this.gameMap.getTilesPosition([TILES.BOX])
-    boxesPosition.forEach((pos) => {
-      new Box(this, pos, this.boxes).on(PLAYER_TOUCHED_BOX, this.handlePlayerGoToBox)
-    })
-
+    this.targets = this.physics.add.staticGroup()
+    this.gameMap.createTargets(this.targets, this.handlePlayerGoToTarget)
+    
     this.createBackButton()
 
     this.hiddenChars = this.add.group()
     this.hiddenThumbChars = new HiddenThumbChars(this, width * 0.5, height * 0)
 
-    this.physics.add.collider(this.player, this.boxes, undefined, undefined, this)
-    this.physics.add.collider(this.hiddenChars, this.boxes, undefined, undefined, this)
+    this.physics.add.collider(this.player, this.targets, undefined, undefined, this)
+    this.physics.add.collider(this.hiddenChars, this.targets, undefined, undefined, this)
 
     this.levelText = new ColoredText(
       this,
@@ -104,15 +99,15 @@ export default class MainScene extends Phaser.Scene {
     this.backgroundAudio = getOrAddAudio(this, SOUNDS.BACKGROUND, { volume: 0.4, loop: true })
     playSound(this, this.backgroundAudio)
 
-    this.clickOnBoxAudio = getOrAddAudio(this, SOUNDS.CLICK_BOX)
+    this.clickOnTargetAudio = getOrAddAudio(this, SOUNDS.CLICK_TARGET)
 
     this.scoreText = new ScoreText(this, width - 270, 70)
 
     this.createHiddenChars(this.level.hiddens)
     this.hiddenThumbChars.on(HIDDEN_THUMB_CHAR_MOVED_TO_NEXT, (data) => {
       if (!this.isInTutorialMode) return
-      this.toggleHelpBox(data?.previous, false)
-      this.toggleHelpBox(data?.current, true)
+      this.toggleHelpTarget(data?.previous, false)
+      this.toggleHelpTarget(data?.current, true)
     })
   }
 
@@ -122,20 +117,20 @@ export default class MainScene extends Phaser.Scene {
 
   handleLoseFocus = () => {
     // assuming a Paused scene that has a pause modal
-    if (this.scene.isActive('PauseScene')) {
+    if (this.scene.isActive(SCENES.PAUSE_SCENE)) {
       return
     }
 
     // show Paused scene only if Main scene is active
-    if (!this.scene.isActive('MainScene')) {
+    if (!this.scene.isActive(SCENES.MAIN_SCENE)) {
       return
     }
 
     // stop all sounds and main scene
-    this.scene.pause('MainScene')
+    this.scene.pause(SCENES.MAIN_SCENE)
     this.sound.pauseAll()
 
-    this.scene.run('PauseScene', <PauseSceneConfig>{
+    this.scene.run(SCENES.PAUSE_SCENE, <PauseSceneConfig>{
       onResume: this.resumePausedScene,
       onHome: () => {
         this.resumePausedScene()
@@ -155,8 +150,8 @@ export default class MainScene extends Phaser.Scene {
   }
 
   resumePausedScene = () => {
-    this.scene.stop('PauseScene')
-    this.scene.resume('MainScene')
+    this.scene.stop(SCENES.PAUSE_SCENE)
+    this.scene.resume(SCENES.MAIN_SCENE)
     this.sound.resumeAll()
   }
 
@@ -177,13 +172,13 @@ export default class MainScene extends Phaser.Scene {
       },
     }
     const currentLevel = { ...this.level }
-    const nextLevelExists = this.isLevelExist(currentLevel.level + 1)
+    const nextLevelExists = isLevelExist(this.currentWorld.levels, currentLevel.level + 1)
 
     const nextLevelButtonConfig: ButtonConfig = {
       name: BUTTON.RIGHT,
       onClick: () => {
         if (nextLevelExists) {
-          this.restartScene(this.getLevel(currentLevel.level + 1))
+          this.restartScene(getLevel(this.currentWorld.levels, currentLevel.level + 1))
         }
       },
     }
@@ -211,7 +206,7 @@ export default class MainScene extends Phaser.Scene {
         width * 0.5,
         height * 0.5,
         text,
-        finishedLevel ? '3 / 3': `${stars} / 3`,
+        finishedLevel ? '3 / 3' : `${stars} / 3`,
         finishedLevel,
         {
           name: BUTTON.HOME,
@@ -247,16 +242,16 @@ export default class MainScene extends Phaser.Scene {
 
   goToMenuScene = () => {
     this.setToGameOverState(() => {
-      this.scene.stop('MainScene')
+      this.scene.stop(SCENES.MAIN_SCENE)
       this.backgroundAudio.stop()
-      this.scene.start('MenuScene')
+      this.scene.start(SCENES.MENU_SCENE)
     })
   }
 
   goToLevelScene() {
     this.setToGameOverState(() => {
       this.backgroundAudio.stop()
-      this.scene.start('LevelScene')
+      this.scene.start(SCENES.LEVEL_SCENE)
     })
   }
 
@@ -267,7 +262,7 @@ export default class MainScene extends Phaser.Scene {
         this.player.active = false
         this.player.visible = false
         this.clearHiddenChars()
-        this.closeBoxes()
+        this.closeTargets()
         this.backgroundAudio.stop()
       }
       cb()
@@ -277,12 +272,12 @@ export default class MainScene extends Phaser.Scene {
   hiddenCharsAreReady(): boolean {
     return (
       this.currentHiddenSkins.length === this.hiddenChars.getLength() &&
-      this.hiddenChars.getChildren().every((x: any) => x.reachedBox)
+      this.hiddenChars.getChildren().every((hiddenChar: any) => <HiddenChar>hiddenChar.reachedTarget)
     )
   }
 
   shouldGoToNextLevel(): boolean {
-    return this.hiddenChars.getChildren().every((x: any) => x.visible)
+    return this.hiddenChars.getChildren().every((hiddenChar: any) => <HiddenChar>hiddenChar.visible)
   }
 
   nextLevel = async (): Promise<void> => {
@@ -304,7 +299,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     this.time.delayedCall(500, () => {
-      this.resetBoxes()
+      this.resetTargets()
 
       const pathToGo = this.gameMap.getPathTo(this.player.objectPosition, { ...this.getInitialPlayerPosition() })
       this.player.setIsGoingTo(pathToGo, true)
@@ -315,23 +310,13 @@ export default class MainScene extends Phaser.Scene {
     return Promise.resolve()
   }
 
-  isLevelExist(level: number): boolean {
-    return LEVELS.find((levelConfig) => level === levelConfig.level) !== undefined
+  resetTargets() {
+    this.targets.getChildren().forEach((target: any) => (<TargetInterface>target).reset())
   }
 
-  getLevel(level: number): Level {
-    const levelFound = LEVELS.find((levelConfig) => level === levelConfig.level)
-    if (!levelFound) throw new Error(`level ${level} not found`)
-    return levelFound
-  }
-
-  resetBoxes() {
-    this.boxes.getChildren().forEach((box: any) => box.reset())
-  }
-
-  closeBoxes() {
-    this.boxes.getChildren().forEach((box: any) => {
-      box.close()
+  closeTargets() {
+    this.targets.getChildren().forEach((target: any) => {
+      (<TargetInterface>target).close()
     })
   }
 
@@ -361,20 +346,20 @@ export default class MainScene extends Phaser.Scene {
     const { width, height } = this.scale
     this.time.delayedCall(delay, () => {
       const hiddenChar = new HiddenChar(this, width * 0.05, height * 0.1, hiddenSkin)
-      hiddenChar.on(HIDDEN_CHAR_REACHED_BOX, this.handleHiddenCharReachedBox)
+      hiddenChar.on(HIDDEN_CHAR_REACHED_TARGET, this.handleHiddenCharReachedTarget)
       this.hiddenChars.add(hiddenChar)
-      hiddenChar.goTo(this.getFreeBox())
+      hiddenChar.goTo(this.getFreeTarget())
     })
   }
 
-  getFreeBox(): Box {
-    const availBoxes = this.getFreeBoxes()
-    const randomBoxPos = Math.floor(Math.random() * availBoxes.length)
-    return availBoxes[this.isInTutorialMode ? 0 : randomBoxPos]
+  getFreeTarget(): TargetInterface {
+    const availTargets = this.getFreeTargets()
+    const randomTargetPos = Math.floor(Math.random() * availTargets.length)
+    return availTargets[this.isInTutorialMode ? 0 : randomTargetPos]
   }
 
-  getFreeBoxes(): Box[] {
-    return <Box[]>this.boxes.getChildren().filter((box: any) => !box.hiddenCharName)
+  getFreeTargets(): TargetInterface[] {
+    return <TargetInterface[]>this.targets.getChildren().filter((target: any) => !(<TargetInterface>target.hiddenCharName))
   }
 
   getHiddenChar(skin: string): HiddenChar {
@@ -384,59 +369,59 @@ export default class MainScene extends Phaser.Scene {
   }
 
   getInitialPlayerPosition(): ObjectPosition {
-    return this.gameMap.getTilesPosition([TILES.PLAYER])[0]
+    return this.gameMap.getPlayerPosition()
   }
 
-  handlePlayerGoToBox = (box: Box) => {
-    if (!this.hiddenCharOnTheirPosition || box.opened) return
+  handlePlayerGoToTarget = (target: TargetInterface) => {
+    if (!this.hiddenCharOnTheirPosition || target.opened) return
 
-    const pathToGo = this.gameMap.getPathTo(this.player.objectPosition, box.objectPosition)
+    const pathToGo = this.gameMap.getPathTo(this.player.objectPosition, target.objectPosition)
 
-    if (this.clickOnBoxAudio.isPlaying) this.clickOnBoxAudio.stop()
-    playSound(this, this.clickOnBoxAudio)
+    if (this.clickOnTargetAudio.isPlaying) this.clickOnTargetAudio.stop()
+    playSound(this, this.clickOnTargetAudio)
 
-    this.player.goTo(box, pathToGo)
+    this.player.goTo(target, pathToGo)
   }
 
-  handleHiddenCharReachedBox = () => {
+  handleHiddenCharReachedTarget = () => {
     if (this.hiddenCharsAreReady()) {
       this.time.delayedCall(500, () => {
-        this.closeBoxes()
+        this.closeTargets()
         this.hiddenCharOnTheirPosition = true
         this.player.active = true
 
         const currentHiddenChar = this.hiddenThumbChars.getCurrentHiddenChar()
         if (currentHiddenChar) {
-          this.toggleHelpBox(currentHiddenChar, true)
+          this.toggleHelpTarget(currentHiddenChar, true)
         }
       })
     }
   }
 
-  handleReachedBox = (box: Box) => {
+  handleReachedTarget = (target: TargetInterface) => {
     this.time.delayedCall(100, () => {
-      this.openBox(box)
+      this.openTarget(target)
     })
   }
 
-  toggleHelpBox(hiddenChar: string, enable: boolean) {
+  toggleHelpTarget(hiddenChar: string, enable: boolean) {
     if (this.isInTutorialMode && hiddenChar) {
-      const box: Box = <Box>this.boxes.children.getArray().find((box: any) => {
-        return box.hiddenCharName === hiddenChar
+      const target: TargetInterface = <TargetInterface>this.targets.children.getArray().find((target: any) => {
+        return (<TargetInterface>target).hiddenCharName === hiddenChar
       })
-      if (box) {
-        box.toggleHelp(enable)
+      if (target) {
+        target.toggleHelp(enable)
       }
     }
   }
 
-  openBox = async (box: Box) => {
+  openTarget = async (target: TargetInterface) => {
     this.player.active = false
     const currentHiddenChar = this.hiddenThumbChars.getCurrentHiddenChar()
 
-    if (!box.hiddenCharName || !box.isRightBox(currentHiddenChar)) {
-      box.wrongBox()
-      this.closeBox(box)
+    if (!target.hiddenCharName || !target.isRightTarget(currentHiddenChar)) {
+      target.wrongTarget()
+      this.closeTarget(target)
       if (!this.isInTutorialMode) {
         // TODO: move to constants/util
         let stars = 0
@@ -456,11 +441,11 @@ export default class MainScene extends Phaser.Scene {
       return
     }
 
-    box.openBox()
+    target.openTarget(true)
     this.scoreText.incScore()
-    this.hiddenThumbChars.moveToNext(box.hiddenCharName)
+    this.hiddenThumbChars.moveToNext(target.hiddenCharName)
 
-    const hiddenChar: HiddenChar = this.getHiddenChar(box.hiddenCharName)
+    const hiddenChar: HiddenChar = this.getHiddenChar(target.hiddenCharName)
     if (!hiddenChar) return
     this.tweens.add({
       targets: hiddenChar,
@@ -501,13 +486,13 @@ export default class MainScene extends Phaser.Scene {
       this.time.delayedCall(totalDelay, () => {
         resolve()
       })
-    })    
+    })
   }
 
-  closeBox = (box: Box) => {
-    if (!box) return
+  closeTarget = (target: TargetInterface) => {
+    if (!target) return
     this.time.delayedCall(1000, () => {
-      box.close()
+      target.close()
       this.player.active = true
     })
   }

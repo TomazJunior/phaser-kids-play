@@ -1,13 +1,15 @@
 import BackgroundParallax from '../ui/backgroundParallax'
 import { ButtonSmall } from '../ui/buttonSmall'
-import { BUTTON, BUTTON_PREFIX, FONTS, LEVELS } from '../utils/constants'
+import { BUTTON, BUTTON_PREFIX, FONTS, SCENES } from '../utils/constants'
 import { getFileStorageConfig } from '../utils/fileStorage'
+import { getGameWorld } from '../utils/worldUtil'
 
 export default class LevelScene extends Phaser.Scene {
-  background: BackgroundParallax
+  private gameWorld: GameWorld
+  private background: BackgroundParallax
 
   constructor() {
-    super({ key: 'LevelScene' })
+    super({ key: SCENES.LEVEL_SCENE })
   }
   create() {
     this.background = new BackgroundParallax(this, false)
@@ -15,11 +17,19 @@ export default class LevelScene extends Phaser.Scene {
     this.createBackButton()
   }
 
+  init(gameWorld: GameWorld) {
+    if (!gameWorld?.name) {
+      this.gameWorld = getGameWorld()
+    } else {
+      this.gameWorld = { ...gameWorld }
+    }
+  }
+
   createBackButton() {
     new ButtonSmall(this, 10, 10, {
       name: BUTTON.LEFT,
       onClick: () => {
-        this.scene.start('MenuScene')
+        this.scene.start(SCENES.MENU_SCENE)
       },
     }).setOrigin(0, 0)
   }
@@ -41,7 +51,7 @@ export default class LevelScene extends Phaser.Scene {
 
     const fileStorageData: FileStorageConfig = getFileStorageConfig()
 
-    LEVELS.forEach((level, index) => {
+    this.gameWorld.levels.forEach((level, index) => {
       if (index) {
         posX += 150
       }
@@ -62,10 +72,13 @@ export default class LevelScene extends Phaser.Scene {
       const button = new ButtonSmall(this, posX, posY, {
         name: BUTTON.EMPTY,
         onClick: () => {
-          this.scene.start('MainScene', level)
+          this.scene.start(SCENES.MAIN_SCENE, <MainSceneConfig>{
+            gameWorld: this.gameWorld,
+            level,
+          })
         },
         text: {
-          title: level.level.toString()
+          title: level.level.toString(),
         },
         prefix: level.level > maxLevel ? BUTTON_PREFIX.BLOCKED : undefined,
         scale: {

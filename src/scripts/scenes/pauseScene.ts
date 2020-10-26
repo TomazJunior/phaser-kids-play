@@ -2,14 +2,14 @@ import BackgroundParallax from '../ui/backgroundParallax'
 import { ButtonBig } from '../ui/buttonBig'
 import { ButtonSmall } from '../ui/buttonSmall'
 import { changeSoundState } from '../utils/audioUtil'
-import { BUTTON, BUTTON_PREFIX, BUTTON_PREFIX_EXTRA, FONTS } from '../utils/constants'
+import { BUTTON, BUTTON_PREFIX, BUTTON_PREFIX_EXTRA, FONTS, SCENES } from '../utils/constants'
 import { isSoundEnabled, setSoundEnabled } from '../utils/fileStorage'
 
 export default class PauseScene extends Phaser.Scene {
   private config: PauseSceneConfig
 
   constructor() {
-    super({ key: 'PauseScene' })
+    super({ key: SCENES.PAUSE_SCENE })
   }
 
   init(config: PauseSceneConfig) {

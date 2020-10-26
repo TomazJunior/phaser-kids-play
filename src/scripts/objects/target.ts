@@ -1,8 +1,8 @@
-import { PLAYER_TOUCHED_BOX } from '../events/events'
+import { PLAYER_TOUCHED_TARGET } from '../events/events'
 import { getOrAddAudio, playSound } from '../utils/audioUtil'
 import { ANIMAL_SKINS, BOX, IMAGE_NAME, SOUNDS, SPRITE_NAME } from '../utils/constants'
 
-export default class Box extends Phaser.Physics.Arcade.Sprite {
+export default abstract class Target extends Phaser.Physics.Arcade.Sprite implements TargetInterface {
   hiddenCharName: ANIMAL_SKINS | null
   opened = true
   border: Phaser.GameObjects.Image
@@ -15,23 +15,22 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
   constructor(
     scene: Phaser.Scene,
     objectPosition: ObjectPosition,
-    container: Phaser.Physics.Arcade.StaticGroup
+    container: Phaser.Physics.Arcade.StaticGroup,
+    tileConfigGameWorld: TileConfigGameWorld,
+    texture: string | Phaser.Textures.Texture,
+    frame?: string | integer
   ) {
-    super(scene, objectPosition.x, objectPosition.y, BOX.SKINS.OPENED)
-    container.add(this)
-    this.objectPosition  = objectPosition
-    const {x, y} = objectPosition
-    this.shadow = scene.add.sprite(x, y,  BOX.SKINS.CLOSED).setScale(1.2).setTint(0x000000).setAlpha(0.6).setVisible(false)
-    
-    this.setBodySize(BOX.width, 35)
-    this.setOffset(0, 135)
-
+    super(scene, objectPosition.x, objectPosition.y, texture, frame)
     scene.add.existing(this)
+    container.add(this)
+    this.objectPosition = objectPosition
+    const { x, y } = objectPosition
+    this.shadow = this.createShadow(x, y)
 
     this.fingerPoint = scene.add.image(x, y, IMAGE_NAME.FINGER_POINT).setScale(0.3).setOrigin(1, 0.3).setVisible(false)
 
     this.border = scene.add.image(x, y, SPRITE_NAME.SOKOBAN, 39)
-    this.border.setScale(BOX.scale + 0.4)
+    this.border.setScale(tileConfigGameWorld.scale + 0.4)
     this.border.visible = false
     this.borderTween = this.scene.tweens.add({
       targets: [this.border],
@@ -44,14 +43,22 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
     this.borderTween.pause()
 
     this.setInteractive().on('pointerdown', (pointer, localX, localY, event) => {
-      this.emit(PLAYER_TOUCHED_BOX, this)
+      this.emit(PLAYER_TOUCHED_TARGET, this)
     })
 
-    this.clickOnWrongBoxAudio = getOrAddAudio(scene, SOUNDS.WRONG_BOX)
+    this.clickOnWrongBoxAudio = getOrAddAudio(scene, SOUNDS.WRONG_TARGET)
     this.clickOnRightBoxAudio = getOrAddAudio(scene, SOUNDS.FIND_HIDDEN)
   }
 
-  toggleHelp(enable: boolean) {
+  protected abstract createShadow(x: number, y: number): Phaser.GameObjects.Sprite
+
+  public wrongTarget() {
+    playSound(this.scene, this.clickOnWrongBoxAudio)
+    this.opened = false
+    this.shadow.setVisible(true)
+  }
+
+  public toggleHelp(enable: boolean) {
     this.border.visible = enable
     this.fingerPoint.setVisible(this.border.visible)
     if (this.border.visible) {
@@ -64,44 +71,26 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
     }
   }
 
-  setHiddenCharName(name: ANIMAL_SKINS | null) {
-    this.openBox(false)
+  public isSelected() {
+    this.opened = false
+    this.shadow.setVisible(true)
+  }
+
+  public setHiddenCharName(name: ANIMAL_SKINS | null) {
+    this.openTarget(false)
     this.hiddenCharName = name
   }
 
-  reset() {
+  public reset() {
     this.shadow.setVisible(false)
     this.hiddenCharName = null
-    this.openBox(false)
+    this.openTarget(false)
     this.toggleHelp(false)
   }
 
-  close() {
-    this.shadow.setVisible(false)
-    if (!this.opened) return
+  public abstract close()
 
-    this.opened = false
-    this.setTexture(BOX.SKINS.CLOSED)
-  }
+  public abstract openTarget(withSound: boolean)
 
-  isSelected() {
-    this.opened = false
-    this.shadow.setVisible(true)
-  }
-
-  wrongBox() {
-    playSound(this.scene, this.clickOnWrongBoxAudio)
-    this.opened = false
-    this.shadow.setVisible(true)
-  }
-
-  openBox(withSound = true) {
-    withSound && playSound(this.scene, this.clickOnRightBoxAudio)
-    this.opened = true
-    this.setTexture(BOX.SKINS.OPENED)
-  }
-
-  isRightBox(skin: ANIMAL_SKINS | null): boolean {
-    return skin === this.hiddenCharName
-  }
+  public abstract isRightTarget(skin: ANIMAL_SKINS | null): boolean
 }
