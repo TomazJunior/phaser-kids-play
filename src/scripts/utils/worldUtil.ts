@@ -13,7 +13,7 @@ export const getLevel = (levels: Array<Level>, level: number): Level => {
 export const getGameWorld = (name?: string): GameWorld => {
   if (!name) return GAME_WORLDS[0]
 
-  const gameWorldFound = GAME_WORLDS.find((gameWorld) => name === gameWorld.name)
+  const gameWorldFound = GAME_WORLDS.find((gameWorld) => name === gameWorld.key)
   if (!gameWorldFound) throw new Error(`Game World ${name} not found`)
   return gameWorldFound
 }
@@ -45,4 +45,17 @@ export const getTileGameWorldByTile = (
   tile: TILES
 ): TileGameWorld | undefined => {
   return tileGameWorlds.find((tileGameWorld) => tileGameWorld.tile === tile)
+}
+
+export const getNextWorld = (gameWorld: GameWorld): GameWorld | undefined => {
+  const index = GAME_WORLDS.findIndex(value => value.key === gameWorld.key)
+  if (index === -1) return undefined
+  if (index >= GAME_WORLDS.length - 1) return undefined
+  return GAME_WORLDS[index + 1]
+}
+
+export const getPreviousWorld = (gameWorld: GameWorld): GameWorld | undefined => {
+  const index = GAME_WORLDS.findIndex(value => value.key === gameWorld.key)
+  if (index <= 0) return undefined
+  return GAME_WORLDS[index - 1]
 }

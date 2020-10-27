@@ -35,7 +35,7 @@ export default class MainScene extends Phaser.Scene {
 
   init(config: MainSceneConfig) {
     this.gameover = false
-    if (!config.gameWorld?.name) {
+    if (!config.gameWorld?.key) {
       this.currentWorld = getGameWorld()
     } else {
       this.currentWorld = { ...config.gameWorld }
@@ -175,12 +175,10 @@ export default class MainScene extends Phaser.Scene {
     const currentLevel = { ...this.level }
     const nextLevelExists = isLevelExist(this.currentWorld.levels, currentLevel.level + 1)
 
-    console.log('nextLevelExists', nextLevelExists)
     const nextLevelButtonConfig: ButtonConfig = {
       name: BUTTON.RIGHT,
       onClick: () => {
         if (nextLevelExists) {
-          console.log('currentLevel.level', currentLevel.level)
           this.restartScene(getLevel(this.currentWorld.levels, currentLevel.level + 1))
         }
       },
@@ -296,7 +294,7 @@ export default class MainScene extends Phaser.Scene {
     ++this.round
     if (this.round > this.level.rounds) {
       this.backgroundAudio.stop()
-      setLevel({ level: this.level.level, stars: 3 })
+      setLevel({ level: this.level.level, stars: 3, key: this.currentWorld.key })
       this.showFinishGameDialog('You Win!', true, 3)
       return Promise.resolve()
     }
@@ -440,7 +438,7 @@ export default class MainScene extends Phaser.Scene {
 
         await this.showMissedHidden()
 
-        setLevel({ level: this.level.level, stars })
+        setLevel({ level: this.level.level, stars, key: this.currentWorld.key })
         this.showFinishGameDialog('Game over', false, stars)
       }
       return

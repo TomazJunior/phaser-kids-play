@@ -46,6 +46,7 @@ declare interface FileStorageConfig {
 }
 
 declare interface LevelFileStorageConfig {
+  key: string
   level: number
   stars: number
 }
@@ -64,6 +65,7 @@ declare interface Window {
 }
 
 declare interface GameWorld {
+  key: string
   name: string
   map: any[][]
   playerClazz: PlayerConstructor

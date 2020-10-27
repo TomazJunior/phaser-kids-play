@@ -1,3 +1,5 @@
+import { GAME_WORLDS } from './constants'
+
 const FILE_STORAGE_KEY = 'fileStorage'
 const initialFileStorageConfig: FileStorageConfig = {
   tutorials: [
@@ -13,6 +15,7 @@ const initialFileStorageConfig: FileStorageConfig = {
   sound: true,
   levels: [
     {
+      key: GAME_WORLDS[0].key,
       level: 1,
       stars: 0,
     },
