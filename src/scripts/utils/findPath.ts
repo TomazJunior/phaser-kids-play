@@ -10,6 +10,38 @@ const toKey = (x: number, y: number) => `${x}x${y}`
 const isCollidable = (x: number, y: number, colideables: Array<Phaser.Math.Vector2>): boolean => {
   return !!colideables.find((pos) => pos.x === x && pos.y === y)
 }
+const findNeighbors = (
+  position: Phaser.Math.Vector2,
+  collidables: Array<Phaser.Math.Vector2>,
+  map: number[][]
+): Array<TilePosition> => {
+  const { x, y } = position
+
+  const possibleNeighbors: Array<TilePosition> = [
+    { x, y: y - 1 }, // top
+    { x: x + 1, y }, // right
+    { x, y: y + 1 }, // bottom
+    { x: x - 1, y }, // left
+  ]
+
+  return possibleNeighbors.reduce((neighbors: Array<TilePosition>, neighbor: TilePosition) => {
+    if (isCollidable(neighbor.x, neighbor.y, collidables)) {
+      return neighbors
+    }
+
+    if (neighbor.x < 0 || neighbor.x > map[0].length - 1) {
+      return neighbors
+    }
+
+    if (neighbor.y < 0 || neighbor.y > map.length - 1) {
+      return neighbors
+    }
+
+    neighbors.push(neighbor)
+    return neighbors
+  }, [])
+}
+
 const findPath = (
   start: Phaser.Math.Vector2,
   target: Phaser.Math.Vector2,
@@ -47,11 +79,11 @@ const findPath = (
     for (let i = 0; i < neighbors.length; ++i) {
       const neighbor = neighbors[i]
 
-      if (neighbor.x < 0 || neighbor.x > map.length - 1) {
+      if (neighbor.x < 0 || neighbor.x > map[0].length - 1) {
         continue
       }
 
-      if (neighbor.y < 0 || neighbor.y > map[neighbor.x].length - 1) {
+      if (neighbor.y < 0 || neighbor.y > map.length - 1) {
         continue
       }
 
@@ -89,4 +121,4 @@ const findPath = (
   return path.reverse()
 }
 
-export default findPath
+export { findPath, findNeighbors }

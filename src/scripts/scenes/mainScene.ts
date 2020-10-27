@@ -1,8 +1,5 @@
 import HiddenChar from '../objects/hiddenChar'
-import {
-  HIDDEN_CHAR_REACHED_TARGET,
-  HIDDEN_THUMB_CHAR_MOVED_TO_NEXT,
-} from '../events/events'
+import { HIDDEN_CHAR_REACHED_TARGET, HIDDEN_THUMB_CHAR_MOVED_TO_NEXT } from '../events/events'
 import { getAllSkins, getARandomSkinFrom } from '../utils/skinUtils'
 import { FONTS, ANIMAL_SKINS, BUTTON, SOUNDS, SCENES } from '../utils/constants'
 import ColoredText from '../ui/coloredText'
@@ -76,14 +73,14 @@ export default class MainScene extends Phaser.Scene {
 
     this.targets = this.physics.add.staticGroup()
     this.gameMap.createTargets(this.targets, this.handlePlayerGoToTarget)
-    
+
     this.createBackButton()
 
     this.hiddenChars = this.add.group()
     this.hiddenThumbChars = new HiddenThumbChars(this, width * 0.5, height * 0)
 
     this.physics.add.collider(this.player, this.targets, undefined, undefined, this)
-    this.physics.add.collider(this.hiddenChars, this.targets, undefined, undefined, this)
+    // this.physics.add.collider(this.hiddenChars, this.targets, undefined, undefined, this)
 
     this.levelText = new ColoredText(
       this,
@@ -116,6 +113,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   handleLoseFocus = () => {
+    // if (1 === 1) return
     // assuming a Paused scene that has a pause modal
     if (this.scene.isActive(SCENES.PAUSE_SCENE)) {
       return
@@ -138,14 +136,17 @@ export default class MainScene extends Phaser.Scene {
       },
       onRestart: () => {
         this.resumePausedScene()
-        this.restartScene()
+        this.restartScene(this.level)
       },
     })
   }
 
-  restartScene = (level?: Level) => {
+  restartScene = (level: Level) => {
     this.setToGameOverState(() => {
-      this.scene.restart(level)
+      this.scene.restart(<MainSceneConfig>{
+        gameWorld: this.currentWorld,
+        level,
+      })
     })
   }
 
@@ -168,16 +169,18 @@ export default class MainScene extends Phaser.Scene {
     const restartButtonConfig: ButtonConfig = {
       name: BUTTON.RESTART,
       onClick: () => {
-        this.restartScene()
+        this.restartScene(this.level)
       },
     }
     const currentLevel = { ...this.level }
     const nextLevelExists = isLevelExist(this.currentWorld.levels, currentLevel.level + 1)
 
+    console.log('nextLevelExists', nextLevelExists)
     const nextLevelButtonConfig: ButtonConfig = {
       name: BUTTON.RIGHT,
       onClick: () => {
         if (nextLevelExists) {
+          console.log('currentLevel.level', currentLevel.level)
           this.restartScene(getLevel(this.currentWorld.levels, currentLevel.level + 1))
         }
       },
@@ -316,7 +319,7 @@ export default class MainScene extends Phaser.Scene {
 
   closeTargets() {
     this.targets.getChildren().forEach((target: any) => {
-      (<TargetInterface>target).close()
+      ;(<TargetInterface>target).close()
     })
   }
 
@@ -359,7 +362,9 @@ export default class MainScene extends Phaser.Scene {
   }
 
   getFreeTargets(): TargetInterface[] {
-    return <TargetInterface[]>this.targets.getChildren().filter((target: any) => !(<TargetInterface>target.hiddenCharName))
+    return <TargetInterface[]>(
+      this.targets.getChildren().filter((target: any) => !(<TargetInterface>target.hiddenCharName))
+    )
   }
 
   getHiddenChar(skin: string): HiddenChar {
@@ -375,7 +380,7 @@ export default class MainScene extends Phaser.Scene {
   handlePlayerGoToTarget = (target: TargetInterface) => {
     if (!this.hiddenCharOnTheirPosition || target.opened) return
 
-    const pathToGo = this.gameMap.getPathTo(this.player.objectPosition, target.objectPosition)
+    const pathToGo = this.gameMap.getPathTo(this.player.objectPosition, target.objectPosition, true)
 
     if (this.clickOnTargetAudio.isPlaying) this.clickOnTargetAudio.stop()
     playSound(this, this.clickOnTargetAudio)

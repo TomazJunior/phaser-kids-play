@@ -65,7 +65,7 @@ declare interface Window {
 
 declare interface GameWorld {
   name: string
-  map: number[][]
+  map: any[][]
   playerClazz: PlayerConstructor
   targetClazz: TargetConstructor
   levels: Array<Level>
@@ -76,7 +76,7 @@ declare interface GameWorld {
 declare interface TileConfigGameWorld {
   width: number
   height: number
-  scale: number
+  scale: number,
 }
 
 declare interface TileGameWorld {
@@ -86,6 +86,7 @@ declare interface TileGameWorld {
   frame?: string
   tile: import('../src/scripts/utils/constants').TILES
   tileType: import('../src/scripts/utils/constants').TileGameWorldType
+  rotation?: number
 }
 
 declare interface Level {
@@ -119,7 +120,8 @@ declare interface TargetConstructor {
     scene: Phaser.Scene,
     objectPosition: ObjectPosition,
     container: Phaser.Physics.Arcade.StaticGroup,
-    tileConfigGameWorld: TileConfigGameWorld
+    tileConfigGameWorld: TileConfigGameWorld,
+    tileGameWorld: TileGameWorld | undefined,
   ): TargetInterface
 }
 

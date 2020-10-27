@@ -1,24 +1,23 @@
 import { PLAYER_CHAR_REACHED_TARGET, PLAYER_TOUCHED_TARGET } from '../events/events'
-import { TILES } from '../utils/constants'
-import findPath from '../utils/findPath'
+import { TileGameWorldType, TILES } from '../utils/constants'
+import { findPath, findNeighbors } from '../utils/findPath'
 import {
   getCollidableTiles,
-  getNonCollidableTiles,
   getPlayerTile,
   getTargetTiles,
   getTileGameWorldByTile,
+  getTilesOfType,
 } from '../utils/worldUtil'
 
 export class GameMap {
-  nonCollidableTiles: TILES[]
   playerTile: TILES
   targetTiles: TILES[]
 
   constructor(private scene: Phaser.Scene, private x: number, private y: number, private gameWorld: GameWorld) {
-    this.nonCollidableTiles = getNonCollidableTiles(gameWorld.tiles)
     this.playerTile = getPlayerTile(gameWorld.tiles)
     this.targetTiles = getTargetTiles(gameWorld.tiles)
-    this.createTiles(this.nonCollidableTiles)
+
+    this.createTiles([...getTilesOfType(gameWorld.tiles, [TileGameWorldType.TILE]), this.playerTile])
   }
 
   public getPlayerPosition = (): ObjectPosition => {
@@ -29,21 +28,28 @@ export class GameMap {
     return this.getTilesPosition(this.targetTiles)
   }
 
-  public getPathTo = (origin: ObjectPosition, target: ObjectPosition): Array<ObjectPosition> => {
+  public getPathTo = (
+    origin: ObjectPosition,
+    target: ObjectPosition,
+    findNearestTarget: boolean = false
+  ): Array<ObjectPosition> => {
     const collidableTiles = getCollidableTiles(this.gameWorld.tiles)
     const collidable: Array<Phaser.Math.Vector2> = this.getTilesPosition(collidableTiles).map((pos) => {
       return new Phaser.Math.Vector2(pos.col, pos.row)
     })
 
-    // move target y position to nearest position of the box
-    let targetCol = target.col
-    if (collidableTiles.includes(this.gameWorld.map[target.row][target.col])) {
-      targetCol = target.col > origin.col ? targetCol + 1 : targetCol - 1
+    let vectorTarget = { ...target }
+    if (findNearestTarget) {
+      const neighbors = findNeighbors(new Phaser.Math.Vector2(target.col, target.row), collidable, this.gameWorld.map)
+      if (neighbors.length) {
+        vectorTarget.col = neighbors[0].x
+        vectorTarget.row = neighbors[0].y
+      }
     }
 
     const path = findPath(
       new Phaser.Math.Vector2(origin.col, origin.row),
-      new Phaser.Math.Vector2(targetCol, target.row),
+      new Phaser.Math.Vector2(vectorTarget.col, vectorTarget.row),
       collidable,
       this.gameWorld.map
     )
@@ -67,7 +73,14 @@ export class GameMap {
   ): Array<TargetInterface> => {
     const targetsPosition = this.getTargetTilePositions()
     return targetsPosition.map((pos) => {
-      const target = new this.gameWorld.targetClazz(this.scene, pos, targetGroup, this.gameWorld.tileConfig)
+      const tileGameWorld = this.getTileByPosition(pos)
+      const target = new this.gameWorld.targetClazz(
+        this.scene,
+        pos,
+        targetGroup,
+        this.gameWorld.tileConfig,
+        tileGameWorld
+      )
       if (onPlayerGoToTarget) {
         target.on(PLAYER_TOUCHED_TARGET, onPlayerGoToTarget)
       }
@@ -75,8 +88,23 @@ export class GameMap {
     })
   }
 
+  private getTileByPosition = (objectPosition: ObjectPosition): TileGameWorld | undefined => {
+    const value: any = this.gameWorld.map[objectPosition.row][objectPosition.col]
+    const tileKey = Object.keys(TILES).find((key: string) => {
+      TILES[key] === value
+    })
+
+    if (!tileKey) return undefined
+
+    return this.gameWorld.tiles.find((tileGameWorld) => tileGameWorld.tile === TILES[tileKey])
+  }
+
   private getTilesPosition = (tiles: Array<TILES>): Array<ObjectPosition> => {
-    const { width, height } = this.gameWorld.tileConfig
+    let { width, height } = this.gameWorld.tileConfig
+    const { scale } = this.gameWorld.tileConfig
+    width *= scale
+    height *= scale
+
     const positions: Array<ObjectPosition> = []
 
     for (let i = 0; i < this.gameWorld.map.length; ++i) {
@@ -85,8 +113,8 @@ export class GameMap {
         const cell = row[j]
         if (tiles.includes(cell)) {
           positions.push({
-            x: width / 2 + width * j,
-            y: !i ? this.y : this.y + (height / 2) * i,
+            x: !j ? this.x : this.x + width * j,
+            y: !i ? this.y : this.y + height * i,
             col: j,
             row: i,
           })
@@ -97,17 +125,25 @@ export class GameMap {
   }
 
   private getTilePosition = (row: number, col: number): ObjectPosition => {
-    const { width, height } = this.gameWorld.tileConfig
+    let { width, height } = this.gameWorld.tileConfig
+    const { scale } = this.gameWorld.tileConfig
+    width *= scale
+    height *= scale
+
     return {
-      x: width / 2 + width * col,
-      y: !row ? this.y : this.y + (height / 2) * row,
+      x: !col ? this.x : this.x + width * col,
+      y: !row ? this.y : this.y + height * row,
       row,
       col,
     }
   }
 
   private createTiles = (tiles: Array<TILES>) => {
-    const { width, height } = this.gameWorld.tileConfig
+    let { width, height } = this.gameWorld.tileConfig
+    const { scale } = this.gameWorld.tileConfig
+    width *= scale
+    height *= scale
+
     for (let y = 0; y < this.gameWorld.map.length; ++y) {
       const row = this.gameWorld.map[y]
       for (let x = 0; x < row.length; ++x) {
@@ -116,7 +152,17 @@ export class GameMap {
           const tileGameWorld = getTileGameWorldByTile(this.gameWorld.tiles, cell)
 
           if (tileGameWorld) {
-            this.scene.add.image(width / 2 + width * x, !y ? this.y : this.y + (height / 2) * y, tileGameWorld.texture)
+            const image = this.scene.add.image(
+              !x ? this.x : this.x + width * x,
+              !y ? this.y : this.y + height * y,
+              tileGameWorld.texture,
+              tileGameWorld.frame
+            )
+            image.setScale(scale, scale)
+
+            if (tileGameWorld.rotation) {
+              image.setRotation(tileGameWorld.rotation)
+            }
           }
         }
       }

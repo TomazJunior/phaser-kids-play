@@ -1,6 +1,6 @@
 import { PLAYER_TOUCHED_TARGET } from '../events/events'
-import { getOrAddAudio, playSound } from '../utils/audioUtil'
-import { ANIMAL_SKINS, BOX, IMAGE_NAME, SOUNDS, SPRITE_NAME } from '../utils/constants'
+import { getOrAddAudio } from '../utils/audioUtil'
+import { ANIMAL_SKINS, IMAGE_NAME, SOUNDS, SPRITE_NAME } from '../utils/constants'
 
 export default abstract class Target extends Phaser.Physics.Arcade.Sprite implements TargetInterface {
   hiddenCharName: ANIMAL_SKINS | null
@@ -12,18 +12,28 @@ export default abstract class Target extends Phaser.Physics.Arcade.Sprite implem
   clickOnRightBoxAudio: Phaser.Sound.BaseSound
   shadow: Phaser.GameObjects.Sprite
   objectPosition: ObjectPosition
+  tileConfigGameWorld: TileConfigGameWorld
   constructor(
     scene: Phaser.Scene,
     objectPosition: ObjectPosition,
     container: Phaser.Physics.Arcade.StaticGroup,
     tileConfigGameWorld: TileConfigGameWorld,
+    tileGameWorld: TileGameWorld | undefined,
     texture: string | Phaser.Textures.Texture,
     frame?: string | integer
   ) {
     super(scene, objectPosition.x, objectPosition.y, texture, frame)
     scene.add.existing(this)
     container.add(this)
+    
+    if (tileGameWorld?.rotation) {
+      this.setRotation(tileGameWorld?.rotation)
+    }
+    this.setScale(tileConfigGameWorld.scale, tileConfigGameWorld.scale)
+    this.setSize(tileConfigGameWorld.width, tileConfigGameWorld.height)
+
     this.objectPosition = objectPosition
+    this.tileConfigGameWorld = tileConfigGameWorld
     const { x, y } = objectPosition
     this.shadow = this.createShadow(x, y)
 
@@ -48,14 +58,6 @@ export default abstract class Target extends Phaser.Physics.Arcade.Sprite implem
 
     this.clickOnWrongBoxAudio = getOrAddAudio(scene, SOUNDS.WRONG_TARGET)
     this.clickOnRightBoxAudio = getOrAddAudio(scene, SOUNDS.FIND_HIDDEN)
-  }
-
-  protected abstract createShadow(x: number, y: number): Phaser.GameObjects.Sprite
-
-  public wrongTarget() {
-    playSound(this.scene, this.clickOnWrongBoxAudio)
-    this.opened = false
-    this.shadow.setVisible(true)
   }
 
   public toggleHelp(enable: boolean) {
@@ -87,10 +89,14 @@ export default abstract class Target extends Phaser.Physics.Arcade.Sprite implem
     this.openTarget(false)
     this.toggleHelp(false)
   }
+  
+  protected abstract createShadow(x: number, y: number): Phaser.GameObjects.Sprite 
 
   public abstract close()
 
   public abstract openTarget(withSound: boolean)
 
   public abstract isRightTarget(skin: ANIMAL_SKINS | null): boolean
+
+  public abstract wrongTarget()
 }

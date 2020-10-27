@@ -26,12 +26,6 @@ export default class PreloadScene extends Phaser.Scene {
 
     this.load.image('finger-point', 'assets/img/finger-point-gesture.png')
 
-    this.load.image('chest-closed', 'assets/img/chest-closed.png')
-    this.load.image('chest-opened', 'assets/img/chest-opened.png')
-    this.load.image('chest-lid', 'assets/img/chest-lid.png')
-    this.load.image('dirt-block', 'assets/img/dirt-block.png')
-    this.load.image('grass-block', 'assets/img/grass-block.png')
-
     this.load.image('stars-zero', 'assets/img/stars-zero.png')
     this.load.image('stars-one', 'assets/img/stars-one.png')
     this.load.image('stars-two', 'assets/img/stars-two.png')
@@ -49,6 +43,10 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.audio(SOUNDS.CLICK_TARGET, 'assets/audio/434756_notarget_wood-step-sample-1.mp3')
     this.load.audio(SOUNDS.WRONG_TARGET, 'assets/audio/350984__cabled-mess__lose-c-03.mp3')
     this.load.audio(SOUNDS.WALKING, 'assets/audio/430708_juandamb_running.mp3')
+    
+    //tiles from worlds
+    this.loadSpritesGameWorld()
+    
     //buttons
     this.loadImageButtons()
 
@@ -63,7 +61,7 @@ export default class PreloadScene extends Phaser.Scene {
     this.loadAssetsProgress()
   }
 
-  loadImageButtons() {
+  private loadImageButtons() {
     Object.keys(BUTTON).forEach((key) => {
       Object.keys(BUTTON_PREFIX).forEach((prefix) => {
         const buttonKey = `${BUTTON[key]}-${BUTTON_PREFIX[prefix]}`
@@ -73,7 +71,7 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image(`${BUTTON.SOUND}-${BUTTON_PREFIX_EXTRA.INACTIVE}`, `assets/img/${BUTTON.SOUND}-${BUTTON_PREFIX_EXTRA.INACTIVE}.png`)
   }
 
-  loadAssetsProgress = () => {
+  private loadAssetsProgress = () => {
     this.load.on('progress', this.progressBar.updateValue)
     // this.load.on('fileprogress', (file) => {
     //   console.log(file.src)
@@ -83,6 +81,24 @@ export default class PreloadScene extends Phaser.Scene {
       this.scene.start(SCENES.MENU_SCENE)
       // this.scene.start(SCENES.MAIN_SCENE)
     })
+  }
+
+  private loadSpritesGameWorld = () => {
+    // world-2
+    this.load.image('world-2-grass', 'assets/img/world/world-2/grass.png')
+    this.load.image('world-2-dirt', 'assets/img/world/world-2/path-dirt.png')
+    this.load.image('world-2-dirt-left', 'assets/img/world/world-2/dirt-left.png')
+    this.load.image('world-2-dirt-right', 'assets/img/world/world-2/dirt-right.png')
+    this.load.image('world-2-dirt-top', 'assets/img/world/world-2/dirt-top.png')
+    this.load.image('world-2-dirt-bottom', 'assets/img/world/world-2/dirt-bottom.png')
+    this.load.image('world-2-dirt-right-bottom', 'assets/img/world/world-2/dirt-right-bottom.png')
+    this.load.image('world-2-dirt-right-top', 'assets/img/world/world-2/dirt-right-top.png')
+    this.load.image('world-2-dirt-left-bottom', 'assets/img/world/world-2/dirt-left-bottom.png')
+    this.load.image('world-2-dirt-left-top', 'assets/img/world/world-2/dirt-left-top.png')
+    
+    this.load.image('world-2-grass-top-left', 'assets/img/world/world-2/grass-top-left.png')
+    this.load.image('world-2-grass-top-right', 'assets/img/world/world-2/grass-top-right.png')
+    
   }
 
   create() {

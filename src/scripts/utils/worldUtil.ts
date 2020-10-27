@@ -26,6 +26,10 @@ export const getNonCollidableTiles = (tiles: Array<TileGameWorld>): Array<TILES>
   return tiles.filter((tile) => !tile.collidable).map((tile) => tile.tile)
 }
 
+export const getTilesOfType = (tiles: Array<TileGameWorld>, tileTypes: Array<TileGameWorldType>): Array<TILES> => {
+  return tiles.filter((tile) => tileTypes.includes(tile.tileType)).map((tile) => tile.tile)
+}
+
 export const getPlayerTile = (tiles: Array<TileGameWorld>): TILES => {
   const playerTileFound = tiles.find((tile) => tile.tileType === TileGameWorldType.PLAYER)?.tile
   if (!playerTileFound) throw new Error(`player tile not found`)
