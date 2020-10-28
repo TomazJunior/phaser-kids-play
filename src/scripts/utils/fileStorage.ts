@@ -67,11 +67,11 @@ export const isSoundEnabled = (): boolean => {
 
 export const setLevel = (level: LevelFileStorageConfig) => {
   const { levels } = getFileStorageConfig()
-  const currentLevel = levels.find((item) => item.level === level.level)
+  const currentLevel = levels.find((item) => item.level === level.level && item.key === level.key)
   if (!currentLevel || level.stars > currentLevel.stars) {
     setFileStorageConfig({
       ...getFileStorageConfig(),
-      levels: [...levels.filter((item) => item.level !== level.level), level],
+      levels: [...levels.filter((item) => !(item.key === level.key && item.level === level.level)), level],
     })
   }
 }
