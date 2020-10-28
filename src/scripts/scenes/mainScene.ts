@@ -344,12 +344,17 @@ export default class MainScene extends Phaser.Scene {
   }
 
   createHiddenChar(hiddenSkin: ANIMAL_SKINS | null, delay: number) {
-    const { width, height } = this.scale
+    const playerPosition = this.gameMap.getPlayerPosition()
+
     this.time.delayedCall(delay, () => {
-      const hiddenChar = new HiddenChar(this, width * 0.05, height * 0.1, hiddenSkin)
+      const hiddenChar = new HiddenChar(this, {...playerPosition, x: 1}, hiddenSkin)
       hiddenChar.on(HIDDEN_CHAR_REACHED_TARGET, this.handleHiddenCharReachedTarget)
       this.hiddenChars.add(hiddenChar)
-      hiddenChar.goTo(this.getFreeTarget())
+
+      const target =  this.getFreeTarget()
+      const pathToGo = this.gameMap.getPathTo(this.player.objectPosition, target.objectPosition, false)
+
+      hiddenChar.goTo(target, pathToGo)
     })
   }
 

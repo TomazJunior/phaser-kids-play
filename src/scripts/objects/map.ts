@@ -34,9 +34,16 @@ export class GameMap {
     findNearestTarget: boolean = false
   ): Array<ObjectPosition> => {
     const collidableTiles = getCollidableTiles(this.gameWorld.tiles)
-    const collidable: Array<Phaser.Math.Vector2> = this.getTilesPosition(collidableTiles).map((pos) => {
+    const possibleCollidables: Array<Phaser.Math.Vector2> = this.getTilesPosition(collidableTiles).map((pos) => {
       return new Phaser.Math.Vector2(pos.col, pos.row)
     })
+
+    const collidable = findNearestTarget
+      ? possibleCollidables
+      : possibleCollidables.filter((vector) => {
+          const found = vector.x === target.col && vector.y === target.row
+          return !found
+        })
 
     let vectorTarget = { ...target }
     if (findNearestTarget) {
