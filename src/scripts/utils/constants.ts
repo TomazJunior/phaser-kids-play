@@ -374,6 +374,7 @@ export enum BUTTON {
   LEVEL = 'level-button',
   RIGHT = 'right-button',
   SOUND = 'sound-button',
+  PAUSE = 'pause-button',
 }
 
 export enum BUTTON_PREFIX {

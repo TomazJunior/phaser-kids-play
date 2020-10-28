@@ -35,6 +35,7 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('big-frame-window', 'assets/img/big-frame-window.png')
     this.load.image('small-frame-window', 'assets/img/small-frame-window.png')
     this.load.image('small-frame', 'assets/img/small-frame.png')
+    this.load.image('small-frame-level', 'assets/img/small-frame-level.png')
     
     this.load.bitmapFont(FONTS.PIXEL_FONT, 'assets/fonts/pixelFont.png', 'assets/fonts/pixelFont.xml')
 

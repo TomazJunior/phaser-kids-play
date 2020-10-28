@@ -1,8 +1,7 @@
 import HiddenChar from '../objects/hiddenChar'
 import { HIDDEN_CHAR_REACHED_TARGET, HIDDEN_THUMB_CHAR_MOVED_TO_NEXT } from '../events/events'
 import { getAllSkins, getARandomSkinFrom } from '../utils/skinUtils'
-import { FONTS, ANIMAL_SKINS, BUTTON, SOUNDS, SCENES } from '../utils/constants'
-import ColoredText from '../ui/coloredText'
+import { ANIMAL_SKINS, BUTTON, SOUNDS, SCENES } from '../utils/constants'
 import HiddenThumbChars from '../objects/hiddenThumbChars'
 import ScoreText from '../ui/scoreText'
 import { GameMap } from '../objects/map'
@@ -11,6 +10,8 @@ import { LevelCompleteDialog } from '../ui/levelCompleteDialog'
 import { getTutorialSeen, setLevel, setTutorialSeen } from '../utils/fileStorage'
 import { getOrAddAudio, playSound } from '../utils/audioUtil'
 import { getGameWorld, getLevel, isLevelExist } from '../utils/worldUtil'
+import { FrameLevel } from '../ui/frameLevel'
+import { calculateStars } from '../utils/starsUtil'
 
 export default class MainScene extends Phaser.Scene {
   targets: Phaser.Physics.Arcade.StaticGroup
@@ -24,11 +25,11 @@ export default class MainScene extends Phaser.Scene {
   level: Level
   round: number
   hiddenCharOnTheirPosition = false
-  levelText: ColoredText
   scoreText: ScoreText
   backgroundAudio: Phaser.Sound.BaseSound
   clickOnTargetAudio: Phaser.Sound.BaseSound
   gameMap: GameMap
+  frameLevel: FrameLevel
   constructor() {
     super({ key: SCENES.MAIN_SCENE })
   }
@@ -82,23 +83,18 @@ export default class MainScene extends Phaser.Scene {
     this.physics.add.collider(this.player, this.targets, undefined, undefined, this)
     this.physics.add.collider(this.hiddenChars, this.targets, undefined, undefined, this)
 
-    this.levelText = new ColoredText(
+    this.frameLevel = new FrameLevel(
       this,
-      width - 270,
-      20,
-      this.isInTutorialMode ? 'Tutorial' : `level ${this.level.level}`,
-      {
-        fontFamily: FONTS.ALLOY_INK,
-        fontSize: '48px',
-      }
+      width - 150,
+      60,
+      this.isInTutorialMode ? 'Tutorial' : `Level ${this.level.level}`,
+      0,
+      this.handleLoseFocus
     )
-
     this.backgroundAudio = getOrAddAudio(this, SOUNDS.BACKGROUND, { volume: 0.4, loop: true })
     playSound(this, this.backgroundAudio)
 
     this.clickOnTargetAudio = getOrAddAudio(this, SOUNDS.CLICK_TARGET)
-
-    this.scoreText = new ScoreText(this, width - 270, 70)
 
     this.createHiddenChars(this.level.hiddens)
     this.hiddenThumbChars.on(HIDDEN_THUMB_CHAR_MOVED_TO_NEXT, (data) => {
@@ -161,7 +157,7 @@ export default class MainScene extends Phaser.Scene {
       return
     }
     setTutorialSeen(this.level.level, true)
-    this.levelText.content = `level ${this.level.level}`
+    this.frameLevel.title = `Level ${this.level.level}`
   }
 
   showFinishGameDialog = (text: string, finishedLevel: boolean, stars: number) => {
@@ -292,6 +288,7 @@ export default class MainScene extends Phaser.Scene {
       return Promise.resolve()
     }
 
+    this.frameLevel.stars = calculateStars(this.round)
     ++this.round
     if (this.round > this.level.rounds) {
       this.backgroundAudio.stop()
@@ -352,7 +349,7 @@ export default class MainScene extends Phaser.Scene {
       hiddenChar.on(HIDDEN_CHAR_REACHED_TARGET, this.handleHiddenCharReachedTarget)
       this.hiddenChars.add(hiddenChar)
 
-      const target =  this.getFreeTarget()
+      const target = this.getFreeTarget()
       const pathToGo = this.gameMap.getPathTo(initialPosition, target.objectPosition, false)
 
       hiddenChar.goTo(target, pathToGo)
@@ -432,18 +429,8 @@ export default class MainScene extends Phaser.Scene {
       target.wrongTarget()
       this.closeTarget(target)
       if (!this.isInTutorialMode) {
-        // TODO: move to constants/util
-        let stars = 0
-        if (this.round === 5) {
-          stars = 3
-        } else if (this.round > 3) {
-          stars = 2
-        } else if (this.round > 1) {
-          stars = 1
-        }
-
         await this.showMissedHidden()
-
+        const stars = calculateStars(this.round)
         setLevel({ level: this.level.level, stars, key: this.currentWorld.key })
         this.showFinishGameDialog('Game over', false, stars)
       }
@@ -451,7 +438,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     target.openTarget(true)
-    this.scoreText.incScore()
+    // this.scoreText.incScore()
     this.hiddenThumbChars.moveToNext(target.hiddenCharName)
 
     const hiddenChar: HiddenChar = this.getHiddenChar(target.hiddenCharName)
