@@ -1,5 +1,5 @@
 import { PLAYER_CHAR_REACHED_TARGET, PLAYER_TOUCHED_TARGET } from '../events/events'
-import { TileGameWorldType, TILES } from '../utils/constants'
+import { TILES } from '../utils/constants'
 import { findPath, findNeighbors } from '../utils/findPath'
 import {
   getCollidableTiles,
@@ -17,7 +17,7 @@ export class GameMap {
     this.playerTile = getPlayerTile(gameWorld.tiles)
     this.targetTiles = getTargetTiles(gameWorld.tiles)
 
-    this.createTiles([...getTilesOfType(gameWorld.tiles, [TileGameWorldType.TILE]), this.playerTile])
+    this.createTiles([...getTilesOfType(gameWorld.tiles), this.playerTile])
   }
 
   public getPlayerPosition = (): ObjectPosition => {
@@ -108,7 +108,7 @@ export class GameMap {
       col,
     }
   }
-  
+
   private getTileByPosition = (objectPosition: ObjectPosition): TileGameWorld | undefined => {
     const value: any = this.gameWorld.map[objectPosition.row][objectPosition.col]
     const tileKey = Object.keys(TILES).find((key: string) => {
@@ -157,22 +157,34 @@ export class GameMap {
         const cell = row[x]
         if (tiles.includes(cell)) {
           const tileGameWorld = getTileGameWorldByTile(this.gameWorld.tiles, cell)
-
-          if (tileGameWorld) {
-            const image = this.scene.add.image(
-              !x ? this.x : this.x + width * x,
-              !y ? this.y : this.y + height * y,
-              tileGameWorld.texture,
-              tileGameWorld.frame
-            )
-            image.setScale(scale, scale)
-
-            if (tileGameWorld.rotation) {
-              image.setRotation(tileGameWorld.rotation)
-            }
-          }
+          tileGameWorld?.textures?.forEach(({ texture, frame}) => {
+            this.createImage(x, y, width, height, texture, scale, tileGameWorld.rotation, frame)
+          })
         }
       }
+    }
+  }
+
+  private createImage(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    texture: string,
+    scale: number,
+    rotation?: number,
+    frame?: string
+  ) {
+    const image = this.scene.add.image(
+      !x ? this.x : this.x + width * x,
+      !y ? this.y : this.y + height * y,
+      texture,
+      frame
+    )
+    image.setScale(scale, scale)
+
+    if (rotation) {
+      image.setRotation(rotation)
     }
   }
 }

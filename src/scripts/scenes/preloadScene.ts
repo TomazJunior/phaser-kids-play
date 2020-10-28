@@ -100,6 +100,15 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('world-2-grass-top-left', 'assets/img/world/world-2/grass-top-left.png')
     this.load.image('world-2-grass-top-right', 'assets/img/world/world-2/grass-top-right.png')
     
+    this.load.image('world-2-flower-six-points', 'assets/img/world/world-2/flower-six-points.png')
+    this.load.image('world-2-flower-three-points', 'assets/img/world/world-2/flower-three-points.png')
+    
+    this.load.image('world-2-tree-big', 'assets/img/world/world-2/tree-big.png')
+    this.load.image('world-2-tree-tiny', 'assets/img/world/world-2/tree-tiny.png')
+
+    this.load.image('world-2-rock-big', 'assets/img/world/world-2/rock-big.png')
+    this.load.image('world-2-rock-small', 'assets/img/world/world-2/rock-small.png')
+    this.load.image('world-2-rock-tiny', 'assets/img/world/world-2/rock-tiny.png')
   }
 
   create() {

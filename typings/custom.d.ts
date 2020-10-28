@@ -78,14 +78,13 @@ declare interface GameWorld {
 declare interface TileConfigGameWorld {
   width: number
   height: number
-  scale: number,
+  scale: number
 }
 
 declare interface TileGameWorld {
   name: string
   collidable: boolean
-  texture: string
-  frame?: string
+  textures?: Array<{ texture: string; frame?: string }>
   tile: import('../src/scripts/utils/constants').TILES
   tileType: import('../src/scripts/utils/constants').TileGameWorldType
   rotation?: number
@@ -123,7 +122,7 @@ declare interface TargetConstructor {
     objectPosition: ObjectPosition,
     container: Phaser.Physics.Arcade.StaticGroup,
     tileConfigGameWorld: TileConfigGameWorld,
-    tileGameWorld: TileGameWorld | undefined,
+    tileGameWorld: TileGameWorld | undefined
   ): TargetInterface
 }
 

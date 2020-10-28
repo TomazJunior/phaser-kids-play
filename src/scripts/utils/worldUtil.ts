@@ -26,8 +26,8 @@ export const getNonCollidableTiles = (tiles: Array<TileGameWorld>): Array<TILES>
   return tiles.filter((tile) => !tile.collidable).map((tile) => tile.tile)
 }
 
-export const getTilesOfType = (tiles: Array<TileGameWorld>, tileTypes: Array<TileGameWorldType>): Array<TILES> => {
-  return tiles.filter((tile) => tileTypes.includes(tile.tileType)).map((tile) => tile.tile)
+export const getTilesOfType = (tiles: Array<TileGameWorld>, tileTypes?: Array<TileGameWorldType>): Array<TILES> => {
+  return tiles.filter((tile) => !tileTypes || tileTypes.includes(tile.tileType)).map((tile) => tile.tile)
 }
 
 export const getPlayerTile = (tiles: Array<TileGameWorld>): TILES => {
