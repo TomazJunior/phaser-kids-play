@@ -28,7 +28,7 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
 
   public setIsGoingTo(pathToGo: Array<ObjectPosition>) {
     this.isWalking = true
-    this.pathToGo = pathToGo
+    this.pathToGo = [...pathToGo]
     this.goToNextPosition()
   }
 

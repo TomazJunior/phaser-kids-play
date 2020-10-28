@@ -80,7 +80,7 @@ export default class MainScene extends Phaser.Scene {
     this.hiddenThumbChars = new HiddenThumbChars(this, width * 0.5, height * 0)
 
     this.physics.add.collider(this.player, this.targets, undefined, undefined, this)
-    // this.physics.add.collider(this.hiddenChars, this.targets, undefined, undefined, this)
+    this.physics.add.collider(this.hiddenChars, this.targets, undefined, undefined, this)
 
     this.levelText = new ColoredText(
       this,
@@ -345,7 +345,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   createHiddenChar(hiddenSkin: ANIMAL_SKINS | null, delay: number) {
-    const initialPosition = this.gameMap.getTilePosition(7, 0)
+    const initialPosition = this.gameMap.getTilePosition(7, 1)
 
     this.time.delayedCall(delay, () => {
       const hiddenChar = new HiddenChar(this, initialPosition, hiddenSkin)
@@ -353,7 +353,7 @@ export default class MainScene extends Phaser.Scene {
       this.hiddenChars.add(hiddenChar)
 
       const target =  this.getFreeTarget()
-      const pathToGo = this.gameMap.getPathTo(this.player.objectPosition, target.objectPosition, false)
+      const pathToGo = this.gameMap.getPathTo(initialPosition, target.objectPosition, false)
 
       hiddenChar.goTo(target, pathToGo)
     })
