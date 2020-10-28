@@ -95,6 +95,20 @@ export class GameMap {
     })
   }
 
+  public getTilePosition = (row: number, col: number): ObjectPosition => {
+    let { width, height } = this.gameWorld.tileConfig
+    const { scale } = this.gameWorld.tileConfig
+    width *= scale
+    height *= scale
+
+    return {
+      x: !col ? this.x : this.x + width * col,
+      y: !row ? this.y : this.y + height * row,
+      row,
+      col,
+    }
+  }
+  
   private getTileByPosition = (objectPosition: ObjectPosition): TileGameWorld | undefined => {
     const value: any = this.gameWorld.map[objectPosition.row][objectPosition.col]
     const tileKey = Object.keys(TILES).find((key: string) => {
@@ -129,20 +143,6 @@ export class GameMap {
       }
     }
     return positions
-  }
-
-  private getTilePosition = (row: number, col: number): ObjectPosition => {
-    let { width, height } = this.gameWorld.tileConfig
-    const { scale } = this.gameWorld.tileConfig
-    width *= scale
-    height *= scale
-
-    return {
-      x: !col ? this.x : this.x + width * col,
-      y: !row ? this.y : this.y + height * row,
-      row,
-      col,
-    }
   }
 
   private createTiles = (tiles: Array<TILES>) => {

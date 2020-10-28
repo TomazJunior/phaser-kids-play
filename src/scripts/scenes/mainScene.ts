@@ -259,6 +259,7 @@ export default class MainScene extends Phaser.Scene {
   setToGameOverState(cb: () => void) {
     this.time.delayedCall(300, () => {
       if (!this.gameover) {
+        this.round = 0
         this.gameover = true
         this.player.active = false
         this.player.visible = false
@@ -344,10 +345,10 @@ export default class MainScene extends Phaser.Scene {
   }
 
   createHiddenChar(hiddenSkin: ANIMAL_SKINS | null, delay: number) {
-    const playerPosition = this.gameMap.getPlayerPosition()
+    const initialPosition = this.gameMap.getTilePosition(7, 0)
 
     this.time.delayedCall(delay, () => {
-      const hiddenChar = new HiddenChar(this, {...playerPosition, x: 1}, hiddenSkin)
+      const hiddenChar = new HiddenChar(this, initialPosition, hiddenSkin)
       hiddenChar.on(HIDDEN_CHAR_REACHED_TARGET, this.handleHiddenCharReachedTarget)
       this.hiddenChars.add(hiddenChar)
 
