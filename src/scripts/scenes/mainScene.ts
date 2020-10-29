@@ -1,5 +1,5 @@
 import HiddenChar from '../objects/hiddenChar'
-import { HIDDEN_CHARS_ENQUEUED, HIDDEN_CHAR_REACHED_TARGET, HIDDEN_THUMB_CHAR_MOVED_TO_NEXT } from '../events/events'
+import { HIDDEN_CHARS_ENQUEUED, HIDDEN_CHAR_REACHED_TARGET, HIDDEN_THUMB_CHAR_MOVED_TO_NEXT, PLAYER_REACHED_FINAL_POS, PLAYER_REACHED_INITIAL_POS } from '../events/events'
 import { getAllSkins, getARandomSkinFrom } from '../utils/skinUtils'
 import { ANIMAL_SKINS, BUTTON, SOUNDS, SCENES } from '../utils/constants'
 import HiddenThumbChars from '../objects/hiddenThumbChars'
@@ -70,9 +70,7 @@ export default class MainScene extends Phaser.Scene {
     const { width, height } = this.scale
 
     this.createBackground()
-
     this.gameMap = new GameMap(this, 0, 0, this.currentWorld)
-    this.player = this.gameMap.createPlayer(this.handleReachedTarget)
 
     this.targets = this.physics.add.staticGroup()
 
@@ -84,9 +82,6 @@ export default class MainScene extends Phaser.Scene {
 
     this.hiddenChars = this.add.group()
     this.hiddenThumbChars = new HiddenThumbChars(this, width * 0.5, height * 0)
-
-    this.physics.add.collider(this.player, this.targets, undefined, undefined, this)
-    this.physics.add.collider(this.hiddenChars, this.targets, undefined, undefined, this)
 
     this.frameLevel = new FrameLevel(
       this,
@@ -107,6 +102,13 @@ export default class MainScene extends Phaser.Scene {
       this.toggleHelpTarget(data?.previous, false)
       this.toggleHelpTarget(data?.current, true)
     })
+
+    this.player = this.gameMap.createPlayer(this.handleReachedTarget)
+    this.player.on(PLAYER_REACHED_INITIAL_POS, this.handlePlayerReachedInitialPosition)
+    this.player.on(PLAYER_REACHED_FINAL_POS, this.handlePlayerReachedFinalPosition)
+
+    this.physics.add.collider(this.player, this.targets, undefined, undefined, this)
+    this.physics.add.collider(this.hiddenChars, this.targets, undefined, undefined, this)
   }
 
   private get isInTutorialMode(): boolean {
@@ -294,6 +296,16 @@ export default class MainScene extends Phaser.Scene {
     }
 
     this.frameLevel.stars = calculateStars(this.round)
+    // it will go to next round when reach the final position
+    this.playerGotoFinalPosition()
+    return Promise.resolve()
+  }
+
+  handlePlayerReachedInitialPosition = () => {
+    //TODO: to be implemenented
+  }
+
+  handlePlayerReachedFinalPosition = () => {
     ++this.round
     if (this.round > this.level.rounds) {
       this.backgroundAudio.stop()
@@ -305,12 +317,9 @@ export default class MainScene extends Phaser.Scene {
     this.time.delayedCall(500, () => {
       this.resetTargets()
 
-      const pathToGo = this.gameMap.getPathTo(this.player.objectPosition, { ...this.getInitialPlayerPosition() })
-      this.player.setIsGoingTo(pathToGo, true)
       this.createHiddenChars(this.level.hiddens)
       this.player.active = true
     })
-    return Promise.resolve()
   }
 
   resetTargets() {
@@ -398,13 +407,32 @@ export default class MainScene extends Phaser.Scene {
       this.time.delayedCall(500, () => {
         this.closeTargets()
         this.hiddenCharOnTheirPosition = true
-        this.player.active = true
+        // go to initial position only on the first round
+        if (this.round === 1) {
+          this.playerGotoInitialPosition()
+        }
         this.targetQueue.clear()
         if (this.hiddenThumbChars.currentHiddenChar) {
           this.toggleHelpTarget(this.hiddenThumbChars.currentHiddenChar, true)
         }
       })
     }
+  }
+
+  playerGotoInitialPosition = () => {
+    this.player.setVisible(true)
+    this.player.active = true
+    const playerInitialPosition = this.gameMap.getPlayerInitPosition()
+    const pathToGo = this.gameMap.getPathTo(this.player.objectPosition, playerInitialPosition, true)
+    this.player.goToPath(playerInitialPosition, pathToGo)
+  }
+
+  playerGotoFinalPosition = () => {
+    this.player.setVisible(true)
+    this.player.active = true
+    const playerFinalPosition = this.gameMap.getPlayerFinalPosition()
+    const pathToGo = this.gameMap.getPathTo(this.player.objectPosition, playerFinalPosition, true)
+    this.player.goToPath(playerFinalPosition, pathToGo)
   }
 
   handleReachedTarget = (target: TargetInterface) => {

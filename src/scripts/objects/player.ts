@@ -1,5 +1,5 @@
-import { PLAYER_CHAR_REACHED_TARGET } from '../events/events'
-import { PLAYER, SOUNDS } from '../utils/constants'
+import { PLAYER_CHAR_REACHED_TARGET, PLAYER_REACHED_FINAL_POS, PLAYER_REACHED_INITIAL_POS } from '../events/events'
+import { PLAYER, SOUNDS, TILES } from '../utils/constants'
 import { getOrAddAudio, playSound } from '../utils/audioUtil'
 
 export default abstract class Player extends Phaser.Physics.Arcade.Sprite implements PlayerInterface {
@@ -14,6 +14,7 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
   walkingAudio: Phaser.Sound.BaseSound
   objectPosition: ObjectPosition
   pathToGo: Array<ObjectPosition>
+  targetObjectPosition: ObjectPosition | undefined
 
   constructor(
     scene: Phaser.Scene,
@@ -33,6 +34,9 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
     this.play(this.animation, true)
     this.pathToGo = []
 
+    // player will be visible only after all chars being hidden
+    this.setVisible(false)
+
     this.walkingAudio = getOrAddAudio(scene, SOUNDS.WALKING, { volume: 0.4, loop: true })
     scene.events.on('update', this.update, this)
   }
@@ -50,16 +54,25 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
     if (this.walkingAudio.isPlaying) this.walkingAudio.stop()
     if (!this.active) return
 
-    this.setActiveBox(target)
     this.setIsGoingTo(pathToGo, false)
+    this.setActiveBox(target)
   }
 
-  setActiveBox(box: TargetInterface) {
+  public goToPath(targetObjectPosition: ObjectPosition, pathToGo: Array<ObjectPosition>) {
+    if (this.walkingAudio.isPlaying) this.walkingAudio.stop()
+    if (!this.active) return
+    this.targetObjectPosition = targetObjectPosition
+
+    this.setIsGoingTo(pathToGo, true)
+  }
+
+  private setActiveBox(box: TargetInterface) {
     if (this.activeTarget) {
       this.activeTarget.close()
     }
     this.activeTarget = box
     this.activeTarget.isSelected()
+    this.targetObjectPosition = undefined
   }
 
   update() {
@@ -95,6 +108,16 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
         this.animation = PLAYER.ANIMATIONS.DOWN_IDLE
         if (!initialPos) {
           this.emit(PLAYER_CHAR_REACHED_TARGET, this.activeTarget)
+        } else if (this.targetObjectPosition) {
+          switch (this.targetObjectPosition.tile) {
+            case TILES.INIT_POSITION:
+              this.emit(PLAYER_REACHED_INITIAL_POS)
+              break
+            case TILES.FINAL_POSITION:
+              this.emit(PLAYER_REACHED_FINAL_POS)
+              break
+          }
+          this.targetObjectPosition = undefined
         }
         this.walkingAudio.stop()
       }

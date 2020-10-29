@@ -1,13 +1,3 @@
-// import Player from '../src/scripts/objects/player';
-
-// import Box from '../src/scripts/objects/box';
-
-// import Player from '../src/scripts/objects/player';
-
-// import Player from '../src/scripts/objects/player';
-
-// import Player from '../src/scripts/objects/player';
-
 declare interface ObjectPosition extends TilePosition {
   x: number
   y: number
@@ -16,6 +6,7 @@ declare interface ObjectPosition extends TilePosition {
 declare interface TilePosition {
   row: number
   col: number
+  tile?: import('../src/scripts/utils/constants').TILES
 }
 
 declare interface ButtonConfig {
@@ -114,6 +105,7 @@ declare interface PlayerInterface extends Phaser.Physics.Arcade.Sprite {
   objectPosition: ObjectPosition
   setIsGoingTo: (pathToGo: Array<ObjectPosition>, initialPos) => void
   goTo: (target: TargetInterface, pathToGo: Array<ObjectPosition>) => void
+  goToPath: (targetObjectPosition: ObjectPosition, pathToGo: Array<ObjectPosition>) => void
 }
 
 declare interface TargetConstructor {

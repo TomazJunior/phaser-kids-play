@@ -24,6 +24,14 @@ export class GameMap {
     return this.getTilesPosition([this.playerTile])[0]
   }
 
+  public getPlayerInitPosition = (): ObjectPosition => {
+    return this.getTilesPosition([TILES.INIT_POSITION])[0]
+  }
+
+  public getPlayerFinalPosition = (): ObjectPosition => {
+    return this.getTilesPosition([TILES.FINAL_POSITION])[0]
+  }
+
   public getTargetTilePositions = (): Array<ObjectPosition> => {
     return this.getTilesPosition(this.targetTiles)
   }
@@ -102,11 +110,17 @@ export class GameMap {
     width *= scale
     height *= scale
 
-    return {
+    const objectPosition: ObjectPosition = {
       x: !col ? this.x : this.x + width * col,
       y: !row ? this.y : this.y + height * row,
       row,
       col,
+    }
+
+    const tileGameWorld = this.getTileByPosition(objectPosition)
+    return {
+      ...objectPosition,
+      tile: tileGameWorld?.tile
     }
   }
 
@@ -139,6 +153,7 @@ export class GameMap {
             y: !i ? this.y : this.y + height * i,
             col: j,
             row: i,
+            tile: cell
           })
         }
       }
