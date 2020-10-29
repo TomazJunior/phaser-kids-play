@@ -2,7 +2,6 @@ import { BUTTON, FONTS } from '../utils/constants'
 import { ButtonSmall } from './buttonSmall'
 
 export class FrameLevel extends Phaser.GameObjects.Sprite {
-
   private titleText: Phaser.GameObjects.Text
   private starText: Phaser.GameObjects.Text
   constructor(scene: Phaser.Scene, x: number, y: number, title: string, stars: number, onPause: () => void) {
@@ -28,12 +27,20 @@ export class FrameLevel extends Phaser.GameObjects.Sprite {
       },
     })
   }
-  
-  public set stars(v : number) {
-      this.starText.text = `${v} / 3`
+
+  public get starsFormated(): string {
+    return this.starText.text
   }
-  
-  public set title(v : string) {
-      this.titleText.text = v
+
+  public set stars(v: number) {
+    this.starText.text = this.formatStars(v)
+  }
+
+  public set title(v: string) {
+    this.titleText.text = v
+  }
+
+  private formatStars(v: number) {
+    return `${v} / 3`
   }
 }

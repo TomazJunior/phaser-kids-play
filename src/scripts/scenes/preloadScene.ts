@@ -1,6 +1,6 @@
 import ProgressBar from '../ui/progressBar'
 import { changeSoundState } from '../utils/audioUtil'
-import { BUTTON, BUTTON_PREFIX, BUTTON_PREFIX_EXTRA, FONTS, SCENES, SOUNDS, SPRITE_NAME } from '../utils/constants'
+import { BUTTON, BUTTON_PREFIX, BUTTON_PREFIX_EXTRA, FONTS, GAME_WORLDS, SCENES, SOUNDS, SPRITE_NAME } from '../utils/constants'
 import { isSoundEnabled } from '../utils/fileStorage'
 
 export default class PreloadScene extends Phaser.Scene {
@@ -81,7 +81,10 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.on('complete', () => {
       // this.scene.start(SCENES.LEVEL_SCENE)
       this.scene.start(SCENES.MENU_SCENE)
-      // this.scene.start(SCENES.MAIN_SCENE)
+      // this.scene.start(SCENES.MAIN_SCENE, <MainSceneConfig>{
+      //   gameWorld: GAME_WORLDS[0],
+      //   level: GAME_WORLDS[0].levels[0]
+      // })
     })
   }
 

@@ -76,20 +76,21 @@ export class GameMap {
 
   public createTargets = (
     targetGroup: Phaser.Physics.Arcade.StaticGroup,
-    onPlayerGoToTarget?: (target: TargetInterface) => void
+    onTouchTarget?: (target: TargetInterface) => void
   ): Array<TargetInterface> => {
     const targetsPosition = this.getTargetTilePositions()
-    return targetsPosition.map((pos) => {
+    return targetsPosition.map((pos, index) => {
       const tileGameWorld = this.getTileByPosition(pos)
       const target = new this.gameWorld.targetClazz(
         this.scene,
         pos,
         targetGroup,
         this.gameWorld.tileConfig,
-        tileGameWorld
+        tileGameWorld,
+        index
       )
-      if (onPlayerGoToTarget) {
-        target.on(PLAYER_TOUCHED_TARGET, onPlayerGoToTarget)
+      if (onTouchTarget) {
+        target.on(PLAYER_TOUCHED_TARGET, onTouchTarget)
       }
       return target
     })

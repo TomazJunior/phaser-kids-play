@@ -1,6 +1,6 @@
 import { PLAYER_TOUCHED_TARGET } from '../events/events'
 import { getOrAddAudio } from '../utils/audioUtil'
-import { ANIMAL_SKINS, IMAGE_NAME, SOUNDS, SPRITE_NAME } from '../utils/constants'
+import { ANIMAL_SKINS, FONTS, IMAGE_NAME, SOUNDS, SPRITE_NAME } from '../utils/constants'
 
 export default abstract class Target extends Phaser.Physics.Arcade.Sprite implements TargetInterface {
   hiddenCharName: ANIMAL_SKINS | null
@@ -13,6 +13,7 @@ export default abstract class Target extends Phaser.Physics.Arcade.Sprite implem
   shadow: Phaser.GameObjects.Sprite
   objectPosition: ObjectPosition
   tileConfigGameWorld: TileConfigGameWorld
+  queuePositionText: Phaser.GameObjects.Text
   constructor(
     scene: Phaser.Scene,
     objectPosition: ObjectPosition,
@@ -20,12 +21,13 @@ export default abstract class Target extends Phaser.Physics.Arcade.Sprite implem
     tileConfigGameWorld: TileConfigGameWorld,
     tileGameWorld: TileGameWorld | undefined,
     texture: string | Phaser.Textures.Texture,
+    public readonly id: number,
     frame?: string | integer
   ) {
     super(scene, objectPosition.x, objectPosition.y, texture, frame)
     scene.add.existing(this)
     container.add(this)
-    
+
     if (tileGameWorld?.rotation) {
       this.setRotation(tileGameWorld?.rotation)
     }
@@ -51,6 +53,8 @@ export default abstract class Target extends Phaser.Physics.Arcade.Sprite implem
       yoyo: true,
     })
     this.borderTween.pause()
+
+    this.queuePositionText = this.createQueuePosition()
 
     this.setInteractive().on('pointerdown', (pointer, localX, localY, event) => {
       this.emit(PLAYER_TOUCHED_TARGET, this)
@@ -88,9 +92,18 @@ export default abstract class Target extends Phaser.Physics.Arcade.Sprite implem
     this.hiddenCharName = null
     this.openTarget(false)
     this.toggleHelp(false)
+    this.hideQueuePosition()
   }
-  
-  protected abstract createShadow(x: number, y: number): Phaser.GameObjects.Sprite 
+
+  public showQueuePosition(position: number) {
+    this.queuePositionText.setText(position.toString()).setVisible(true)
+  }
+
+  public hideQueuePosition() {
+    this.queuePositionText.setText('').setVisible(false)
+  }
+
+  protected abstract createShadow(x: number, y: number): Phaser.GameObjects.Sprite
 
   public abstract close()
 
@@ -99,4 +112,14 @@ export default abstract class Target extends Phaser.Physics.Arcade.Sprite implem
   public abstract isRightTarget(skin: ANIMAL_SKINS | null): boolean
 
   public abstract wrongTarget()
+
+  private createQueuePosition() {
+    return this.scene.add
+      .text(this.x, this.y - 15, '', {
+        fontFamily: FONTS.ALLOY_INK,
+        fontSize: '64px',
+      })
+      .setVisible(false)
+      .setOrigin(0.5, 0)
+  }
 }

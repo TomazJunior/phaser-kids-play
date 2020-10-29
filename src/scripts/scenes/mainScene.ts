@@ -1,5 +1,5 @@
 import HiddenChar from '../objects/hiddenChar'
-import { HIDDEN_CHAR_REACHED_TARGET, HIDDEN_THUMB_CHAR_MOVED_TO_NEXT } from '../events/events'
+import { HIDDEN_CHARS_ENQUEUED, HIDDEN_CHAR_REACHED_TARGET, HIDDEN_THUMB_CHAR_MOVED_TO_NEXT } from '../events/events'
 import { getAllSkins, getARandomSkinFrom } from '../utils/skinUtils'
 import { ANIMAL_SKINS, BUTTON, SOUNDS, SCENES } from '../utils/constants'
 import HiddenThumbChars from '../objects/hiddenThumbChars'
@@ -12,6 +12,7 @@ import { getOrAddAudio, playSound } from '../utils/audioUtil'
 import { getGameWorld, getLevel, isLevelExist } from '../utils/worldUtil'
 import { FrameLevel } from '../ui/frameLevel'
 import { calculateStars } from '../utils/starsUtil'
+import { TargetQueue } from '../controllers/targetQueue'
 
 export default class MainScene extends Phaser.Scene {
   targets: Phaser.Physics.Arcade.StaticGroup
@@ -30,6 +31,7 @@ export default class MainScene extends Phaser.Scene {
   clickOnTargetAudio: Phaser.Sound.BaseSound
   gameMap: GameMap
   frameLevel: FrameLevel
+  targetQueue: TargetQueue
   constructor() {
     super({ key: SCENES.MAIN_SCENE })
   }
@@ -73,8 +75,11 @@ export default class MainScene extends Phaser.Scene {
     this.player = this.gameMap.createPlayer(this.handleReachedTarget)
 
     this.targets = this.physics.add.staticGroup()
-    this.gameMap.createTargets(this.targets, this.handlePlayerGoToTarget)
 
+    this.targetQueue = new TargetQueue(this, this.level, this.gameMap.createTargets(this.targets))
+    if (!this.events.eventNames().includes(HIDDEN_CHARS_ENQUEUED)) {
+      this.events.on(HIDDEN_CHARS_ENQUEUED, this.goToNextHiddenChar, this)
+    }
     this.createBackButton()
 
     this.hiddenChars = this.add.group()
@@ -203,7 +208,7 @@ export default class MainScene extends Phaser.Scene {
         width * 0.5,
         height * 0.5,
         text,
-        finishedLevel ? '3 / 3' : `${stars} / 3`,
+        this.frameLevel.starsFormated,
         finishedLevel,
         {
           name: BUTTON.HOME,
@@ -275,7 +280,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   shouldGoToNextLevel(): boolean {
-    return this.hiddenChars.getChildren().every((hiddenChar: any) => <HiddenChar>hiddenChar.visible)
+    return this.targetQueue.isEmpty && this.hiddenChars.getChildren().every((hiddenChar: any) => <HiddenChar>hiddenChar.visible)
   }
 
   nextLevel = async (): Promise<void> => {
@@ -284,7 +289,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     if (!this.shouldGoToNextLevel()) {
-      this.player.active = true
+      this.goToNextHiddenChar()
       return Promise.resolve()
     }
 
@@ -302,7 +307,6 @@ export default class MainScene extends Phaser.Scene {
 
       const pathToGo = this.gameMap.getPathTo(this.player.objectPosition, { ...this.getInitialPlayerPosition() })
       this.player.setIsGoingTo(pathToGo, true)
-
       this.createHiddenChars(this.level.hiddens)
       this.player.active = true
     })
@@ -315,7 +319,7 @@ export default class MainScene extends Phaser.Scene {
 
   closeTargets() {
     this.targets.getChildren().forEach((target: any) => {
-      ;(<TargetInterface>target).close()
+      (<TargetInterface>target).close()
     })
   }
 
@@ -337,7 +341,6 @@ export default class MainScene extends Phaser.Scene {
       this.currentHiddenSkins.push(hiddenSkin)
       this.createHiddenChar(hiddenSkin, 1000 * (index + 1))
     }
-
     this.hiddenThumbChars.createChars(this.currentHiddenSkins)
   }
 
@@ -378,15 +381,16 @@ export default class MainScene extends Phaser.Scene {
     return this.gameMap.getPlayerPosition()
   }
 
-  handlePlayerGoToTarget = (target: TargetInterface) => {
-    if (!this.hiddenCharOnTheirPosition || target.opened) return
+  goToNextHiddenChar = () => {
+    const target = this.targetQueue.dequeue()
+    if (target) {
+      this.player.active = true
+      const pathToGo = this.gameMap.getPathTo(this.player.objectPosition, target.objectPosition, true)
+      if (this.clickOnTargetAudio.isPlaying) this.clickOnTargetAudio.stop()
+      playSound(this, this.clickOnTargetAudio)
 
-    const pathToGo = this.gameMap.getPathTo(this.player.objectPosition, target.objectPosition, true)
-
-    if (this.clickOnTargetAudio.isPlaying) this.clickOnTargetAudio.stop()
-    playSound(this, this.clickOnTargetAudio)
-
-    this.player.goTo(target, pathToGo)
+      this.player.goTo(target, pathToGo)
+    }
   }
 
   handleHiddenCharReachedTarget = () => {
@@ -395,10 +399,9 @@ export default class MainScene extends Phaser.Scene {
         this.closeTargets()
         this.hiddenCharOnTheirPosition = true
         this.player.active = true
-
-        const currentHiddenChar = this.hiddenThumbChars.getCurrentHiddenChar()
-        if (currentHiddenChar) {
-          this.toggleHelpTarget(currentHiddenChar, true)
+        this.targetQueue.clear()
+        if (this.hiddenThumbChars.currentHiddenChar) {
+          this.toggleHelpTarget(this.hiddenThumbChars.currentHiddenChar, true)
         }
       })
     }
@@ -423,9 +426,7 @@ export default class MainScene extends Phaser.Scene {
 
   openTarget = async (target: TargetInterface) => {
     this.player.active = false
-    const currentHiddenChar = this.hiddenThumbChars.getCurrentHiddenChar()
-
-    if (!target.hiddenCharName || !target.isRightTarget(currentHiddenChar)) {
+    if (!target.hiddenCharName || !target.isRightTarget(this.hiddenThumbChars.currentHiddenChar)) {
       target.wrongTarget()
       this.closeTarget(target)
       if (!this.isInTutorialMode) {
@@ -438,7 +439,6 @@ export default class MainScene extends Phaser.Scene {
     }
 
     target.openTarget(true)
-    // this.scoreText.incScore()
     this.hiddenThumbChars.moveToNext(target.hiddenCharName)
 
     const hiddenChar: HiddenChar = this.getHiddenChar(target.hiddenCharName)

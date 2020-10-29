@@ -10,8 +10,9 @@ export class Box extends Target {
     container: Phaser.Physics.Arcade.StaticGroup,
     tileConfigGameWorld: TileConfigGameWorld,
     tileGameWorld: TileGameWorld | undefined,
+    id: number
   ) {
-    super(scene, objectPosition, container, tileConfigGameWorld, tileGameWorld, SPRITE_NAME.SOKOBAN, 8)
+    super(scene, objectPosition, container, tileConfigGameWorld, tileGameWorld, SPRITE_NAME.SOKOBAN, id, 8)
     this.setBodySize(tileConfigGameWorld.width * tileConfigGameWorld.scale, 52)
     this.setOffset(-18, -15)    
   }

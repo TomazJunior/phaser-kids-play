@@ -122,7 +122,8 @@ declare interface TargetConstructor {
     objectPosition: ObjectPosition,
     container: Phaser.Physics.Arcade.StaticGroup,
     tileConfigGameWorld: TileConfigGameWorld,
-    tileGameWorld: TileGameWorld | undefined
+    tileGameWorld: TileGameWorld | undefined,
+    id: number
   ): TargetInterface
 }
 
@@ -130,6 +131,7 @@ declare interface TargetInterface extends Phaser.Physics.Arcade.Sprite {
   opened: boolean
   hiddenCharName: import('../src/scripts/utils/constants').ANIMAL_SKINS | null
   objectPosition: ObjectPosition
+  id: number
 
   isRightTarget: (skin: import('../src/scripts/utils/constants').ANIMAL_SKINS | null) => boolean
   wrongTarget: () => void
@@ -139,4 +141,6 @@ declare interface TargetInterface extends Phaser.Physics.Arcade.Sprite {
   setHiddenCharName: (name: import('../src/scripts/utils/constants').ANIMAL_SKINS | null) => void
   isSelected: () => void
   toggleHelp: (enable: boolean) => void
+  hideQueuePosition: () => void
+  showQueuePosition: (position: number )=> void
 }

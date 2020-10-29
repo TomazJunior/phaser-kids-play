@@ -1,12 +1,11 @@
 import { HIDDEN_THUMB_CHAR_MOVED_TO_NEXT } from '../events/events'
 import { ANIMAL_SKINS, SPRITE_NAME } from '../utils/constants'
-import { getSkin } from '../utils/skinUtils'
 export default class HiddenThumbChars extends Phaser.GameObjects.Container {
+  private _currentHiddenChar: ANIMAL_SKINS | null
   scene: Phaser.Scene
   group: Phaser.GameObjects.Group
   border: Phaser.GameObjects.Image
   boardX: number
-
   offset: number = 80
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y)
@@ -25,36 +24,42 @@ export default class HiddenThumbChars extends Phaser.GameObjects.Container {
     hiddenSkins.forEach((hiddenSkin: ANIMAL_SKINS, index: number) => {
       this.addHiddenChar(hiddenSkin, index)
     })
+    this._currentHiddenChar = hiddenSkins[0]
   }
 
   clear() {
+    this._currentHiddenChar = null
     this.group.clear(true, true)
   }
 
-  getCurrentHiddenChar(): ANIMAL_SKINS | null {
-    const found = this.group
-      .getChildren()
-      .find((hiddenChar: any) => hiddenChar.visible)
-
-      if (!found) return null
-      return getSkin((<Phaser.GameObjects.Sprite>found).frame.name)
+  public get currentHiddenChar(): ANIMAL_SKINS | null {
+    return this._currentHiddenChar
   }
 
   getHiddenChars(onlyVisible: boolean): Array<ANIMAL_SKINS> {
-    return this.group.getChildren().filter((hiddenChar: any) => {
-      if (onlyVisible) {
-        return hiddenChar.visible === true
-      } else {
-        return true
-      }
-    }).map((hiddenChar: any) => {
-      return hiddenChar.frame.name
-    })
+    return this.group
+      .getChildren()
+      .filter((hiddenChar: any) => {
+        if (onlyVisible) {
+          return hiddenChar.visible === true
+        } else {
+          return true
+        }
+      })
+      .map((hiddenChar: any) => {
+        return hiddenChar.frame.name
+      })
   }
 
   moveToNext(skin: ANIMAL_SKINS) {
-    this.group.getChildren().forEach((hiddenChar: any) => {
+    const index = this.group.getChildren().findIndex((hiddenChar: any) => hiddenChar.frame.name === skin)
+    if (index !== -1 && this.group.getChildren().length > index + 1) {
+      this._currentHiddenChar = (<any>this.group.getChildren()[index + 1]).frame.name
+    } else {
+      this._currentHiddenChar = null
+    }
 
+    this.group.getChildren().forEach((hiddenChar: any) => {
       const shouldDisapear = hiddenChar.frame.name === skin
       if (shouldDisapear) {
         this.scene.tweens.add({
@@ -63,18 +68,18 @@ export default class HiddenThumbChars extends Phaser.GameObjects.Container {
           alpha: 0,
           duration: 1000,
           onComplete: (tween: Phaser.Tweens.Tween, targets: any[]) => {
-            targets.forEach(target => target.setVisible(false))
+            targets.forEach((target) => target.setVisible(false))
             this.emit(HIDDEN_THUMB_CHAR_MOVED_TO_NEXT, {
               previous: skin,
-              current: this.getCurrentHiddenChar()
+              current: this._currentHiddenChar,
             })
-          }
+          },
         })
       } else {
         this.scene.tweens.add({
           targets: hiddenChar,
           x: `+=${this.offset}`,
-          duration: 1000
+          duration: 500,
         })
       }
     })
