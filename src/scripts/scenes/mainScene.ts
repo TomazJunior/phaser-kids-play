@@ -90,8 +90,8 @@ export default class MainScene extends Phaser.Scene {
 
     this.frameLevel = new FrameLevel(
       this,
-      width - 150,
-      60,
+      width - 200,
+      90,
       this.isInTutorialMode ? 'Tutorial' : `Level ${this.level.level}`,
       0,
       this.handleLoseFocus
