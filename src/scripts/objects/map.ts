@@ -36,6 +36,14 @@ export class GameMap {
     return this.getTilesPosition(this.targetTiles)
   }
 
+  public getDoorMidPosition = (): ObjectPosition => {
+    return this.getTilesPosition([TILES.DOOR_MID])[0]
+  }
+
+  public getDoorTopPosition = (): ObjectPosition => {
+    return this.getTilesPosition([TILES.DOOR_TOP])[0]
+  }
+
   public getPathTo = (
     origin: ObjectPosition,
     target: ObjectPosition,

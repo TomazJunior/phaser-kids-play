@@ -28,6 +28,12 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('box-closed', 'assets/img/box-closed.png')
     this.load.image('box-wrong', 'assets/img/box-wrong.png')
     
+    this.load.image('door-closed-mid', 'assets/img/door-closed-mid.png')
+    this.load.image('door-closed-top', 'assets/img/door-closed-top.png')
+    this.load.image('door-open-mid', 'assets/img/door-open-mid.png')
+    this.load.image('door-open-top', 'assets/img/door-open-top.png')
+    this.load.image('sign-exit', 'assets/img/sign-exit.png')
+    
     this.load.image('finger-point', 'assets/img/finger-point-gesture.png')
 
     this.load.image('stars-zero', 'assets/img/stars-zero.png')

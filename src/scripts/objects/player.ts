@@ -5,6 +5,7 @@ import HiddenChar from './hiddenChar'
 import { GameMap } from './map'
 
 export default abstract class Player extends Phaser.Physics.Arcade.Sprite implements PlayerInterface {
+  private _isReady: boolean = false
   isWalking = false
   isGoingTo: {
     x: number
@@ -21,7 +22,6 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
   targetObjectPosition: ObjectPosition | undefined
   foundChars: Array<HiddenChar>
   gameMap: GameMap
-  tail: Phaser.Math.Vector2
 
   constructor(
     scene: Phaser.Scene,
@@ -49,10 +49,13 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
     this.foundChars = []
     this.walkingAudio = getOrAddAudio(scene, SOUNDS.WALKING, { volume: 0.4, loop: true })
     scene.events.on('update', this.update, this)
-    this.tail = new Phaser.Math.Vector2(this.objectPosition.x, this.objectPosition.y)
   }
 
   protected abstract createAnimations()
+
+  public get isReady(): boolean {
+    return this._isReady && this.active
+  }
 
   public setIsGoingTo(pathToGo: Array<ObjectPosition>, roadPosition: boolean) {
     playSound(this.scene, this.walkingAudio)
@@ -76,8 +79,11 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
     this.setIsGoingTo(pathToGo, true)
   }
 
-  public pushHiddenChar = (hiddenChar: HiddenChar, target: TargetInterface | undefined, onComplete: () => Promise<void>) => {
-    
+  public pushHiddenChar = (
+    hiddenChar: HiddenChar,
+    target: TargetInterface | undefined,
+    onComplete: () => Promise<void>
+  ) => {
     const objectPosition = this.foundChars.length
       ? this.foundChars[this.foundChars.length - 1].objectPosition
       : this.objectPosition
@@ -91,13 +97,13 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
       const playerFinalPosition = this.gameMap.getPlayerFinalPosition()
       neighbor = this.getTheBestHiddenPosition(playerFinalPosition, neighbors)
     }
-    
+
     // if dont find neighbor in the right position
     if (!neighbor) {
       const neighborKey = Object.keys(neighbors).find((key) => {
         return neighbors[key].x || neighbors[key].y
       })
-  
+
       if (neighborKey) {
         neighbor = this.gameMap.getTilePosition(neighbors[neighborKey].y, neighbors[neighborKey].x)
       }
@@ -111,7 +117,7 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
 
   private getTheBestHiddenPosition(objectPosition: ObjectPosition, neighbors: Neighbors): ObjectPosition | undefined {
     let neighbor
-    
+
     let distanceX = Math.trunc(objectPosition.x - this.x)
     let distanceY = Math.trunc(objectPosition.y - this.y)
 
@@ -121,12 +127,12 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
     if (Math.abs(distanceY) < 5) {
       distanceY = 0
     }
-  
+
     const rightDown = distanceX < 0
     const leftDown = distanceX > 0
     const downDown = distanceY < 0
     const upDown = distanceY > 0
-      
+
     if (!neighbor && leftDown && neighbors.left) {
       neighbor = this.gameMap.getTilePosition(neighbors.left.y, neighbors.left.x)
     }
@@ -207,6 +213,7 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
         } else if (this.targetObjectPosition) {
           switch (this.targetObjectPosition.tile) {
             case TILES.INIT_POSITION:
+              this._isReady = true
               this.emit(PLAYER_REACHED_INITIAL_POS)
               break
             case TILES.FINAL_POSITION:

@@ -20,6 +20,7 @@ import { getGameWorld, getLevel, isLevelExist } from '../utils/worldUtil'
 import { FrameLevel } from '../ui/frameLevel'
 import { calculateStars } from '../utils/starsUtil'
 import { TargetQueue } from '../controllers/targetQueue'
+import Door from '../objects/door'
 
 export default class MainScene extends Phaser.Scene {
   targets: Phaser.Physics.Arcade.StaticGroup
@@ -39,6 +40,7 @@ export default class MainScene extends Phaser.Scene {
   frameLevel: FrameLevel
   targetQueue: TargetQueue
   roundInProgress: boolean
+  door: Door
   constructor() {
     super({ key: SCENES.MAIN_SCENE })
   }
@@ -81,11 +83,7 @@ export default class MainScene extends Phaser.Scene {
 
     this.targets = this.physics.add.staticGroup()
 
-    this.targetQueue = new TargetQueue(
-      this,
-      this.level,
-      this.gameMap.createTargets(this.targets)
-    )
+    this.targetQueue = new TargetQueue(this, this.level, this.gameMap.createTargets(this.targets))
     if (!this.events.eventNames().includes(HIDDEN_CHARS_ENQUEUED)) {
       this.events.on(HIDDEN_CHARS_ENQUEUED, this.goToNextHiddenChar, this)
     }
@@ -118,6 +116,8 @@ export default class MainScene extends Phaser.Scene {
 
     this.physics.add.collider(this.player, this.targets, undefined, undefined, this)
     this.physics.add.collider(this.hiddenChars, this.targets, undefined, undefined, this)
+
+    this.door = this.createDoor()
   }
 
   private get isInTutorialMode(): boolean {
@@ -314,13 +314,21 @@ export default class MainScene extends Phaser.Scene {
   }
 
   handlePlayerReachedInitialPosition = () => {
-    //TODO: to be implemenented
+    this.targetQueue.clear()
+  }
+
+  handleHiddenReachedFinalPosition = (hiddenChar: HiddenChar) => {
+    hiddenChar.goToDoor(this.door.objectPosition)
+    this.time.delayedCall(600, () => {
+      this.handlePlayerReachedFinalPosition()
+    })
   }
 
   handlePlayerReachedFinalPosition = () => {
+    this.door.open = true
     if (this.hiddenCharsAreReady() && !this.roundInProgress) {
       this.roundInProgress = true
-
+      
       ++this.round
       if (this.round > this.level.rounds) {
         this.backgroundAudio.stop()
@@ -331,7 +339,7 @@ export default class MainScene extends Phaser.Scene {
 
       this.time.delayedCall(1000, () => {
         this.resetTargets()
-
+        this.door.open = false
         this.createHiddenChars(this.level.hiddens)
         this.player.active = true
       })
@@ -358,6 +366,15 @@ export default class MainScene extends Phaser.Scene {
     this.hiddenThumbChars.clear()
   }
 
+  createDoor() {
+    return new Door(
+      this,
+      this.currentWorld.tileConfig,
+      this.gameMap.getDoorMidPosition(),
+      this.gameMap.getDoorTopPosition()
+    )
+  }
+
   createHiddenChars(numberOfHiddens: number) {
     this.clearHiddenChars()
 
@@ -374,8 +391,8 @@ export default class MainScene extends Phaser.Scene {
 
     this.time.delayedCall(delay, () => {
       const hiddenChar = new HiddenChar(this, initialPosition, this.gameMap, hiddenSkin)
-      hiddenChar.on(HIDDEN_CHAR_REACHED_TARGET, this.handleHiddenCharReachedTarget)
-      hiddenChar.on(HIDDEN_CHAR_REACHED_FINAL_POS, this.handlePlayerReachedFinalPosition)
+      hiddenChar.once(HIDDEN_CHAR_REACHED_TARGET, this.handleHiddenCharReachedTarget)
+      hiddenChar.once(HIDDEN_CHAR_REACHED_FINAL_POS, this.handleHiddenReachedFinalPosition)
 
       this.hiddenChars.add(hiddenChar)
 
@@ -426,7 +443,9 @@ export default class MainScene extends Phaser.Scene {
         if (this.round === 1) {
           this.playerGotoInitialPosition()
         }
-        this.targetQueue.clear()
+        if (this.player.isReady) {
+          this.targetQueue.clear()
+        }
         if (this.hiddenThumbChars.currentHiddenChar) {
           this.toggleHelpTarget(this.hiddenThumbChars.currentHiddenChar, true)
         }

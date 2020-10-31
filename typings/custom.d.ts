@@ -115,6 +115,7 @@ declare interface PlayerInterface extends Phaser.Physics.Arcade.Sprite {
     target: TargetInterface | undefined,
     onComplete: () => Promise<void>
   ) => void
+  isReady: boolean
 }
 
 declare interface TargetConstructor {

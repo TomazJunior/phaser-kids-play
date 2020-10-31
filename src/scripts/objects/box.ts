@@ -28,7 +28,6 @@ export class Box extends Target {
   }
 
   public close() {
-    this.shadow.setVisible(false)
     if (!this.opened) return
 
     this.opened = false
