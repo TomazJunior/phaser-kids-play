@@ -1,5 +1,5 @@
 import { PLAYER_TOUCHED_TARGET } from '../events/events'
-import { getOrAddAudio } from '../utils/audioUtil'
+import { getOrAddAudio, playSound } from '../utils/audioUtil'
 import { ANIMAL_SKINS, FONTS, IMAGE_NAME, SOUNDS, SPRITE_NAME } from '../utils/constants'
 
 export default abstract class Target extends Phaser.Physics.Arcade.Sprite implements TargetInterface {
@@ -14,6 +14,8 @@ export default abstract class Target extends Phaser.Physics.Arcade.Sprite implem
   objectPosition: ObjectPosition
   tileConfigGameWorld: TileConfigGameWorld
   queuePositionText: Phaser.GameObjects.Text
+  clickOnTargetAudio: Phaser.Sound.BaseSound
+
   constructor(
     scene: Phaser.Scene,
     objectPosition: ObjectPosition,
@@ -62,6 +64,7 @@ export default abstract class Target extends Phaser.Physics.Arcade.Sprite implem
 
     this.clickOnWrongBoxAudio = getOrAddAudio(scene, SOUNDS.WRONG_TARGET)
     this.clickOnRightBoxAudio = getOrAddAudio(scene, SOUNDS.FIND_HIDDEN)
+    this.clickOnTargetAudio = getOrAddAudio(scene, SOUNDS.CLICK_TARGET)
   }
 
   public toggleHelp(enable: boolean) {
@@ -79,7 +82,6 @@ export default abstract class Target extends Phaser.Physics.Arcade.Sprite implem
 
   public isSelected() {
     this.opened = false
-    this.shadow.setVisible(true)
   }
 
   public setHiddenCharName(name: ANIMAL_SKINS | null) {
@@ -96,10 +98,13 @@ export default abstract class Target extends Phaser.Physics.Arcade.Sprite implem
   }
 
   public showQueuePosition(position: number) {
+    this.shadow.setVisible(true)
+    playSound(this.scene, this.clickOnTargetAudio)
     this.queuePositionText.setText(position.toString()).setVisible(true)
   }
 
   public hideQueuePosition() {
+    this.shadow.setVisible(false)
     this.queuePositionText.setText('').setVisible(false)
   }
 

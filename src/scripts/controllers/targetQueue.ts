@@ -37,6 +37,10 @@ export class TargetQueue {
     })
   }
 
+  getNext(): TargetInterface | undefined {
+    return !this.isEmpty ? this.getTarget(this.queue[0]) : undefined
+  }
+
   public clear() {
     this.queue = []
     this.queueLocked = false

@@ -1,13 +1,17 @@
 import { PLAYER_CHAR_REACHED_TARGET, PLAYER_REACHED_FINAL_POS, PLAYER_REACHED_INITIAL_POS } from '../events/events'
 import { PLAYER, SOUNDS, TILES } from '../utils/constants'
 import { getOrAddAudio, playSound } from '../utils/audioUtil'
+import HiddenChar from './hiddenChar'
+import { GameMap } from './map'
 
 export default abstract class Player extends Phaser.Physics.Arcade.Sprite implements PlayerInterface {
   isWalking = false
   isGoingTo: {
     x: number
     y: number
-    initialPos: false
+    row: number
+    col: number
+    roadPosition: boolean
   }
   activeTarget: TargetInterface
   animation: string
@@ -15,15 +19,20 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
   objectPosition: ObjectPosition
   pathToGo: Array<ObjectPosition>
   targetObjectPosition: ObjectPosition | undefined
+  foundChars: Array<HiddenChar>
+  gameMap: GameMap
+  tail: Phaser.Math.Vector2
 
   constructor(
     scene: Phaser.Scene,
     objectPosition: ObjectPosition,
+    gameMap: GameMap,
     texture: string | Phaser.Textures.Texture,
     frame?: string | number | undefined
   ) {
     super(scene, objectPosition.x, objectPosition.y, texture, frame)
     scene.add.existing(this)
+    this.gameMap = gameMap
     this.objectPosition = objectPosition
     scene.physics.add.existing(this)
     this.setDepth(10)
@@ -37,17 +46,19 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
     // player will be visible only after all chars being hidden
     this.setVisible(false)
 
+    this.foundChars = []
     this.walkingAudio = getOrAddAudio(scene, SOUNDS.WALKING, { volume: 0.4, loop: true })
     scene.events.on('update', this.update, this)
+    this.tail = new Phaser.Math.Vector2(this.objectPosition.x, this.objectPosition.y)
   }
 
   protected abstract createAnimations()
 
-  public setIsGoingTo(pathToGo: Array<ObjectPosition>, initialPos) {
+  public setIsGoingTo(pathToGo: Array<ObjectPosition>, roadPosition: boolean) {
     playSound(this.scene, this.walkingAudio)
     this.isWalking = true
     this.pathToGo = pathToGo
-    this.goToNextPosition(initialPos)
+    this.goToNextPosition(roadPosition)
   }
 
   public goTo(target: TargetInterface, pathToGo: Array<ObjectPosition>) {
@@ -62,8 +73,91 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
     if (this.walkingAudio.isPlaying) this.walkingAudio.stop()
     if (!this.active) return
     this.targetObjectPosition = targetObjectPosition
-
     this.setIsGoingTo(pathToGo, true)
+  }
+
+  public pushHiddenChar = (hiddenChar: HiddenChar, target: TargetInterface | undefined, onComplete: () => Promise<void>) => {
+    
+    const objectPosition = this.foundChars.length
+      ? this.foundChars[this.foundChars.length - 1].objectPosition
+      : this.objectPosition
+
+    let neighbor: ObjectPosition | undefined
+    const neighbors = this.gameMap.findNeighbors(objectPosition)
+
+    if (target?.objectPosition) {
+      neighbor = this.getTheBestHiddenPosition(target.objectPosition, neighbors)
+    } else {
+      const playerFinalPosition = this.gameMap.getPlayerFinalPosition()
+      neighbor = this.getTheBestHiddenPosition(playerFinalPosition, neighbors)
+    }
+    
+    // if dont find neighbor in the right position
+    if (!neighbor) {
+      const neighborKey = Object.keys(neighbors).find((key) => {
+        return neighbors[key].x || neighbors[key].y
+      })
+  
+      if (neighborKey) {
+        neighbor = this.gameMap.getTilePosition(neighbors[neighborKey].y, neighbors[neighborKey].x)
+      }
+    }
+
+    if (!neighbor) throw new Error('No available position next player')
+
+    this.foundChars.push(hiddenChar)
+    hiddenChar.getOut(neighbor, onComplete)
+  }
+
+  private getTheBestHiddenPosition(objectPosition: ObjectPosition, neighbors: Neighbors): ObjectPosition | undefined {
+    let neighbor
+    
+    let distanceX = Math.trunc(objectPosition.x - this.x)
+    let distanceY = Math.trunc(objectPosition.y - this.y)
+
+    if (Math.abs(distanceX) < 5) {
+      distanceX = 0
+    }
+    if (Math.abs(distanceY) < 5) {
+      distanceY = 0
+    }
+  
+    const rightDown = distanceX < 0
+    const leftDown = distanceX > 0
+    const downDown = distanceY < 0
+    const upDown = distanceY > 0
+      
+    if (!neighbor && leftDown && neighbors.left) {
+      neighbor = this.gameMap.getTilePosition(neighbors.left.y, neighbors.left.x)
+    }
+
+    if (!neighbor && rightDown && neighbors.right) {
+      neighbor = this.gameMap.getTilePosition(neighbors.right.y, neighbors.right.x)
+    }
+
+    if (!neighbor && upDown && neighbors.top) {
+      neighbor = this.gameMap.getTilePosition(neighbors.top.y, neighbors.top.x)
+    }
+
+    if (!neighbor && downDown && neighbors.bottom) {
+      neighbor = this.gameMap.getTilePosition(neighbors.bottom.y, neighbors.bottom.x)
+    }
+    return neighbor
+  }
+
+  private moveHiddenChars(objectPosition: ObjectPosition, finalPosition: boolean = false) {
+    if (!this.foundChars.length) return
+    for (let index = 0; index < this.foundChars.length; index++) {
+      const hiddenChar: HiddenChar = this.foundChars[index]
+      let previousPosition: ObjectPosition
+      if (index === 0 || finalPosition) {
+        previousPosition = objectPosition
+      } else {
+        previousPosition = this.foundChars[index - 1].objectPosition
+      }
+      const pathToGo = this.gameMap.getPathTo(hiddenChar.objectPosition, previousPosition)
+      hiddenChar.goToPath(previousPosition, pathToGo)
+    }
   }
 
   private setActiveBox(box: TargetInterface) {
@@ -88,7 +182,7 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
 
     if (!this.isWalking) return
 
-    let { x, y, initialPos } = this.isGoingTo
+    let { x, y, roadPosition: initialPos } = this.isGoingTo
     let distanceX = Math.trunc(x - this.x)
     let distanceY = Math.trunc(y - this.y)
 
@@ -105,6 +199,8 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
       } else {
         this.isWalking = false
         this.setVelocity(0, 0)
+        this.objectPosition = this.isGoingTo
+
         this.animation = PLAYER.ANIMATIONS.DOWN_IDLE
         if (!initialPos) {
           this.emit(PLAYER_CHAR_REACHED_TARGET, this.activeTarget)
@@ -114,10 +210,12 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
               this.emit(PLAYER_REACHED_INITIAL_POS)
               break
             case TILES.FINAL_POSITION:
+              this.moveHiddenChars(this.objectPosition, true)
               this.emit(PLAYER_REACHED_FINAL_POS)
               break
           }
           this.targetObjectPosition = undefined
+          this.foundChars = []
         }
         this.walkingAudio.stop()
       }
@@ -145,17 +243,18 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
       this.animation = PLAYER.ANIMATIONS.DOWN_IDLE
       this.setVelocity(0, 0)
     }
+
+    this.moveHiddenChars(this.objectPosition, false)
   }
 
-  private goToNextPosition = (initialPos) => {
+  private goToNextPosition = (roadPosition: boolean) => {
     const moviment = this.pathToGo.shift()
 
     if (moviment) {
-      this.objectPosition = moviment
+      this.objectPosition = { ...this.isGoingTo }
       this.isGoingTo = {
-        x: moviment.x,
-        y: moviment.y,
-        initialPos,
+        ...moviment,
+        roadPosition,
       }
     }
   }

@@ -55,10 +55,10 @@ export class GameMap {
 
     let vectorTarget = { ...target }
     if (findNearestTarget) {
-      const neighbors = findNeighbors(new Phaser.Math.Vector2(target.col, target.row), collidable, this.gameWorld.map)
-      if (neighbors.length) {
-        vectorTarget.col = neighbors[0].x
-        vectorTarget.row = neighbors[0].y
+      const neighbor = this.findNeighbor(target, collidable, findNearestTarget)
+      if (neighbor) {
+        vectorTarget.col = neighbor.col
+        vectorTarget.row = neighbor.row
       }
     }
 
@@ -75,7 +75,7 @@ export class GameMap {
   }
 
   public createPlayer = (onReachedTarget?: (target: TargetInterface) => void): PlayerInterface => {
-    const player = new this.gameWorld.playerClazz(this.scene, this.getPlayerPosition())
+    const player = new this.gameWorld.playerClazz(this.scene, this.getPlayerPosition(), this)
     if (onReachedTarget) {
       player.on(PLAYER_CHAR_REACHED_TARGET, onReachedTarget)
     }
@@ -120,14 +120,71 @@ export class GameMap {
     const tileGameWorld = this.getTileByPosition(objectPosition)
     return {
       ...objectPosition,
-      tile: tileGameWorld?.tile
+      tile: tileGameWorld?.tile,
     }
+  }
+
+  public findNeighbor = (
+    target: ObjectPosition,
+    collidable?: Array<Phaser.Math.Vector2>,
+    findNearestTarget?: boolean
+  ): ObjectPosition | undefined => {
+    let collidables: Array<Phaser.Math.Vector2> = []
+    if (!collidable) {
+      const collidableTiles = getCollidableTiles(this.gameWorld.tiles)
+      const possibleCollidables: Array<Phaser.Math.Vector2> = this.getTilesPosition(collidableTiles).map((pos) => {
+        return new Phaser.Math.Vector2(pos.col, pos.row)
+      })
+
+      collidables = findNearestTarget
+        ? possibleCollidables
+        : possibleCollidables.filter((vector) => {
+            const found = vector.x === target.col && vector.y === target.row
+            return !found
+          })
+    } else {
+      collidables = [...collidable]
+    }
+
+    const neighbors = findNeighbors(new Phaser.Math.Vector2(target.col, target.row), collidables, this.gameWorld.map)
+    const neighborKey = Object.keys(neighbors).find((key) => {
+      return neighbors[key].x || neighbors[key].y
+    })
+
+    if (neighborKey) {
+      return this.getTilePosition(neighbors[neighborKey].y, neighbors[neighborKey].x)
+    }
+  }
+
+  public findNeighbors = (
+    target: ObjectPosition,
+    collidable?: Array<Phaser.Math.Vector2>,
+    findNearestTarget?: boolean
+  ): Neighbors => {
+    let collidables: Array<Phaser.Math.Vector2> = []
+    if (!collidable) {
+      const collidableTiles = getCollidableTiles(this.gameWorld.tiles)
+      const possibleCollidables: Array<Phaser.Math.Vector2> = this.getTilesPosition(collidableTiles).map((pos) => {
+        return new Phaser.Math.Vector2(pos.col, pos.row)
+      })
+
+      collidables = findNearestTarget
+        ? possibleCollidables
+        : possibleCollidables.filter((vector) => {
+            const found = vector.x === target.col && vector.y === target.row
+            return !found
+          })
+    } else {
+      collidables = [...collidable]
+    }
+
+    return findNeighbors(new Phaser.Math.Vector2(target.col, target.row), collidables, this.gameWorld.map)
   }
 
   private getTileByPosition = (objectPosition: ObjectPosition): TileGameWorld | undefined => {
     const value: any = this.gameWorld.map[objectPosition.row][objectPosition.col]
     const tileKey = Object.keys(TILES).find((key: string) => {
-      TILES[key] === value
+      return TILES[key] === value
     })
 
     if (!tileKey) return undefined
@@ -153,7 +210,7 @@ export class GameMap {
             y: !i ? this.y : this.y + height * i,
             col: j,
             row: i,
-            tile: cell
+            tile: cell,
           })
         }
       }
@@ -173,7 +230,7 @@ export class GameMap {
         const cell = row[x]
         if (tiles.includes(cell)) {
           const tileGameWorld = getTileGameWorldByTile(this.gameWorld.tiles, cell)
-          tileGameWorld?.textures?.forEach(({ texture, frame}) => {
+          tileGameWorld?.textures?.forEach(({ texture, frame }) => {
             this.createImage(x, y, width, height, texture, scale, tileGameWorld.rotation, frame)
           })
         }

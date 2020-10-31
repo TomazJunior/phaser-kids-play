@@ -2,6 +2,7 @@ import { SOUNDS } from './constants'
 
 export const playSound = (scene: Phaser.Scene, audio: Phaser.Sound.BaseSound) => {
   if (!scene.sound.locked) {
+    if (audio.isPlaying) audio.stop()
     audio.play()
   } else {
     scene.sound.once(Phaser.Sound.Events.UNLOCKED, () => {

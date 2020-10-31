@@ -99,13 +99,22 @@ declare interface MainSceneConfig {
 }
 
 declare interface PlayerConstructor {
-  new (scene: Phaser.Scene, objectPosition: ObjectPosition): PlayerInterface
+  new (
+    scene: Phaser.Scene,
+    objectPosition: ObjectPosition,
+    gameMap: import('../src/scripts/objects/map').GameMap
+  ): PlayerInterface
 }
 declare interface PlayerInterface extends Phaser.Physics.Arcade.Sprite {
   objectPosition: ObjectPosition
   setIsGoingTo: (pathToGo: Array<ObjectPosition>, initialPos) => void
   goTo: (target: TargetInterface, pathToGo: Array<ObjectPosition>) => void
   goToPath: (targetObjectPosition: ObjectPosition, pathToGo: Array<ObjectPosition>) => void
+  pushHiddenChar: (
+    hiddenChar: import('../src/scripts/objects/hiddenChar').default,
+    target: TargetInterface | undefined,
+    onComplete: () => Promise<void>
+  ) => void
 }
 
 declare interface TargetConstructor {
@@ -134,5 +143,12 @@ declare interface TargetInterface extends Phaser.Physics.Arcade.Sprite {
   isSelected: () => void
   toggleHelp: (enable: boolean) => void
   hideQueuePosition: () => void
-  showQueuePosition: (position: number )=> void
+  showQueuePosition: (position: number) => void
+}
+
+declare interface Neighbors {
+  top?: { x: number; y: number }
+  right?: { x: number; y: number }
+  bottom?: { x: number; y: number }
+  left?: { x: number; y: number }
 }

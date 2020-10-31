@@ -1,63 +1,93 @@
-import { HIDDEN_CHAR_REACHED_TARGET } from '../events/events'
-import { ANIMAL_SKINS, SPRITE_NAME } from '../utils/constants'
+import {
+  HIDDEN_CHAR_REACHED_FINAL_POS,
+  HIDDEN_CHAR_REACHED_ROAD_POS,
+  HIDDEN_CHAR_REACHED_TARGET,
+} from '../events/events'
+import { ANIMAL_SKINS, SPRITE_NAME, TILES } from '../utils/constants'
+import { GameMap } from './map'
 
 export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
   isWalking = false
   isGoingTo: {
     x: number
     y: number
+    row: number
+    col: number
+    roadPosition: boolean
   }
   reachedTarget = false
   target: TargetInterface
   objectPosition: ObjectPosition
   pathToGo: Array<ObjectPosition>
+  targetObjectPosition: ObjectPosition | undefined
+  gameMap: GameMap
+  speed: number
 
-  gotToTheBoxCallback: () => void
-
-  constructor(scene: Phaser.Scene, objectPosition: ObjectPosition, public skin: ANIMAL_SKINS | null) {
+  constructor(scene: Phaser.Scene, objectPosition: ObjectPosition, gameMap: GameMap, public skin: ANIMAL_SKINS | null) {
     super(scene, objectPosition.x, objectPosition.y, SPRITE_NAME.ROUND_ANIMALS, skin?.toString())
     scene.add.existing(this)
     scene.physics.add.existing(this)
     this.objectPosition = objectPosition
+    this.gameMap = gameMap
+    this.setBodySize(this.width * 0.5, this.height * 0.5)
     this.setScale(0.5)
     this.setCollideWorldBounds(true)
     this.pathToGo = []
+    this.speed = 300
 
     scene.events.on('update', this.update, this)
   }
 
-  public setIsGoingTo(pathToGo: Array<ObjectPosition>) {
+  public setIsGoingTo(pathToGo: Array<ObjectPosition>, roadPosition: boolean) {
     this.isWalking = true
     this.pathToGo = [...pathToGo]
-    this.goToNextPosition()
-  }
-
-  private goToNextPosition = () => {
-    const moviment = this.pathToGo.shift()
-
-    if (moviment) {
-      this.objectPosition = moviment
-      this.isGoingTo = {
-        x: moviment.x,
-        y: moviment.y,
-      }
-    }
+    this.goToNextPosition(roadPosition)
   }
 
   public goTo(target: TargetInterface, pathToGo: Array<ObjectPosition>) {
     this.target = target
+    this.targetObjectPosition = undefined
     target.setHiddenCharName(this.skin)
-    this.setIsGoingTo(pathToGo)
+    this.setIsGoingTo(pathToGo, false)
+  }
+
+  public goToPath(targetObjectPosition: ObjectPosition, pathToGo: Array<ObjectPosition>) {
+    this.targetObjectPosition = targetObjectPosition
+    this.setIsGoingTo(pathToGo, true)
+  }
+
+  public getOut(position: ObjectPosition, onComplete: () => Promise<void>) {
+    this.speed = 350
+    this.isWalking = false
+    this.visible = true
+    this.reachedTarget = false
+    const pathToGo = this.gameMap.getPathTo(this.objectPosition, this.target.objectPosition)
+    const lastPosition = pathToGo.pop()
+    if (!lastPosition) throw new Error('lastPosition can not be null')
+
+    this.scene.tweens.add({
+      targets: this,
+      x: lastPosition.x,
+      y: lastPosition.y,
+      scale: 0.5,
+      duration: 500,
+      onComplete: async () => {
+        const pathToGo = this.gameMap.getPathTo(lastPosition, position, false)
+        this.goToPath(position, pathToGo)
+        this.once(HIDDEN_CHAR_REACHED_ROAD_POS, async () => {
+          this.removeListener(HIDDEN_CHAR_REACHED_ROAD_POS)
+          await onComplete()
+        })
+      },
+    })
   }
 
   update() {
-    const speed = 300
-
     if (!this.isWalking || !this.active) return
 
     const offset = 10
 
-    let { x, y } = this.isGoingTo
+    let { x, y, roadPosition } = this.isGoingTo
     let distanceX = Math.trunc(x - this.x)
     let distanceY = Math.trunc(y - this.y)
 
@@ -70,26 +100,46 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
 
     if (distanceX === 0 && distanceY === 0) {
       if (this.pathToGo.length) {
-        this.goToNextPosition()
+        this.goToNextPosition(roadPosition)
       } else {
         this.isWalking = false
         this.setVelocity(0, 0)
         this.setAngle(0)
+        this.objectPosition = this.isGoingTo
 
-        this.scene.tweens.add({
-          targets: this,
-          y: this.target.y,
-          x: this.target.x,
-          alpha: 1,
-          scale: 0,
-          duration: 500,
-          onComplete: () => {
-            this.reachedTarget = true
-            this.emit(HIDDEN_CHAR_REACHED_TARGET)
-            this.visible = false
-          },
-        })
-        this.emit(HIDDEN_CHAR_REACHED_TARGET)
+        if (!roadPosition) {
+          this.scene.tweens.add({
+            targets: this,
+            y: this.target.y - 100,
+            x: this.target.x,
+            scale: 0.4,
+            duration: 500,
+            onComplete: () => {
+              this.scene.tweens.add({
+                targets: this,
+                y: this.target.y,
+                ease: 'Quart.easeIn',
+                duration: 500,
+                onComplete: () => {
+                  this.reachedTarget = true
+                  this.emit(HIDDEN_CHAR_REACHED_TARGET)
+                  this.visible = false
+                },
+              })
+            },
+          })
+        } else if (this.targetObjectPosition) {
+          switch (this.targetObjectPosition.tile) {
+            case TILES.FINAL_POSITION:
+              this.reachedTarget = true
+              this.emit(HIDDEN_CHAR_REACHED_FINAL_POS)
+              break
+            default:
+              this.emit(HIDDEN_CHAR_REACHED_ROAD_POS)
+              break
+          }
+          this.targetObjectPosition = undefined
+        }
       }
       return
     }
@@ -101,15 +151,31 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
 
     this.angle += 1
     if (leftDown) {
-      this.setVelocity(-speed, 0)
+      this.setVelocity(-this.speed, 0)
     } else if (rightDown) {
-      this.setVelocity(speed, 0)
+      this.setVelocity(this.speed, 0)
     } else if (upDown) {
-      this.setVelocity(0, -speed)
+      this.setVelocity(0, -this.speed)
     } else if (downDown) {
-      this.setVelocity(0, speed)
+      this.setVelocity(0, this.speed)
     } else {
       this.setVelocity(0, 0)
+    }
+  }
+
+  private goToNextPosition = (roadPosition: boolean) => {
+    const moviment = this.pathToGo.shift()
+    if (moviment) {
+      this.objectPosition = { ...this.isGoingTo }
+      this.isGoingTo = {
+        ...moviment,
+        roadPosition,
+      }
+    } else {
+      this.isGoingTo = {
+        ...this.isGoingTo,
+        roadPosition,
+      }
     }
   }
 }

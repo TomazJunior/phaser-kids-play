@@ -1,5 +1,12 @@
 import HiddenChar from '../objects/hiddenChar'
-import { HIDDEN_CHARS_ENQUEUED, HIDDEN_CHAR_REACHED_TARGET, HIDDEN_THUMB_CHAR_MOVED_TO_NEXT, PLAYER_REACHED_FINAL_POS, PLAYER_REACHED_INITIAL_POS } from '../events/events'
+import {
+  HIDDEN_CHARS_ENQUEUED,
+  HIDDEN_CHAR_REACHED_FINAL_POS,
+  HIDDEN_CHAR_REACHED_TARGET,
+  HIDDEN_THUMB_CHAR_MOVED_TO_NEXT,
+  PLAYER_REACHED_FINAL_POS,
+  PLAYER_REACHED_INITIAL_POS,
+} from '../events/events'
 import { getAllSkins, getARandomSkinFrom } from '../utils/skinUtils'
 import { ANIMAL_SKINS, BUTTON, SOUNDS, SCENES } from '../utils/constants'
 import HiddenThumbChars from '../objects/hiddenThumbChars'
@@ -28,10 +35,10 @@ export default class MainScene extends Phaser.Scene {
   hiddenCharOnTheirPosition = false
   scoreText: ScoreText
   backgroundAudio: Phaser.Sound.BaseSound
-  clickOnTargetAudio: Phaser.Sound.BaseSound
   gameMap: GameMap
   frameLevel: FrameLevel
   targetQueue: TargetQueue
+  roundInProgress: boolean
   constructor() {
     super({ key: SCENES.MAIN_SCENE })
   }
@@ -74,7 +81,11 @@ export default class MainScene extends Phaser.Scene {
 
     this.targets = this.physics.add.staticGroup()
 
-    this.targetQueue = new TargetQueue(this, this.level, this.gameMap.createTargets(this.targets))
+    this.targetQueue = new TargetQueue(
+      this,
+      this.level,
+      this.gameMap.createTargets(this.targets)
+    )
     if (!this.events.eventNames().includes(HIDDEN_CHARS_ENQUEUED)) {
       this.events.on(HIDDEN_CHARS_ENQUEUED, this.goToNextHiddenChar, this)
     }
@@ -93,8 +104,6 @@ export default class MainScene extends Phaser.Scene {
     )
     this.backgroundAudio = getOrAddAudio(this, SOUNDS.BACKGROUND, { volume: 0.4, loop: true })
     playSound(this, this.backgroundAudio)
-
-    this.clickOnTargetAudio = getOrAddAudio(this, SOUNDS.CLICK_TARGET)
 
     this.createHiddenChars(this.level.hiddens)
     this.hiddenThumbChars.on(HIDDEN_THUMB_CHAR_MOVED_TO_NEXT, (data) => {
@@ -282,7 +291,10 @@ export default class MainScene extends Phaser.Scene {
   }
 
   shouldGoToNextLevel(): boolean {
-    return this.targetQueue.isEmpty && this.hiddenChars.getChildren().every((hiddenChar: any) => <HiddenChar>hiddenChar.visible)
+    return (
+      this.targetQueue.isEmpty &&
+      this.hiddenChars.getChildren().every((hiddenChar: any) => <HiddenChar>hiddenChar.visible)
+    )
   }
 
   nextLevel = async (): Promise<void> => {
@@ -294,7 +306,7 @@ export default class MainScene extends Phaser.Scene {
       this.goToNextHiddenChar()
       return Promise.resolve()
     }
-
+    this.roundInProgress = false
     this.frameLevel.stars = calculateStars(this.round)
     // it will go to next round when reach the final position
     this.playerGotoFinalPosition()
@@ -306,20 +318,24 @@ export default class MainScene extends Phaser.Scene {
   }
 
   handlePlayerReachedFinalPosition = () => {
-    ++this.round
-    if (this.round > this.level.rounds) {
-      this.backgroundAudio.stop()
-      setLevel({ level: this.level.level, stars: 3, key: this.currentWorld.key })
-      this.showFinishGameDialog('You Win!', true, 3)
-      return Promise.resolve()
+    if (this.hiddenCharsAreReady() && !this.roundInProgress) {
+      this.roundInProgress = true
+
+      ++this.round
+      if (this.round > this.level.rounds) {
+        this.backgroundAudio.stop()
+        setLevel({ level: this.level.level, stars: 3, key: this.currentWorld.key })
+        this.showFinishGameDialog('You Win!', true, 3)
+        return Promise.resolve()
+      }
+
+      this.time.delayedCall(1000, () => {
+        this.resetTargets()
+
+        this.createHiddenChars(this.level.hiddens)
+        this.player.active = true
+      })
     }
-
-    this.time.delayedCall(500, () => {
-      this.resetTargets()
-
-      this.createHiddenChars(this.level.hiddens)
-      this.player.active = true
-    })
   }
 
   resetTargets() {
@@ -328,7 +344,7 @@ export default class MainScene extends Phaser.Scene {
 
   closeTargets() {
     this.targets.getChildren().forEach((target: any) => {
-      (<TargetInterface>target).close()
+      ;(<TargetInterface>target).close()
     })
   }
 
@@ -357,8 +373,10 @@ export default class MainScene extends Phaser.Scene {
     const initialPosition = this.gameMap.getTilePosition(7, 1)
 
     this.time.delayedCall(delay, () => {
-      const hiddenChar = new HiddenChar(this, initialPosition, hiddenSkin)
+      const hiddenChar = new HiddenChar(this, initialPosition, this.gameMap, hiddenSkin)
       hiddenChar.on(HIDDEN_CHAR_REACHED_TARGET, this.handleHiddenCharReachedTarget)
+      hiddenChar.on(HIDDEN_CHAR_REACHED_FINAL_POS, this.handlePlayerReachedFinalPosition)
+
       this.hiddenChars.add(hiddenChar)
 
       const target = this.getFreeTarget()
@@ -395,9 +413,6 @@ export default class MainScene extends Phaser.Scene {
     if (target) {
       this.player.active = true
       const pathToGo = this.gameMap.getPathTo(this.player.objectPosition, target.objectPosition, true)
-      if (this.clickOnTargetAudio.isPlaying) this.clickOnTargetAudio.stop()
-      playSound(this, this.clickOnTargetAudio)
-
       this.player.goTo(target, pathToGo)
     }
   }
@@ -471,21 +486,14 @@ export default class MainScene extends Phaser.Scene {
 
     const hiddenChar: HiddenChar = this.getHiddenChar(target.hiddenCharName)
     if (!hiddenChar) return
-    this.tweens.add({
-      targets: hiddenChar,
-      y: '-=50',
-      alpha: 1,
-      scale: 1,
-      duration: 500,
-      onComplete: async () => {
-        hiddenChar.visible = true
-        await this.nextLevel()
-      },
+
+    this.player.pushHiddenChar(hiddenChar, this.targetQueue.getNext(), async () => {
+      await this.nextLevel()
     })
   }
 
   showMissedHidden = async (): Promise<void> => {
-    const delay = 500
+    const delay = 1000
     return new Promise((resolve, reject) => {
       const missedHiddenChars: Array<ANIMAL_SKINS> = this.hiddenThumbChars.getHiddenChars(true)
       const totalDelay = delay + delay * missedHiddenChars.length

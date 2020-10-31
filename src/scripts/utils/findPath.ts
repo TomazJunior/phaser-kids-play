@@ -14,32 +14,34 @@ const findNeighbors = (
   position: Phaser.Math.Vector2,
   collidables: Array<Phaser.Math.Vector2>,
   map: number[][]
-): Array<TilePosition> => {
+): Neighbors => {
   const { x, y } = position
 
-  const possibleNeighbors: Array<TilePosition> = [
-    { x, y: y - 1 }, // top
-    { x: x + 1, y }, // right
-    { x, y: y + 1 }, // bottom
-    { x: x - 1, y }, // left
-  ]
+  const possibleNeighbors: Neighbors = {
+    top: { x, y: y - 1 },
+    right: { x: x + 1, y },
+    bottom: { x, y: y + 1 },
+    left: { x: x - 1, y },
+  }
 
-  return possibleNeighbors.reduce((neighbors: Array<TilePosition>, neighbor: TilePosition) => {
-    if (isCollidable(neighbor.x, neighbor.y, collidables)) {
+  return Object.keys(possibleNeighbors).reduce((neighbors: Neighbors, key: string) => {
+    let possibleNeighbor = possibleNeighbors[key]
+
+    if (isCollidable(possibleNeighbor.x, possibleNeighbor.y, collidables)) {
       return neighbors
     }
 
-    if (neighbor.x < 0 || neighbor.x > map[0].length - 1) {
+    if (possibleNeighbor.x < 0 || possibleNeighbor.x > map[0].length - 1) {
       return neighbors
     }
 
-    if (neighbor.y < 0 || neighbor.y > map.length - 1) {
+    if (possibleNeighbor.y < 0 || possibleNeighbor.y > map.length - 1) {
       return neighbors
     }
 
-    neighbors.push(neighbor)
+    neighbors[key] = possibleNeighbor
     return neighbors
-  }, [])
+  }, {})
 }
 
 const findPath = (

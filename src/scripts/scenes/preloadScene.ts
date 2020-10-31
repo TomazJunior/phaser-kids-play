@@ -24,6 +24,10 @@ export default class PreloadScene extends Phaser.Scene {
       'assets/img/round_nodetailsOutline.xml'
     )
 
+    this.load.image('box-opened', 'assets/img/box-opened.png')
+    this.load.image('box-closed', 'assets/img/box-closed.png')
+    this.load.image('box-wrong', 'assets/img/box-wrong.png')
+    
     this.load.image('finger-point', 'assets/img/finger-point-gesture.png')
 
     this.load.image('stars-zero', 'assets/img/stars-zero.png')
