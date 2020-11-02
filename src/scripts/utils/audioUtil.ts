@@ -1,13 +1,23 @@
+import { getFileStorageConfig } from './fileStorage'
 import { SOUNDS } from './constants'
 
 export const playSound = (scene: Phaser.Scene, audio: Phaser.Sound.BaseSound) => {
   if (!scene.sound.locked) {
-    if (audio.isPlaying) audio.stop()
-    audio.play()
+    handlePlaySound(audio)
   } else {
     scene.sound.once(Phaser.Sound.Events.UNLOCKED, () => {
-      audio.play()
+      handlePlaySound(audio)
     })
+  }
+}
+
+const handlePlaySound = (audio: Phaser.Sound.BaseSound) => {
+  const {sound, backgroudSound} = getFileStorageConfig()
+  const isBgSound = audio.key === SOUNDS.BACKGROUND
+  const shouldPlay = (sound && !isBgSound )|| (backgroudSound && isBgSound)
+  if (!isBgSound && audio.isPlaying) audio.stop()
+  if (shouldPlay) {
+    audio.isPaused ? audio.resume() : audio.play()
   }
 }
 
@@ -19,12 +29,20 @@ export const getOrAddAudio = (
   return scene.sound.get(key) || scene.sound.add(key, config)
 }
 
-export const changeSoundState = (scene: Phaser.Scene, soundEnabled: boolean) => {
+export const updateSoundState = (scene: Phaser.Scene) => {
+  const bgSound = getOrAddAudio(scene, SOUNDS.BACKGROUND)
+  
   if (!scene.sound.locked) {
-    scene.sound.mute = !soundEnabled
+    handlUpdateSoundState(bgSound)
   } else {
     scene.sound.once(Phaser.Sound.Events.UNLOCKED, () => {
-      scene.sound.mute = !soundEnabled
+      handlUpdateSoundState(bgSound)
     })
+  }
+}
+const handlUpdateSoundState = (bgSound: Phaser.Sound.BaseSound) => {
+  const { backgroudSound } = getFileStorageConfig()
+  if (!backgroudSound) {
+    bgSound.pause()
   }
 }

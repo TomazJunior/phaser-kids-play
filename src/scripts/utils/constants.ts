@@ -428,6 +428,7 @@ export enum BUTTON {
   LEVEL = 'level-button',
   RIGHT = 'right-button',
   SOUND = 'sound-button',
+  SOUND_BG = 'sound-bg-button',
   PAUSE = 'pause-button',
 }
 

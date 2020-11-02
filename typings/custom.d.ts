@@ -31,7 +31,8 @@ declare interface ButtonConfig {
 }
 
 declare interface FileStorageConfig {
-  sound: boolean
+  sound: boolean,
+  backgroudSound: boolean,
   tutorials: Array<TutorialFileStorageConfig>
   levels: Array<LevelFileStorageConfig>
 }

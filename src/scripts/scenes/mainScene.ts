@@ -165,7 +165,7 @@ export default class MainScene extends Phaser.Scene {
   resumePausedScene = () => {
     this.scene.stop(SCENES.PAUSE_SCENE)
     this.scene.resume(SCENES.MAIN_SCENE)
-    this.sound.resumeAll()
+    playSound(this, getOrAddAudio(this, SOUNDS.BACKGROUND))
   }
 
   tryToFinishTutorialMode = () => {
@@ -328,7 +328,7 @@ export default class MainScene extends Phaser.Scene {
     this.door.open = true
     if (this.hiddenCharsAreReady() && !this.roundInProgress) {
       this.roundInProgress = true
-      
+
       ++this.round
       if (this.round > this.level.rounds) {
         this.backgroundAudio.stop()

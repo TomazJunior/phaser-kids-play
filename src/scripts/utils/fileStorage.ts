@@ -1,5 +1,3 @@
-import { GAME_WORLDS } from './constants'
-
 const FILE_STORAGE_KEY = 'fileStorage'
 const initialFileStorageConfig: FileStorageConfig = {
   tutorials: [
@@ -13,9 +11,10 @@ const initialFileStorageConfig: FileStorageConfig = {
     },
   ],
   sound: true,
+  backgroudSound: true,
   levels: [
     {
-      key: GAME_WORLDS[0].key,
+      key: '1',
       level: 1,
       stars: 0,
     },
@@ -63,6 +62,17 @@ export const setSoundEnabled = (isSoundEnabled: boolean) => {
 
 export const isSoundEnabled = (): boolean => {
   return getFileStorageConfig().sound
+}
+
+export const setBackgroundSoundEnabled = (value: boolean) => {
+  setFileStorageConfig({
+    ...getFileStorageConfig(),
+    backgroudSound: value,
+  })
+}
+
+export const isBackgroundSoundEnabled = (): boolean => {
+  return getFileStorageConfig().backgroudSound
 }
 
 export const setLevel = (level: LevelFileStorageConfig) => {

@@ -40,8 +40,8 @@ const onPause = (game: Phaser.Game) => {
 }
 
 const onResume = (game: Phaser.Game) => {
-  if (!game) return
-  game.sound.resumeAll()
+  // if (!game) return
+  // game.sound.resumeAll()
 }
 
 const onDeviceReady = () => {
