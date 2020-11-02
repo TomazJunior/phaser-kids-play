@@ -3,7 +3,6 @@ import {
   HIDDEN_CHARS_ENQUEUED,
   HIDDEN_CHAR_REACHED_FINAL_POS,
   HIDDEN_CHAR_REACHED_TARGET,
-  HIDDEN_THUMB_CHAR_MOVED_TO_NEXT,
   PLAYER_REACHED_FINAL_POS,
   PLAYER_REACHED_INITIAL_POS,
 } from '../events/events'
@@ -83,10 +82,6 @@ export default class MainScene extends Phaser.Scene {
 
     this.targets = this.physics.add.staticGroup()
 
-    this.targetQueue = new TargetQueue(this, this.level, this.gameMap.createTargets(this.targets))
-    if (!this.events.eventNames().includes(HIDDEN_CHARS_ENQUEUED)) {
-      this.events.on(HIDDEN_CHARS_ENQUEUED, this.goToNextHiddenChar, this)
-    }
     this.createBackButton()
 
     this.hiddenChars = this.add.group()
@@ -104,12 +99,12 @@ export default class MainScene extends Phaser.Scene {
     playSound(this, this.backgroundAudio)
 
     this.createHiddenChars(this.level.hiddens)
-    this.hiddenThumbChars.on(HIDDEN_THUMB_CHAR_MOVED_TO_NEXT, (data) => {
-      if (!this.isInTutorialMode) return
-      this.toggleHelpTarget(data?.previous, false)
-      this.toggleHelpTarget(data?.current, true)
-    })
-
+    
+    this.targetQueue = new TargetQueue(this, this.level, this.gameMap.createTargets(this.targets), this.isInTutorialMode, [...this.currentHiddenSkins])
+    if (!this.events.eventNames().includes(HIDDEN_CHARS_ENQUEUED)) {
+      this.events.on(HIDDEN_CHARS_ENQUEUED, this.goToNextHiddenChar, this)
+    }
+    
     this.player = this.gameMap.createPlayer(this.handleReachedTarget)
     this.player.on(PLAYER_REACHED_INITIAL_POS, this.handlePlayerReachedInitialPosition)
     this.player.on(PLAYER_REACHED_FINAL_POS, this.handlePlayerReachedFinalPosition)
@@ -446,9 +441,6 @@ export default class MainScene extends Phaser.Scene {
         if (this.player.isReady) {
           this.targetQueue.clear()
         }
-        if (this.hiddenThumbChars.currentHiddenChar) {
-          this.toggleHelpTarget(this.hiddenThumbChars.currentHiddenChar, true)
-        }
       })
     }
   }
@@ -473,17 +465,6 @@ export default class MainScene extends Phaser.Scene {
     this.time.delayedCall(100, () => {
       this.openTarget(target)
     })
-  }
-
-  toggleHelpTarget(hiddenChar: string, enable: boolean) {
-    if (this.isInTutorialMode && hiddenChar) {
-      const target: TargetInterface = <TargetInterface>this.targets.children.getArray().find((target: any) => {
-        return (<TargetInterface>target).hiddenCharName === hiddenChar
-      })
-      if (target) {
-        target.toggleHelp(enable)
-      }
-    }
   }
 
   openTarget = async (target: TargetInterface) => {

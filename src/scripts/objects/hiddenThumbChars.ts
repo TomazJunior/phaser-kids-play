@@ -1,4 +1,3 @@
-import { HIDDEN_THUMB_CHAR_MOVED_TO_NEXT } from '../events/events'
 import { ANIMAL_SKINS, SPRITE_NAME } from '../utils/constants'
 export default class HiddenThumbChars extends Phaser.GameObjects.Container {
   private _currentHiddenChar: ANIMAL_SKINS | null
@@ -69,10 +68,6 @@ export default class HiddenThumbChars extends Phaser.GameObjects.Container {
           duration: 1000,
           onComplete: (tween: Phaser.Tweens.Tween, targets: any[]) => {
             targets.forEach((target) => target.setVisible(false))
-            this.emit(HIDDEN_THUMB_CHAR_MOVED_TO_NEXT, {
-              previous: skin,
-              current: this._currentHiddenChar,
-            })
           },
         })
       } else {
