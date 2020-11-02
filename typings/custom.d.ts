@@ -79,7 +79,7 @@ declare interface TileGameWorld {
   textures?: Array<{ texture: string; frame?: string }>
   tile: import('../src/scripts/utils/constants').TILES
   tileType: import('../src/scripts/utils/constants').TileGameWorldType
-  rotation?: number
+  angle?: number
 }
 
 declare interface Level {

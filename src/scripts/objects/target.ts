@@ -30,8 +30,8 @@ export default abstract class Target extends Phaser.Physics.Arcade.Sprite implem
     scene.add.existing(this)
     container.add(this)
 
-    if (tileGameWorld?.rotation) {
-      this.setRotation(tileGameWorld?.rotation)
+    if (tileGameWorld?.angle) {
+      this.setAngle(tileGameWorld?.angle)
     }
     this.setScale(tileConfigGameWorld.scale, tileConfigGameWorld.scale)
     this.setSize(tileConfigGameWorld.width, tileConfigGameWorld.height)

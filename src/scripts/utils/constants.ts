@@ -249,6 +249,7 @@ export const GAME_WORLDS: Array<GameWorld> = [
         collidable: false,
         textures: [{ texture: 'world-2-grass' }, { texture: 'sign-exit' }],
         tileType: TileGameWorldType.TILE,
+        angle: -30
       },
     ],
     map: [

@@ -238,8 +238,8 @@ export class GameMap {
         const cell = row[x]
         if (tiles.includes(cell)) {
           const tileGameWorld = getTileGameWorldByTile(this.gameWorld.tiles, cell)
-          tileGameWorld?.textures?.forEach(({ texture, frame }) => {
-            this.createImage(x, y, width, height, texture, scale, tileGameWorld.rotation, frame)
+          tileGameWorld?.textures?.forEach(({ texture, frame }, index) => {
+            this.createImage(x, y, width, height, texture, scale, !index ? undefined : tileGameWorld.angle, frame)
           })
         }
       }
@@ -253,7 +253,7 @@ export class GameMap {
     height: number,
     texture: string,
     scale: number,
-    rotation?: number,
+    angle?: number,
     frame?: string
   ) {
     const image = this.scene.add.image(
@@ -264,8 +264,8 @@ export class GameMap {
     )
     image.setScale(scale, scale)
 
-    if (rotation) {
-      image.setRotation(rotation)
+    if (angle) {
+      image.setAngle(angle)
     }
   }
 }
