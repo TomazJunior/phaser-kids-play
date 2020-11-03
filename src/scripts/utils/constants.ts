@@ -414,6 +414,8 @@ export enum SOUNDS {
   CLICK_TARGET = 'click-target',
   WRONG_TARGET = 'wrong-target',
   WALKING = 'walking',
+  ENTER_THE_DOOR = 'enter-the-door',
+  ENTER_THE_BOX = 'enter-the-box',
 }
 
 export enum IMAGE_NAME {

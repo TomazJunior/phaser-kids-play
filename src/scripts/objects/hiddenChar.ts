@@ -3,7 +3,8 @@ import {
   HIDDEN_CHAR_REACHED_ROAD_POS,
   HIDDEN_CHAR_REACHED_TARGET,
 } from '../events/events'
-import { ANIMAL_SKINS, SPRITE_NAME, TILES } from '../utils/constants'
+import { getOrAddAudio, playSound } from '../utils/audioUtil'
+import { ANIMAL_SKINS, SOUNDS, SPRITE_NAME, TILES } from '../utils/constants'
 import { GameMap } from './map'
 
 export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
@@ -22,6 +23,8 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
   targetObjectPosition: ObjectPosition | undefined
   gameMap: GameMap
   speed: number
+  enterOnTargetAudio: Phaser.Sound.BaseSound
+  enterOnDoorAudio: Phaser.Sound.BaseSound
 
   constructor(scene: Phaser.Scene, objectPosition: ObjectPosition, gameMap: GameMap, public skin: ANIMAL_SKINS | null) {
     super(scene, objectPosition.x, objectPosition.y, SPRITE_NAME.ROUND_ANIMALS, skin?.toString())
@@ -34,7 +37,8 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
     this.setCollideWorldBounds(true)
     this.pathToGo = []
     this.speed = 300
-
+    this.enterOnTargetAudio = getOrAddAudio(scene, SOUNDS.ENTER_THE_BOX)
+    this.enterOnDoorAudio = getOrAddAudio(scene, SOUNDS.ENTER_THE_DOOR)
     scene.events.on('update', this.update, this)
   }
 
@@ -63,6 +67,9 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
       y: targetObjectPosition.y,
       scale: 0.4,
       duration: 500,
+      onStart: () => {
+        playSound(this.scene, this.enterOnDoorAudio)
+      },
       onComplete: async () => {
         this.visible = false
         this.emit(HIDDEN_CHAR_REACHED_FINAL_POS, this)
@@ -134,6 +141,9 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
                 y: this.target.y,
                 ease: 'Quart.easeIn',
                 duration: 500,
+                onStart: () => {
+                  playSound(this.scene, this.enterOnTargetAudio)
+                },
                 onComplete: () => {
                   this.reachedTarget = true
                   this.emit(HIDDEN_CHAR_REACHED_TARGET)

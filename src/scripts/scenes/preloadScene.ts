@@ -55,6 +55,8 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.audio(SOUNDS.CLICK_TARGET, 'assets/audio/434756_notarget_wood-step-sample-1.mp3')
     this.load.audio(SOUNDS.WRONG_TARGET, 'assets/audio/350984__cabled-mess__lose-c-03.mp3')
     this.load.audio(SOUNDS.WALKING, 'assets/audio/430708_juandamb_running.mp3')
+    this.load.audio(SOUNDS.ENTER_THE_DOOR, 'assets/audio/enter-the-door.mp3')
+    this.load.audio(SOUNDS.ENTER_THE_BOX, 'assets/audio/enter-the-box.mp3')
     
     //tiles from worlds
     this.loadSpritesGameWorld()
