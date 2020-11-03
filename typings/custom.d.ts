@@ -86,6 +86,7 @@ declare interface Level {
   level: number
   rounds: number
   hiddens: number
+  tutorial?: { text: Array<string>}
 }
 
 declare interface PauseSceneConfig {

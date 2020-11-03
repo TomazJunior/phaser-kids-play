@@ -1,15 +1,6 @@
 const FILE_STORAGE_KEY = 'fileStorage'
 const initialFileStorageConfig: FileStorageConfig = {
-  tutorials: [
-    {
-      level: 1,
-      seen: false,
-    },
-    {
-      level: 2,
-      seen: false,
-    },
-  ],
+  tutorials: [],
   sound: true,
   backgroudSound: true,
   levels: [
@@ -37,19 +28,24 @@ export const getFileStorageConfig = (): FileStorageConfig => {
 export const getTutorialSeen = (level: number): boolean => {
   const { tutorials } = getFileStorageConfig()
   const tutorial = tutorials.find((tutorial) => tutorial.level === level)
-  if (!tutorial) return true
+  if (!tutorial) return false
   return tutorial.seen
 }
 
 export const setTutorialSeen = (level: number, seen: boolean) => {
   const { tutorials } = getFileStorageConfig()
-  const tutorial = tutorials.find((tutorial) => tutorial.level === level)
-  if (!tutorial) return
+  let tutorial = tutorials.find((tutorial) => tutorial.level === level)
+  if (!tutorial) {
+    tutorial = {
+      level,
+      seen
+    }
+  }
   tutorial.seen = seen
 
   setFileStorageConfig({
     ...getFileStorageConfig(),
-    tutorials: [...tutorials.filter((item) => item.level !== tutorial.level), tutorial],
+    tutorials: [...tutorials.filter((item) => item.level !== tutorial?.level), tutorial],
   })
 }
 

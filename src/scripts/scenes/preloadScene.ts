@@ -45,6 +45,7 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('small-frame-window', 'assets/img/small-frame-window.png')
     this.load.image('small-frame', 'assets/img/small-frame.png')
     this.load.image('small-frame-level', 'assets/img/small-frame-level.png')
+    this.load.image('frame-char-dialog', 'assets/img/frame-char-dialog.png')
     
     this.load.bitmapFont(FONTS.PIXEL_FONT, 'assets/fonts/pixelFont.png', 'assets/fonts/pixelFont.xml')
 
@@ -93,7 +94,7 @@ export default class PreloadScene extends Phaser.Scene {
       this.scene.start(SCENES.MENU_SCENE)
       // this.scene.start(SCENES.MAIN_SCENE, <MainSceneConfig>{
       //   gameWorld: GAME_WORLDS[0],
-      //   level: GAME_WORLDS[0].levels[1]
+      //   level: GAME_WORLDS[0].levels[0]
       // })
       // this.scene.start(SCENES.PAUSE_SCENE)
     })

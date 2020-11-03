@@ -20,6 +20,7 @@ import { FrameLevel } from '../ui/frameLevel'
 import { calculateStars } from '../utils/starsUtil'
 import { TargetQueue } from '../controllers/targetQueue'
 import Door from '../objects/door'
+import { FrameDialog } from '../ui/frameDialog'
 
 export default class MainScene extends Phaser.Scene {
   targets: Phaser.Physics.Arcade.StaticGroup
@@ -100,12 +101,9 @@ export default class MainScene extends Phaser.Scene {
 
     this.createHiddenChars(this.level.hiddens)
 
-    this.targetQueue = new TargetQueue(
-      this,
-      this.level,
-      this.gameMap.createTargets(this.targets),
-      [...this.currentHiddenSkins]
-    )
+    this.targetQueue = new TargetQueue(this, this.level, this.gameMap.createTargets(this.targets), [
+      ...this.currentHiddenSkins,
+    ])
     if (!this.events.eventNames().includes(HIDDEN_CHARS_ENQUEUED)) {
       this.events.on(HIDDEN_CHARS_ENQUEUED, this.goToNextHiddenChar, this)
     }
@@ -121,7 +119,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   private get isInTutorialMode(): boolean {
-    return !getTutorialSeen(this.level.level)
+    return !!this.level.tutorial && !getTutorialSeen(this.level.level)
   }
 
   handleLoseFocus = () => {
@@ -314,8 +312,12 @@ export default class MainScene extends Phaser.Scene {
   }
 
   handlePlayerReachedInitialPosition = () => {
+    const { height, width } = this.scale
     this.targetQueue.clear()
     this.targetQueue.inTutorialMode = this.isInTutorialMode
+    this.isInTutorialMode &&
+      this.level.tutorial &&
+      new FrameDialog(this, width * 0.5, height * 0.5, this.level.tutorial.text)
   }
 
   handleHiddenReachedFinalPosition = (hiddenChar: HiddenChar) => {

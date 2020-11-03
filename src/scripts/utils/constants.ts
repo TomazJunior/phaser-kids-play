@@ -59,8 +59,8 @@ export const GAME_WORLDS: Array<GameWorld> = [
     playerClazz: PlayerMario,
     targetClazz: Box,
     levels: [
-      { level: 1, rounds: 5, hiddens: 1 },
-      { level: 2, rounds: 5, hiddens: 2 },
+      { level: 1, rounds: 5, hiddens: 1, tutorial: { text: ['Hi there :-)', 'Please, help me!', 'Need to find the animals.'] } },
+      { level: 2, rounds: 5, hiddens: 2, tutorial: { text: ['Hi there :-)', 'Please, find them!', 'In the correct order.'] } },
       { level: 3, rounds: 5, hiddens: 3 },
       { level: 4, rounds: 5, hiddens: 4 },
       { level: 5, rounds: 5, hiddens: 5 },
@@ -249,7 +249,7 @@ export const GAME_WORLDS: Array<GameWorld> = [
         collidable: false,
         textures: [{ texture: 'world-2-grass' }, { texture: 'sign-exit' }],
         tileType: TileGameWorldType.TILE,
-        angle: -30
+        angle: -20
       },
     ],
     map: [
@@ -431,6 +431,7 @@ export enum BUTTON {
   SOUND = 'sound-button',
   SOUND_BG = 'sound-bg-button',
   PAUSE = 'pause-button',
+  CLOSE = 'close-button',
 }
 
 export enum BUTTON_PREFIX {
