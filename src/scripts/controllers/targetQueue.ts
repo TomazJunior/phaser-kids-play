@@ -4,33 +4,39 @@ import { ANIMAL_SKINS } from '../utils/constants'
 export class TargetQueue {
   private queue: Array<number> = []
   private queueLocked = true
+  private _inTutorialMode: boolean = false
 
   constructor(
     private scene: Phaser.Scene,
     private level: Level,
     private targets: Array<TargetInterface>,
-    private inTutorialMode: boolean,
     private currentHiddenSkins: ANIMAL_SKINS[]
   ) {
     targets.forEach((target) => target.on(PLAYER_TOUCHED_TARGET, this.handleTargetQueue))
+  }
+
+  public set inTutorialMode(v: boolean) {
+    this._inTutorialMode = v
+    if (this._inTutorialMode) {
+      this.toggleHelpNextTarget()
+    }
   }
 
   enqueue(target: TargetInterface) {
     if (this.queueLocked) return
     this.queue = [...this.queue, target.id]
     target.showQueuePosition(this.queue.length)
-    
-    if (this.inTutorialMode) {
+
+    if (this._inTutorialMode) {
       target.toggleHelp(false)
       if (this.currentHiddenSkins.length > this.queue.length) {
-        const nextTarget = this.getTargetByHiddenChar(this.currentHiddenSkins[this.queue.length])
-        nextTarget && nextTarget.toggleHelp(true)
+        this.toggleHelpNextTarget()
       } else {
         this.inTutorialMode = false
         this.currentHiddenSkins = []
       }
     }
-    
+
     if (this.level.hiddens === this.queue.length) {
       this.scene.events.emit(HIDDEN_CHARS_ENQUEUED)
       this.queueLocked = true
@@ -74,7 +80,7 @@ export class TargetQueue {
 
   private handleTargetQueue = (target: TargetInterface) => {
     if (this.queueLocked) return
-    if(!this.isValidIfIsTutorialMode(target)) return
+    if (!this.isValidIfIsTutorialMode(target)) return
 
     const index = this.queue.findIndex((id) => id === target.id)
     if (index !== -1) {
@@ -93,7 +99,12 @@ export class TargetQueue {
   }
 
   private isValidIfIsTutorialMode(target: TargetInterface): boolean {
-    if (!this.inTutorialMode) return true
+    if (!this._inTutorialMode) return true
     return target.hiddenCharName === this.currentHiddenSkins[this.queue.length]
+  }
+
+  private toggleHelpNextTarget() {
+    const nextTarget = this.getTargetByHiddenChar(this.currentHiddenSkins[this.queue.length])
+    nextTarget && nextTarget.toggleHelp(true)
   }
 }

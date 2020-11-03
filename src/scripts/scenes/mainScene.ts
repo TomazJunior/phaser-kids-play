@@ -99,12 +99,17 @@ export default class MainScene extends Phaser.Scene {
     playSound(this, this.backgroundAudio)
 
     this.createHiddenChars(this.level.hiddens)
-    
-    this.targetQueue = new TargetQueue(this, this.level, this.gameMap.createTargets(this.targets), this.isInTutorialMode, [...this.currentHiddenSkins])
+
+    this.targetQueue = new TargetQueue(
+      this,
+      this.level,
+      this.gameMap.createTargets(this.targets),
+      [...this.currentHiddenSkins]
+    )
     if (!this.events.eventNames().includes(HIDDEN_CHARS_ENQUEUED)) {
       this.events.on(HIDDEN_CHARS_ENQUEUED, this.goToNextHiddenChar, this)
     }
-    
+
     this.player = this.gameMap.createPlayer(this.handleReachedTarget)
     this.player.on(PLAYER_REACHED_INITIAL_POS, this.handlePlayerReachedInitialPosition)
     this.player.on(PLAYER_REACHED_FINAL_POS, this.handlePlayerReachedFinalPosition)
@@ -310,6 +315,7 @@ export default class MainScene extends Phaser.Scene {
 
   handlePlayerReachedInitialPosition = () => {
     this.targetQueue.clear()
+    this.targetQueue.inTutorialMode = this.isInTutorialMode
   }
 
   handleHiddenReachedFinalPosition = (hiddenChar: HiddenChar) => {
@@ -440,6 +446,7 @@ export default class MainScene extends Phaser.Scene {
         }
         if (this.player.isReady) {
           this.targetQueue.clear()
+          this.targetQueue.inTutorialMode = this.isInTutorialMode
         }
       })
     }
