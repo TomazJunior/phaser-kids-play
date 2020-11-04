@@ -1,6 +1,7 @@
 import BackgroundParallax from '../ui/backgroundParallax'
 import { ButtonBig } from '../ui/buttonBig'
-import { SCENES } from '../utils/constants'
+import { ButtonSmall } from '../ui/buttonSmall'
+import { BUTTON, SCENES } from '../utils/constants'
 export default class MenuScene extends Phaser.Scene {
   constructor() {
     super({ key: SCENES.MENU_SCENE })
@@ -13,9 +14,16 @@ export default class MenuScene extends Phaser.Scene {
         title: 'START',
       },
       onClick: () => {
-        // this.scene.start(SCENES.MAIN_SCENE)
         this.scene.start(SCENES.LEVEL_SCENE)
       },
     }).setOrigin(0.5, 0.5)
+
+    new ButtonSmall(this, width - 100, 10, {
+      name: BUTTON.CONFIG,
+      onClick: () => {
+        this.scene.start(SCENES.CONFIG_SCENE)
+      },
+    }).setOrigin(0, 0)
+
   }
 }

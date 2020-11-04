@@ -2,6 +2,7 @@ import { PlayerMario } from '../objects/playerMario'
 import { Box } from '../objects/box'
 
 export enum SCENES {
+  CONFIG_SCENE = 'ConfigScene',
   LEVEL_SCENE = 'LevelScene',
   MAIN_SCENE = 'MainScene',
   MENU_SCENE = 'MenuScene',
@@ -444,6 +445,8 @@ export enum BUTTON {
   SOUND_BG = 'sound-bg-button',
   PAUSE = 'pause-button',
   CLOSE = 'close-button',
+  CONFIG = 'config-button',
+  INFO = 'info-button'
 }
 
 export enum BUTTON_PREFIX {
