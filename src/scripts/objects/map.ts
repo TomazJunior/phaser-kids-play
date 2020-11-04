@@ -12,12 +12,12 @@ import {
 export class GameMap {
   playerTile: TILES
   targetTiles: TILES[]
+  imageTiles: { [key: string]: Array<Phaser.GameObjects.Image> }
 
   constructor(private scene: Phaser.Scene, private x: number, private y: number, private gameWorld: GameWorld) {
     this.playerTile = getPlayerTile(gameWorld.tiles)
     this.targetTiles = getTargetTiles(gameWorld.tiles)
-
-    this.createTiles([...getTilesOfType(gameWorld.tiles), this.playerTile])
+    this.imageTiles = {}
   }
 
   public getPlayerPosition = (): ObjectPosition => {
@@ -189,6 +189,16 @@ export class GameMap {
     return findNeighbors(new Phaser.Math.Vector2(target.col, target.row), collidables, this.gameWorld.map)
   }
 
+  public createAndOverrideTiles = (level: Level) => {
+    this.createTiles([...getTilesOfType(this.gameWorld.tiles), this.playerTile])
+    if (!level.tileOverride) return
+    level.tileOverride.forEach((tileOveride) => {
+      const tile = this.gameWorld.tiles.find((tile) => tile.name === tileOveride.tileName)
+      const { row, col } = tileOveride.position
+      this.createImages(col, row, tile)
+    })
+  }
+
   private getTileByPosition = (objectPosition: ObjectPosition): TileGameWorld | undefined => {
     const value: any = this.gameWorld.map[objectPosition.row][objectPosition.col]
     const tileKey = Object.keys(TILES).find((key: string) => {
@@ -227,35 +237,34 @@ export class GameMap {
   }
 
   private createTiles = (tiles: Array<TILES>) => {
-    let { width, height } = this.gameWorld.tileConfig
-    const { scale } = this.gameWorld.tileConfig
-    width *= scale
-    height *= scale
-
     for (let y = 0; y < this.gameWorld.map.length; ++y) {
       const row = this.gameWorld.map[y]
       for (let x = 0; x < row.length; ++x) {
         const cell = row[x]
         if (tiles.includes(cell)) {
           const tileGameWorld = getTileGameWorldByTile(this.gameWorld.tiles, cell)
-          tileGameWorld?.textures?.forEach(({ texture, frame }, index) => {
-            this.createImage(x, y, width, height, texture, scale, !index ? undefined : tileGameWorld.angle, frame)
-          })
+          this.createImages(x, y, tileGameWorld)
         }
       }
     }
   }
 
-  private createImage(
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    texture: string,
-    scale: number,
-    angle?: number,
-    frame?: string
-  ) {
+  private createImages = (col, row, tile: TileGameWorld | undefined) => {
+    const key = `${col}x${row}`
+    this.imageTiles[key]?.forEach((image) => image.destroy(true))
+    if (!this.imageTiles[key]) this.imageTiles[key] = []
+    tile?.textures?.forEach(({ texture, frame }, index) => {
+      const image = this.createImage(col, row, texture, !index ? undefined : tile.angle, frame)
+      this.imageTiles[key].push(image)
+    })
+  }
+
+  private createImage(x: number, y: number, texture: string, angle?: number, frame?: string): Phaser.GameObjects.Image {
+    let { width, height } = this.gameWorld.tileConfig
+    const { scale } = this.gameWorld.tileConfig
+    width *= scale
+    height *= scale
+
     const image = this.scene.add.image(
       !x ? this.x : this.x + width * x,
       !y ? this.y : this.y + height * y,
@@ -267,5 +276,6 @@ export class GameMap {
     if (angle) {
       image.setAngle(angle)
     }
+    return image
   }
 }

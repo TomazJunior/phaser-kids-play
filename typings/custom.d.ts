@@ -31,8 +31,8 @@ declare interface ButtonConfig {
 }
 
 declare interface FileStorageConfig {
-  sound: boolean,
-  backgroudSound: boolean,
+  sound: boolean
+  backgroudSound: boolean
   tutorials: Array<TutorialFileStorageConfig>
   levels: Array<LevelFileStorageConfig>
 }
@@ -86,7 +86,8 @@ declare interface Level {
   level: number
   rounds: number
   hiddens: number
-  tutorial?: { text: Array<string>}
+  tutorial?: { text: Array<string> }
+  tileOverride?: Array<{ position: TilePosition; tileName: string }>
 }
 
 declare interface PauseSceneConfig {

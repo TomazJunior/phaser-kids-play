@@ -80,6 +80,7 @@ export default class MainScene extends Phaser.Scene {
 
     this.createBackground()
     this.gameMap = new GameMap(this, 0, 0, this.currentWorld)
+    this.gameMap.createAndOverrideTiles(this.level)
 
     this.targets = this.physics.add.staticGroup()
 
@@ -304,6 +305,7 @@ export default class MainScene extends Phaser.Scene {
       this.goToNextHiddenChar()
       return Promise.resolve()
     }
+    this.gameMap.createAndOverrideTiles(this.level)
     this.roundInProgress = false
     this.frameLevel.stars = calculateStars(this.round)
     // it will go to next round when reach the final position

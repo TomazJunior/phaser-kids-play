@@ -17,6 +17,7 @@ export default class HiddenThumbChars extends Phaser.GameObjects.Container {
 
     this.add(this.group.getChildren())
     this.add(this.border)
+    this.setDepth(8)
   }
 
   createChars(hiddenSkins: ANIMAL_SKINS[]) {
