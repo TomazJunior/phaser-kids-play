@@ -10,6 +10,12 @@ export const getLevel = (levels: Array<Level>, level: number): Level => {
   return levelFound
 }
 
+export const getPreviousLevel = (gameWorld: GameWorld, level: number): Level | undefined => {
+  const index = gameWorld.levels.findIndex(value => value.level === level)
+  if (index <= 0) return undefined
+  return gameWorld.levels[index - 1]
+}
+
 export const getGameWorld = (name?: string): GameWorld => {
   if (!name) return GAME_WORLDS[0]
 

@@ -4,6 +4,7 @@ import { findPath, findNeighbors } from '../utils/findPath'
 import {
   getCollidableTiles,
   getPlayerTile,
+  getPreviousLevel,
   getTargetTiles,
   getTileGameWorldByTile,
   getTilesOfType,
@@ -18,6 +19,7 @@ export class GameMap {
     this.playerTile = getPlayerTile(gameWorld.tiles)
     this.targetTiles = getTargetTiles(gameWorld.tiles)
     this.imageTiles = {}
+    this.createTiles([...getTilesOfType(this.gameWorld.tiles), this.playerTile])
   }
 
   public getPlayerPosition = (): ObjectPosition => {
@@ -189,10 +191,19 @@ export class GameMap {
     return findNeighbors(new Phaser.Math.Vector2(target.col, target.row), collidables, this.gameWorld.map)
   }
 
-  public createAndOverrideTiles = (level: Level) => {
-    this.createTiles([...getTilesOfType(this.gameWorld.tiles), this.playerTile])
-    if (!level.tileOverride) return
-    level.tileOverride.forEach((tileOveride) => {
+  public overrideTiles = (level: Level) => {
+    // remove previous overrides
+    const previousLevel = getPreviousLevel(this.gameWorld, level.level)
+
+    previousLevel?.tileOverride?.forEach((tileOveride) => {
+      const { row, col } = tileOveride.position
+      const cell = this.gameWorld.map[row][col]
+      const tile = getTileGameWorldByTile(this.gameWorld.tiles, cell)
+      this.createImages(col, row, tile)
+    })
+
+    // add new overrides
+    level?.tileOverride?.forEach((tileOveride) => {
       const tile = this.gameWorld.tiles.find((tile) => tile.name === tileOveride.tileName)
       const { row, col } = tileOveride.position
       this.createImages(col, row, tile)
