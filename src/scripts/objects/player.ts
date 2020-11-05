@@ -2,7 +2,7 @@ import { PLAYER_CHAR_REACHED_TARGET, PLAYER_REACHED_FINAL_POS, PLAYER_REACHED_IN
 import { PLAYER, SOUNDS, TILES } from '../utils/constants'
 import { getOrAddAudio, playSound } from '../utils/audioUtil'
 import HiddenChar from './hiddenChar'
-import { GameMap } from './map'
+import { GameMap } from '../controllers/gameMap'
 
 export default abstract class Player extends Phaser.Physics.Arcade.Sprite implements PlayerInterface {
   private _isReady: boolean = false

@@ -1,4 +1,4 @@
-import { GameMap } from "./map"
+import { GameMap } from "../controllers/gameMap"
 import Player from "./player"
 
 export class PlayerMario extends Player{

@@ -90,7 +90,7 @@ export const GAME_WORLDS: Array<GameWorld> = [
         name: 'fake-box',
         tile: TILES.BOX,
         collidable: true,
-        textures: [{ texture: 'world-2-grass' }, { texture: SPRITE_NAME.SOKOBAN, frame: '6' }],
+        textures: [{ texture: 'world-2-grass' }, { texture: SPRITE_NAME.SOKOBAN, frame: '8' }],
         tileType: TileGameWorldType.TILE,
       },
       {

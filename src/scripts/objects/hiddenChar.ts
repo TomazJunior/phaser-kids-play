@@ -5,7 +5,7 @@ import {
 } from '../events/events'
 import { getOrAddAudio, playSound } from '../utils/audioUtil'
 import { ANIMAL_SKINS, SOUNDS, SPRITE_NAME, TILES } from '../utils/constants'
-import { GameMap } from './map'
+import { GameMap } from '../controllers/gameMap'
 
 export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
   isWalking = false

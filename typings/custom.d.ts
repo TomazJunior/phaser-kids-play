@@ -105,7 +105,7 @@ declare interface PlayerConstructor {
   new (
     scene: Phaser.Scene,
     objectPosition: ObjectPosition,
-    gameMap: import('../src/scripts/objects/map').GameMap
+    gameMap: import('../src/scripts/controllers/gameMap').GameMap
   ): PlayerInterface
 }
 declare interface PlayerInterface extends Phaser.Physics.Arcade.Sprite {
