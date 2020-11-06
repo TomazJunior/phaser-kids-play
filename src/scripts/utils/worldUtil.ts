@@ -1,7 +1,8 @@
 import { GAME_WORLDS, TILES, TileGameWorldType } from './constants'
+import { getFileStorageConfig } from './fileStorage'
 
-export const isLevelExist = (levels: Array<Level>, level: number): boolean => {
-  return levels.find((levelConfig) => level === levelConfig.level) !== undefined
+export const isLevelExist = (gameWorld: GameWorld, level: number): boolean => {
+  return !!gameWorld.levels.find((levelConfig) => level === levelConfig.level)
 }
 
 export const getLevel = (levels: Array<Level>, level: number): Level => {
@@ -11,7 +12,7 @@ export const getLevel = (levels: Array<Level>, level: number): Level => {
 }
 
 export const getPreviousLevel = (gameWorld: GameWorld, level: number): Level | undefined => {
-  const index = gameWorld.levels.findIndex(value => value.level === level)
+  const index = gameWorld.levels.findIndex((value) => value.level === level)
   if (index <= 0) return undefined
   return gameWorld.levels[index - 1]
 }
@@ -54,14 +55,22 @@ export const getTileGameWorldByTile = (
 }
 
 export const getNextWorld = (gameWorld: GameWorld): GameWorld | undefined => {
-  const index = GAME_WORLDS.findIndex(value => value.key === gameWorld.key)
+  const index = GAME_WORLDS.findIndex((value) => value.key === gameWorld.key)
   if (index === -1) return undefined
   if (index >= GAME_WORLDS.length - 1) return undefined
   return GAME_WORLDS[index + 1]
 }
 
 export const getPreviousWorld = (gameWorld: GameWorld): GameWorld | undefined => {
-  const index = GAME_WORLDS.findIndex(value => value.key === gameWorld.key)
+  const index = GAME_WORLDS.findIndex((value) => value.key === gameWorld.key)
   if (index <= 0) return undefined
   return GAME_WORLDS[index - 1]
+}
+
+export const allLevelsCompleted = (gameWorld: GameWorld): boolean => {
+  const fileStorageData: FileStorageConfig = getFileStorageConfig()
+
+  return gameWorld.levels.every((level) =>
+    !!fileStorageData.levels.find((lvl) => lvl.key === gameWorld.key && lvl.level === level.level && lvl.stars >= 1)
+  )
 }

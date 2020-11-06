@@ -2,7 +2,7 @@ import BackgroundParallax from '../ui/backgroundParallax'
 import { ButtonSmall } from '../ui/buttonSmall'
 import { BUTTON, BUTTON_PREFIX, FONTS, SCENES } from '../utils/constants'
 import { getFileStorageConfig } from '../utils/fileStorage'
-import { getGameWorld, getNextWorld, getPreviousWorld } from '../utils/worldUtil'
+import { allLevelsCompleted, getGameWorld, getNextWorld, getPreviousWorld } from '../utils/worldUtil'
 
 export default class LevelScene extends Phaser.Scene {
   private gameWorld: GameWorld
@@ -54,6 +54,11 @@ export default class LevelScene extends Phaser.Scene {
 
     const fileStorageData: FileStorageConfig = getFileStorageConfig()
 
+    let initialLevel = 1
+    if (!!previousWorld) {
+      initialLevel = allLevelsCompleted(previousWorld) ? 1 : 0
+    }
+    
     this.gameWorld.levels.forEach((level, index) => {
       if (index) {
         posX += 150
@@ -67,9 +72,6 @@ export default class LevelScene extends Phaser.Scene {
       const levelFileData =
         fileStorageData.levels &&
         fileStorageData.levels.find((lvl) => lvl.level === level.level && lvl.key === this.gameWorld.key)
-
-      // enable level 1 for first world
-      const initialLevel = !!previousWorld ? 0 : 1
 
       const maxLevel = fileStorageData.levels
         .filter((level) => level.key === this.gameWorld.key)

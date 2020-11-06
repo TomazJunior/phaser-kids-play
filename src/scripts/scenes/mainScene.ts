@@ -184,7 +184,7 @@ export default class MainScene extends Phaser.Scene {
       },
     }
     const currentLevel = { ...this.level }
-    const nextLevelExists = isLevelExist(this.currentWorld.levels, currentLevel.level + 1)
+    const nextLevelExists = isLevelExist(this.currentWorld, currentLevel.level + 1)
 
     const nextLevelButtonConfig: ButtonConfig = {
       name: BUTTON.RIGHT,
