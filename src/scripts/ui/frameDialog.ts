@@ -11,7 +11,7 @@ export class FrameDialog extends Phaser.GameObjects.Sprite {
   lineDelay = 100
   closeButton: ButtonSmall
 
-  constructor(scene: Phaser.Scene, x: number, y: number, private content: Array<string>) {
+  constructor(scene: Phaser.Scene, x: number, y: number, private content: Array<string>, onClose?: () => void) {
     super(scene, x, y, 'frame-char-dialog')
     this.scene = scene
     this.group = this.scene.add.group()
@@ -32,6 +32,8 @@ export class FrameDialog extends Phaser.GameObjects.Sprite {
     this.text = scene.add
       .text(this.x - this.width * 0.44, this.y - this.height * 0.44, '', { font: '32px Arial' })
       .setDepth(9)
+    this.text.setShadow(3, 3, 'rgba(0,0,0)', 5)
+
     this.group.add(this.text)
 
     this.closeButton = new ButtonSmall(scene, this.x + this.width * 0.45, this.y - this.height * 0.45, {
@@ -42,6 +44,7 @@ export class FrameDialog extends Phaser.GameObjects.Sprite {
         y: 0.3,
       },
       onClick: () => {
+        if (onClose) onClose()
         this.group.destroy(true)
       },
     }).setDepth(9)

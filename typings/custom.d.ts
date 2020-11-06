@@ -87,7 +87,7 @@ declare interface Level {
   level: number
   rounds: number
   hiddens: number
-  tutorial?: { text: Array<string> }
+  tutorial?: { text: Array<string>, showPointer?: TilePosition }
   tileOverride?: Array<{ position: TilePosition; tileName: string }>
   extraHiddens?: number
 }

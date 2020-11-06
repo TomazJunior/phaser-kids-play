@@ -25,6 +25,13 @@ export const getFileStorageConfig = (): FileStorageConfig => {
   }
 }
 
+export const clearTutorial = (): void => {
+  setFileStorageConfig({
+    ...getFileStorageConfig(),
+    tutorials: [],
+  })
+}
+
 export const getTutorialSeen = (gameWorld: GameWorld, level: number): boolean => {
   const { tutorials } = getFileStorageConfig()
   const tutorial = tutorials.find((tutorial) => tutorial.level === level && gameWorld.key == tutorial.key)

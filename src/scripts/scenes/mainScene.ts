@@ -21,6 +21,7 @@ import { calculateStars } from '../utils/starsUtil'
 import { TargetQueue } from '../controllers/targetQueue'
 import Door from '../objects/door'
 import { FrameDialog } from '../ui/frameDialog'
+import FingerPoint from '../objects/fingerPoint'
 
 export default class MainScene extends Phaser.Scene {
   targets: Phaser.Physics.Arcade.StaticGroup
@@ -114,7 +115,7 @@ export default class MainScene extends Phaser.Scene {
     this.player.on(PLAYER_REACHED_FINAL_POS, this.handlePlayerReachedFinalPosition)
 
     this.physics.add.collider(this.player, this.targets, undefined, undefined, this)
-    this.physics.add.collider(this.hiddenChars, this.targets, undefined, undefined, this)
+    // this.physics.add.collider(this.hiddenChars, this.targets, undefined, undefined, this)
 
     this.door = this.createDoor()
   }
@@ -315,11 +316,24 @@ export default class MainScene extends Phaser.Scene {
 
   handlePlayerReachedInitialPosition = () => {
     const { height, width } = this.scale
-    this.targetQueue.clear()
-    this.targetQueue.inTutorialMode = this.isInTutorialMode
-    this.isInTutorialMode &&
-      this.level.tutorial &&
-      new FrameDialog(this, width * 0.5, height * 0.5, this.level.tutorial.text)
+
+    if (this.isInTutorialMode && this.level.tutorial) {
+      let finderPointer: FingerPoint
+      if (this.level.tutorial.showPointer) {
+        const { row, col } = this.level.tutorial.showPointer
+        const { x, y } = this.gameMap.getTilePosition(row, col)
+        finderPointer = new FingerPoint(this, x + this.currentWorld.tileConfig.height * 0.5, y)
+        finderPointer.setVisible(true)
+      }
+      new FrameDialog(this, width * 0.5, height * 0.5, this.level.tutorial.text, () => {
+        finderPointer?.destroy()
+        this.targetQueue.clear()
+        this.targetQueue.inTutorialMode = this.isInTutorialMode
+      })
+    } else {
+      this.targetQueue.clear()
+      this.targetQueue.inTutorialMode = this.isInTutorialMode
+    }
   }
 
   handleHiddenReachedFinalPosition = (hiddenChar: HiddenChar) => {
@@ -400,17 +414,21 @@ export default class MainScene extends Phaser.Scene {
       this.currentHiddenSkins.push(hiddenSkin)
     }
 
-    const allChars = [...extraSkins, ...this.currentHiddenSkins]
     let index = 0
-    do {
-      const randomIndex = Math.floor(Math.random() * allChars.length)
-      const hiddenSkin = allChars.splice(randomIndex, 1)[0]
-      if (extraSkins.includes(hiddenSkin)) {
-        this.createExtraHiddenChar(hiddenSkin, 1000 * ++index, extraSkins.indexOf(hiddenSkin) % 2 === 0)
-      } else {
-        this.createHiddenChar(hiddenSkin, 1000 * ++index)
+    this.currentHiddenSkins.forEach((hiddenSkin) => {
+      this.createHiddenChar(hiddenSkin, 1000 * ++index)
+      if (extraSkins.length && Math.random() >= 0.5) {
+        const extraSkin = extraSkins.shift()
+        if (extraSkin) {
+          this.createExtraHiddenChar(extraSkin, 1000 * ++index, extraSkins.indexOf(hiddenSkin) % 2 === 0)
+        }
       }
-    } while (allChars.length)
+    })
+
+    // add remeaning extra skins
+    extraSkins.forEach((extraSkin) => {
+      this.createExtraHiddenChar(extraSkin, 1000 * ++index, extraSkins.indexOf(extraSkin) % 2 === 0)
+    })
 
     this.hiddenThumbChars.createChars(this.currentHiddenSkins)
   }

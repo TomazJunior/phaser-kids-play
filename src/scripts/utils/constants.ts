@@ -42,7 +42,7 @@ export enum TILES {
   ROCK_TINY = 0x72,
   INIT_POSITION = 0x90,
   FINAL_POSITION = 0x91,
-  INTERMEDIATE_POSITION = 0x92
+  INTERMEDIATE_POSITION = 0x92,
 }
 
 export const SPRITE_NAME = {
@@ -56,6 +56,7 @@ export enum TileGameWorldType {
   TILE,
 }
 
+//Oh no! Now it’s more than one! Could you please help me to find them in the correct order?
 export const GAME_WORLDS: Array<GameWorld> = [
   {
     key: '1',
@@ -73,11 +74,28 @@ export const GAME_WORLDS: Array<GameWorld> = [
         level: 2,
         rounds: 5,
         hiddens: 2,
-        tutorial: { text: ['Hi there :-)', 'Please, find them!', 'In the correct order.'] },
+        tutorial: {
+          text: ['Oh no!', 'Now it’s more than one!', 'Could you please help me', 'to find them in the correct', 'order?'],
+        },
       },
       { level: 3, rounds: 5, hiddens: 3 },
       { level: 4, rounds: 5, hiddens: 3 },
-      { level: 5, rounds: 5, hiddens: 3, tileOverride: [{ position: { col: 11, row: 5 }, tileName: 'fake-box' }] },
+      {
+        level: 5,
+        rounds: 5,
+        hiddens: 3,
+        tutorial: {
+          text: [
+            'Oh... look!',
+            'They’re trying to trick us,',
+            'adding more boxes!',
+            'I\'m sure it won’t be',
+            'a problem for you...',
+          ],
+          showPointer: { col: 7, row: 1 }
+        },
+        tileOverride: [{ position: { col: 7, row: 1 }, tileName: 'fake-box' }],
+      },
       {
         level: 6,
         rounds: 5,
@@ -342,7 +360,9 @@ export const GAME_WORLDS: Array<GameWorld> = [
         rounds: 5,
         hiddens: 1,
         extraHiddens: 1,
-        tutorial: { text: ['Hi there :-)', 'Have you seen an', 'animal going to the door?', 'Don\'t worry about it', 'It\'s safe.'] },
+        tutorial: {
+          text: ['Hi there :-)', 'Have you seen an', 'animal going to the door?', "Don't worry about it", "It's safe."],
+        },
       },
       {
         level: 2,

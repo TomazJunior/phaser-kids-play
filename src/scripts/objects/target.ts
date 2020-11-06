@@ -1,12 +1,13 @@
 import { PLAYER_TOUCHED_TARGET } from '../events/events'
 import { getOrAddAudio, playSound } from '../utils/audioUtil'
 import { ANIMAL_SKINS, FONTS, IMAGE_NAME, SOUNDS, SPRITE_NAME } from '../utils/constants'
+import FingerPoint from './fingerPoint'
 
 export default abstract class Target extends Phaser.Physics.Arcade.Sprite implements TargetInterface {
   hiddenCharName: ANIMAL_SKINS | null
   opened = true
   border: Phaser.GameObjects.Image
-  fingerPoint: Phaser.GameObjects.Image
+  fingerPoint: FingerPoint
   borderTween: Phaser.Tweens.Tween
   clickOnWrongBoxAudio: Phaser.Sound.BaseSound
   clickOnRightBoxAudio: Phaser.Sound.BaseSound
@@ -41,7 +42,7 @@ export default abstract class Target extends Phaser.Physics.Arcade.Sprite implem
     const { x, y } = objectPosition
     this.shadow = this.createShadow(x, y)
 
-    this.fingerPoint = scene.add.image(x, y, IMAGE_NAME.FINGER_POINT).setScale(0.3).setOrigin(1, 0.3).setVisible(false)
+    this.fingerPoint = new FingerPoint(scene, x, y)
 
     this.border = scene.add.image(x, y, SPRITE_NAME.SOKOBAN, 39)
     this.border.setScale(tileConfigGameWorld.scale + 0.4)
