@@ -32,7 +32,7 @@ export class InfoDialog extends Phaser.GameObjects.Sprite {
     creditsTitle.setShadow(3, 3, 'rgba(0,0,0)', 5)
 
     const versionText = scene.add
-      .text(this.x + this.displayWidth * 0.35, this.y + this.displayHeight * 0.35, 'v.0.1', {
+      .text(this.x + this.displayWidth * 0.35, this.y + this.displayHeight * 0.35, 'v.0.2', {
         fontFamily: FONTS.ALLOY_INK,
         fontSize: '32px',
         color: 'gray',
