@@ -44,6 +44,7 @@ declare interface LevelFileStorageConfig {
 }
 
 declare interface TutorialFileStorageConfig {
+  key: string
   level: number
   seen: boolean
 }
@@ -88,6 +89,7 @@ declare interface Level {
   hiddens: number
   tutorial?: { text: Array<string> }
   tileOverride?: Array<{ position: TilePosition; tileName: string }>
+  extraHiddens?: number
 }
 
 declare interface PauseSceneConfig {

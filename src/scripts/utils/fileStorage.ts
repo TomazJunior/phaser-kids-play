@@ -25,27 +25,34 @@ export const getFileStorageConfig = (): FileStorageConfig => {
   }
 }
 
-export const getTutorialSeen = (level: number): boolean => {
+export const getTutorialSeen = (gameWorld: GameWorld, level: number): boolean => {
   const { tutorials } = getFileStorageConfig()
-  const tutorial = tutorials.find((tutorial) => tutorial.level === level)
+  const tutorial = tutorials.find((tutorial) => tutorial.level === level && gameWorld.key == tutorial.key)
   if (!tutorial) return false
   return tutorial.seen
 }
 
-export const setTutorialSeen = (level: number, seen: boolean) => {
+export const setTutorialSeen = (key: string, level: number, seen: boolean) => {
   const { tutorials } = getFileStorageConfig()
-  let tutorial = tutorials.find((tutorial) => tutorial.level === level)
+  let tutorial = tutorials.find((tutorial) => tutorial.level === level && tutorial.key === key)
   if (!tutorial) {
     tutorial = {
+      key,
       level,
-      seen
+      seen,
     }
   }
   tutorial.seen = seen
 
   setFileStorageConfig({
     ...getFileStorageConfig(),
-    tutorials: [...tutorials.filter((item) => item.level !== tutorial?.level), tutorial],
+    tutorials: [
+      ...tutorials.filter((item) => {
+        const found = item.level === tutorial?.level && item.key === tutorial?.key
+        return !found
+      }),
+      tutorial,
+    ],
   })
 }
 

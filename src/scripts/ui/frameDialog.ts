@@ -1,4 +1,4 @@
-import { BUTTON } from '../utils/constants'
+import { BUTTON, BUTTON_PREFIX } from '../utils/constants'
 import { ButtonSmall } from './buttonSmall'
 
 export class FrameDialog extends Phaser.GameObjects.Sprite {
@@ -7,9 +7,9 @@ export class FrameDialog extends Phaser.GameObjects.Sprite {
   private lineIndex = 0
   private text: Phaser.GameObjects.Text
   private group: Phaser.GameObjects.Group
-
   wordDelay = 50
   lineDelay = 100
+  closeButton: ButtonSmall
 
   constructor(scene: Phaser.Scene, x: number, y: number, private content: Array<string>) {
     super(scene, x, y, 'frame-char-dialog')
@@ -30,12 +30,13 @@ export class FrameDialog extends Phaser.GameObjects.Sprite {
     this.group.add(background)
 
     this.text = scene.add
-      .text(this.x - this.width * 0.4, this.y - this.height * 0.4, '', { font: '32px Arial' })
+      .text(this.x - this.width * 0.44, this.y - this.height * 0.44, '', { font: '32px Arial' })
       .setDepth(9)
     this.group.add(this.text)
 
-    const closeButton = new ButtonSmall(scene, this.x + this.width * 0.45, this.y - this.height * 0.45, {
+    this.closeButton = new ButtonSmall(scene, this.x + this.width * 0.45, this.y - this.height * 0.45, {
       name: BUTTON.CLOSE,
+      prefix: BUTTON_PREFIX.BLOCKED,
       scale: {
         x: 0.3,
         y: 0.3,
@@ -45,13 +46,16 @@ export class FrameDialog extends Phaser.GameObjects.Sprite {
       },
     }).setDepth(9)
 
-    this.group.add(closeButton)
+    this.group.add(this.closeButton)
 
     this.nextLine()
   }
 
   nextLine = () => {
-    if (this.lineIndex === this.content.length) return
+    if (this.lineIndex === this.content.length) {
+      this.closeButton.changeTexture(BUTTON_PREFIX.NORMAL)
+      return
+    }
 
     this.line = this.content[this.lineIndex++].split(' ')
     this.wordIndex = 0

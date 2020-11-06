@@ -6,6 +6,7 @@ import {
 import { getOrAddAudio, playSound } from '../utils/audioUtil'
 import { ANIMAL_SKINS, SOUNDS, SPRITE_NAME, TILES } from '../utils/constants'
 import { GameMap } from '../controllers/gameMap'
+import Door from './door'
 
 export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
   isWalking = false
@@ -25,8 +26,9 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
   speed: number
   enterOnTargetAudio: Phaser.Sound.BaseSound
   enterOnDoorAudio: Phaser.Sound.BaseSound
+  followingPlayer: boolean = false
 
-  constructor(scene: Phaser.Scene, objectPosition: ObjectPosition, gameMap: GameMap, public skin: ANIMAL_SKINS | null) {
+  constructor(scene: Phaser.Scene, objectPosition: ObjectPosition, gameMap: GameMap, public skin: ANIMAL_SKINS) {
     super(scene, objectPosition.x, objectPosition.y, SPRITE_NAME.ROUND_ANIMALS, skin?.toString())
     scene.add.existing(this)
     scene.physics.add.existing(this)
@@ -60,11 +62,13 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
     this.setIsGoingTo(pathToGo, true)
   }
 
-  public goToDoor(targetObjectPosition: ObjectPosition) {
+  public goToDoor(door: Door) {
+    const { objectPosition } = door
+    if (!this.followingPlayer) door.open = true
     this.scene.tweens.add({
       targets: this,
-      x: targetObjectPosition.x,
-      y: targetObjectPosition.y,
+      x: objectPosition.x,
+      y: objectPosition.y,
       scale: 0.4,
       duration: 500,
       onStart: () => {
@@ -72,6 +76,7 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
       },
       onComplete: async () => {
         this.visible = false
+        if (!this.followingPlayer) door.open = false
         this.emit(HIDDEN_CHAR_REACHED_FINAL_POS, this)
       },
     })
@@ -82,6 +87,7 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
     this.isWalking = false
     this.visible = true
     this.reachedTarget = false
+    this.followingPlayer = true
     const pathToGo = this.gameMap.getPathTo(this.objectPosition, this.target.objectPosition)
     const lastPosition = pathToGo.pop()
     if (!lastPosition) throw new Error('lastPosition can not be null')

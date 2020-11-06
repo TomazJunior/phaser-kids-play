@@ -37,6 +37,10 @@ export class GameMap {
     return this.getTilesPosition([TILES.FINAL_POSITION])[0]
   }
 
+  public getIntermediatePosition = (): ObjectPosition => {
+    return this.getTilesPosition([TILES.INTERMEDIATE_POSITION])[0]
+  }
+
   public getTargetTilePositions = (): Array<ObjectPosition> => {
     return this.getTilesPosition(this.targetTiles)
   }

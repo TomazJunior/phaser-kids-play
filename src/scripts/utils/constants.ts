@@ -42,6 +42,7 @@ export enum TILES {
   ROCK_TINY = 0x72,
   INIT_POSITION = 0x90,
   FINAL_POSITION = 0x91,
+  INTERMEDIATE_POSITION = 0x92
 }
 
 export const SPRITE_NAME = {
@@ -292,6 +293,13 @@ export const GAME_WORLDS: Array<GameWorld> = [
         tileType: TileGameWorldType.TILE,
       },
       {
+        name: 'Inter-Pos',
+        tile: TILES.INTERMEDIATE_POSITION,
+        collidable: false,
+        textures: [{ texture: 'world-2-dirt-bottom' }],
+        tileType: TileGameWorldType.TILE,
+      },
+      {
         name: 'Final-Pos',
         tile: TILES.FINAL_POSITION,
         collidable: false,
@@ -329,11 +337,18 @@ export const GAME_WORLDS: Array<GameWorld> = [
     playerClazz: PlayerMario,
     targetClazz: Box,
     levels: [
-      { level: 1, rounds: 5, hiddens: 3 },
+      {
+        level: 1,
+        rounds: 5,
+        hiddens: 1,
+        extraHiddens: 1,
+        tutorial: { text: ['Hi there :-)', 'Have you seen an', 'animal going to the door?', 'Don\'t worry about it', 'It\'s safe.'] },
+      },
       {
         level: 2,
         rounds: 5,
         hiddens: 3,
+        extraHiddens: 1,
         tileOverride: [
           { position: { col: 5, row: 4 }, tileName: 'fake-box' },
           { position: { col: 6, row: 4 }, tileName: 'fake-box' },
@@ -345,6 +360,7 @@ export const GAME_WORLDS: Array<GameWorld> = [
         level: 3,
         rounds: 5,
         hiddens: 3,
+        extraHiddens: 2,
         tileOverride: [
           { position: { col: 5, row: 4 }, tileName: 'fake-box' },
           { position: { col: 6, row: 4 }, tileName: 'fake-box' },
@@ -355,7 +371,8 @@ export const GAME_WORLDS: Array<GameWorld> = [
       {
         level: 4,
         rounds: 5,
-        hiddens: 4,
+        hiddens: 3,
+        extraHiddens: 3,
         tileOverride: [
           { position: { col: 5, row: 4 }, tileName: 'fake-box' },
           { position: { col: 6, row: 4 }, tileName: 'fake-box' },
@@ -367,6 +384,7 @@ export const GAME_WORLDS: Array<GameWorld> = [
         level: 5,
         rounds: 5,
         hiddens: 4,
+        extraHiddens: 3,
         tileOverride: [
           { position: { col: 5, row: 4 }, tileName: 'fake-box' },
           { position: { col: 6, row: 4 }, tileName: 'fake-box' },
@@ -380,6 +398,7 @@ export const GAME_WORLDS: Array<GameWorld> = [
         level: 6,
         rounds: 5,
         hiddens: 4,
+        extraHiddens: 3,
         tileOverride: [
           { position: { col: 5, row: 4 }, tileName: 'fake-box' },
           { position: { col: 6, row: 4 }, tileName: 'fake-box' },
@@ -393,6 +412,7 @@ export const GAME_WORLDS: Array<GameWorld> = [
         level: 7,
         rounds: 5,
         hiddens: 5,
+        extraHiddens: 3,
         tileOverride: [
           { position: { col: 5, row: 4 }, tileName: 'fake-box' },
           { position: { col: 6, row: 4 }, tileName: 'fake-box' },
@@ -402,6 +422,7 @@ export const GAME_WORLDS: Array<GameWorld> = [
         level: 8,
         rounds: 5,
         hiddens: 5,
+        extraHiddens: 3,
         tileOverride: [
           { position: { col: 5, row: 4 }, tileName: 'fake-box' },
           { position: { col: 6, row: 4 }, tileName: 'fake-box' },
@@ -413,6 +434,7 @@ export const GAME_WORLDS: Array<GameWorld> = [
         level: 9,
         rounds: 5,
         hiddens: 5,
+        extraHiddens: 4,
         tileOverride: [
           { position: { col: 5, row: 4 }, tileName: 'fake-box' },
           { position: { col: 6, row: 4 }, tileName: 'fake-box' },
@@ -426,6 +448,7 @@ export const GAME_WORLDS: Array<GameWorld> = [
         level: 10,
         rounds: 5,
         hiddens: 5,
+        extraHiddens: 4,
         tileOverride: [
           { position: { col: 5, row: 4 }, tileName: 'fake-box' },
           { position: { col: 6, row: 4 }, tileName: 'fake-box' },
@@ -439,11 +462,13 @@ export const GAME_WORLDS: Array<GameWorld> = [
         level: 11,
         rounds: 5,
         hiddens: 6,
+        extraHiddens: 1,
       },
       {
         level: 12,
         rounds: 5,
         hiddens: 6,
+        extraHiddens: 6,
         tileOverride: [
           { position: { col: 5, row: 4 }, tileName: 'fake-box' },
           { position: { col: 6, row: 4 }, tileName: 'fake-box' },
@@ -550,6 +575,13 @@ export const GAME_WORLDS: Array<GameWorld> = [
       {
         name: 'Final-Pos',
         tile: TILES.FINAL_POSITION,
+        collidable: false,
+        textures: [{ texture: SPRITE_NAME.SOKOBAN, frame: '89' }],
+        tileType: TileGameWorldType.TILE,
+      },
+      {
+        name: 'Inter-Pos',
+        tile: TILES.INTERMEDIATE_POSITION,
         collidable: false,
         textures: [{ texture: SPRITE_NAME.SOKOBAN, frame: '89' }],
         tileType: TileGameWorldType.TILE,

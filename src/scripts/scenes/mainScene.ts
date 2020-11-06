@@ -100,7 +100,7 @@ export default class MainScene extends Phaser.Scene {
     this.backgroundAudio = getOrAddAudio(this, SOUNDS.BACKGROUND, { volume: 0.4, loop: true })
     playSound(this, this.backgroundAudio)
 
-    this.createHiddenChars(this.level.hiddens)
+    this.createHiddenChars(this.level)
 
     this.targetQueue = new TargetQueue(this, this.level, this.gameMap.createTargets(this.targets), [
       ...this.currentHiddenSkins,
@@ -120,7 +120,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   private get isInTutorialMode(): boolean {
-    return !!this.level.tutorial && !getTutorialSeen(this.level.level)
+    return !!this.level.tutorial && !getTutorialSeen(this.currentWorld, this.level.level)
   }
 
   handleLoseFocus = () => {
@@ -171,7 +171,7 @@ export default class MainScene extends Phaser.Scene {
     if (!this.shouldGoToNextLevel()) {
       return
     }
-    setTutorialSeen(this.level.level, true)
+    setTutorialSeen(this.currentWorld.key, this.level.level, true)
     this.frameLevel.title = `Level ${this.level.level}`
   }
 
@@ -323,10 +323,13 @@ export default class MainScene extends Phaser.Scene {
   }
 
   handleHiddenReachedFinalPosition = (hiddenChar: HiddenChar) => {
-    hiddenChar.goToDoor(this.door.objectPosition)
-    this.time.delayedCall(600, () => {
-      this.handlePlayerReachedFinalPosition()
-    })
+    hiddenChar.goToDoor(this.door)
+
+    if (hiddenChar.followingPlayer) {
+      this.time.delayedCall(600, () => {
+        this.handlePlayerReachedFinalPosition()
+      })
+    }
   }
 
   handlePlayerReachedFinalPosition = () => {
@@ -345,7 +348,7 @@ export default class MainScene extends Phaser.Scene {
       this.time.delayedCall(1000, () => {
         this.resetTargets()
         this.door.open = false
-        this.createHiddenChars(this.level.hiddens)
+        this.createHiddenChars(this.level)
         this.player.active = true
       })
     }
@@ -380,18 +383,60 @@ export default class MainScene extends Phaser.Scene {
     )
   }
 
-  createHiddenChars(numberOfHiddens: number) {
+  createHiddenChars(level: Level) {
+    const { hiddens, extraHiddens } = level
+    const extraSkins: Array<ANIMAL_SKINS> = []
     this.clearHiddenChars()
 
-    for (let index = 0; index < numberOfHiddens; index++) {
+    if (extraHiddens) {
+      for (let index = 0; index < extraHiddens; index++) {
+        const hiddenSkin = getARandomSkinFrom(this.availableHiddenSkins)
+        extraSkins.push(hiddenSkin)
+      }
+    }
+
+    for (let index = 0; index < hiddens; index++) {
       const hiddenSkin = getARandomSkinFrom(this.availableHiddenSkins)
       this.currentHiddenSkins.push(hiddenSkin)
-      this.createHiddenChar(hiddenSkin, 1000 * (index + 1))
     }
+
+    const allChars = [...extraSkins, ...this.currentHiddenSkins]
+    let index = 0
+    do {
+      const randomIndex = Math.floor(Math.random() * allChars.length)
+      const hiddenSkin = allChars.splice(randomIndex, 1)[0]
+      if (extraSkins.includes(hiddenSkin)) {
+        this.createExtraHiddenChar(hiddenSkin, 1000 * ++index, extraSkins.indexOf(hiddenSkin) % 2 === 0)
+      } else {
+        this.createHiddenChar(hiddenSkin, 1000 * ++index)
+      }
+    } while (allChars.length)
+
     this.hiddenThumbChars.createChars(this.currentHiddenSkins)
   }
 
-  createHiddenChar(hiddenSkin: ANIMAL_SKINS | null, delay: number) {
+  createExtraHiddenChar(hiddenSkin: ANIMAL_SKINS, delay: number, useLongPath: boolean) {
+    const initialPosition = this.gameMap.getTilePosition(7, 1)
+    const intermediatePosition = this.gameMap.getIntermediatePosition()
+    const finalPosition = this.gameMap.getPlayerFinalPosition()
+
+    this.time.delayedCall(delay, () => {
+      const hiddenChar = new HiddenChar(this, initialPosition, this.gameMap, hiddenSkin)
+      hiddenChar.once(HIDDEN_CHAR_REACHED_FINAL_POS, this.handleHiddenReachedFinalPosition)
+      let pathToGo: Array<ObjectPosition> = []
+      if (useLongPath) {
+        pathToGo = [
+          ...this.gameMap.getPathTo(initialPosition, intermediatePosition, false),
+          ...this.gameMap.getPathTo(intermediatePosition, finalPosition, false),
+        ]
+      } else {
+        pathToGo = [...this.gameMap.getPathTo(initialPosition, finalPosition, false)]
+      }
+      hiddenChar.goToPath(finalPosition, pathToGo)
+    })
+  }
+
+  createHiddenChar(hiddenSkin: ANIMAL_SKINS, delay: number) {
     const initialPosition = this.gameMap.getTilePosition(7, 1)
 
     this.time.delayedCall(delay, () => {
