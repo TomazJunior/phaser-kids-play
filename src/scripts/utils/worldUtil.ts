@@ -16,11 +16,11 @@ export const getPreviousLevel = (gameWorld: GameWorld, level: number): Level | u
   return gameWorld.levels[index - 1]
 }
 
-export const getGameWorld = (name?: string): GameWorld => {
-  if (!name) return GAME_WORLDS[0]
+export const getGameWorld = (key?: string): GameWorld => {
+  if (!key) return GAME_WORLDS[0]
 
-  const gameWorldFound = GAME_WORLDS.find((gameWorld) => name === gameWorld.key)
-  if (!gameWorldFound) throw new Error(`Game World ${name} not found`)
+  const gameWorldFound = GAME_WORLDS.find((gameWorld) => key === gameWorld.key)
+  if (!gameWorldFound) throw new Error(`Game World ${key} not found`)
   return gameWorldFound
 }
 

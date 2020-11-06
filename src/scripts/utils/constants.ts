@@ -1,5 +1,6 @@
 import { PlayerMario } from '../objects/playerMario'
 import { Box } from '../objects/box'
+import { maps } from './maps'
 
 export enum SCENES {
   CONFIG_SCENE = 'ConfigScene',
@@ -16,6 +17,7 @@ export enum TILES {
   GROUND = 0x00,
   BOX = 0x01,
   PLAYER = 0x03,
+  GROUND_PATH = 0x07,
   GRASS_TOP_LEFT = 0x08,
   DIRT_LEFT = 0x09,
   DIRT_RIGHT = 0x10,
@@ -60,18 +62,74 @@ export const GAME_WORLDS: Array<GameWorld> = [
     playerClazz: PlayerMario,
     targetClazz: Box,
     levels: [
-      { level: 1,  rounds: 5, hiddens: 1, tutorial: { text: ['Hi there :-)', 'Please, help me!', 'Need to find the animals.'] } },
-      { level: 2,  rounds: 5, hiddens: 2, tutorial: { text: ['Hi there :-)', 'Please, find them!', 'In the correct order.'] } },
-      { level: 3,  rounds: 5, hiddens: 3 },
-      { level: 4,  rounds: 5, hiddens: 3 },
-      { level: 5,  rounds: 5, hiddens: 3, tileOverride: [{ position: {col: 11, row: 5}, tileName: 'fake-box'} ] },
-      { level: 6,  rounds: 5, hiddens: 3, tileOverride: [{ position: {col: 11, row: 5}, tileName: 'fake-box'}, { position: {col: 7, row: 1}, tileName: 'fake-box'} ] },
-      { level: 7,  rounds: 5, hiddens: 3, tileOverride: [{ position: {col: 11, row: 5}, tileName: 'fake-box'}, { position: {col: 7, row: 1}, tileName: 'fake-box'}, { position: {col: 8, row: 5}, tileName: 'fake-box'}, { position: {col: 7, row: 4}, tileName: 'fake-box'} ] },
-      { level: 8,  rounds: 5, hiddens: 4, tileOverride: [{ position: {col: 11, row: 5}, tileName: 'fake-box'} ] },
-      { level: 9,  rounds: 5, hiddens: 4, tileOverride: [{ position: {col: 11, row: 5}, tileName: 'fake-box'}, { position: {col: 7, row: 1}, tileName: 'fake-box'}, { position: {col: 8, row: 5}, tileName: 'fake-box'}, { position: {col: 7, row: 4}, tileName: 'fake-box'} ] },
+      {
+        level: 1,
+        rounds: 5,
+        hiddens: 1,
+        tutorial: { text: ['Hi there :-)', 'Please, help me!', 'Need to find the animals.'] },
+      },
+      {
+        level: 2,
+        rounds: 5,
+        hiddens: 2,
+        tutorial: { text: ['Hi there :-)', 'Please, find them!', 'In the correct order.'] },
+      },
+      { level: 3, rounds: 5, hiddens: 3 },
+      { level: 4, rounds: 5, hiddens: 3 },
+      { level: 5, rounds: 5, hiddens: 3, tileOverride: [{ position: { col: 11, row: 5 }, tileName: 'fake-box' }] },
+      {
+        level: 6,
+        rounds: 5,
+        hiddens: 3,
+        tileOverride: [
+          { position: { col: 11, row: 5 }, tileName: 'fake-box' },
+          { position: { col: 7, row: 1 }, tileName: 'fake-box' },
+        ],
+      },
+      {
+        level: 7,
+        rounds: 5,
+        hiddens: 3,
+        tileOverride: [
+          { position: { col: 11, row: 5 }, tileName: 'fake-box' },
+          { position: { col: 7, row: 1 }, tileName: 'fake-box' },
+          { position: { col: 8, row: 5 }, tileName: 'fake-box' },
+          { position: { col: 7, row: 4 }, tileName: 'fake-box' },
+        ],
+      },
+      { level: 8, rounds: 5, hiddens: 4, tileOverride: [{ position: { col: 11, row: 5 }, tileName: 'fake-box' }] },
+      {
+        level: 9,
+        rounds: 5,
+        hiddens: 4,
+        tileOverride: [
+          { position: { col: 11, row: 5 }, tileName: 'fake-box' },
+          { position: { col: 7, row: 1 }, tileName: 'fake-box' },
+          { position: { col: 8, row: 5 }, tileName: 'fake-box' },
+          { position: { col: 7, row: 4 }, tileName: 'fake-box' },
+        ],
+      },
       { level: 10, rounds: 5, hiddens: 5 },
-      { level: 11, rounds: 5, hiddens: 5, tileOverride: [{ position: {col: 11, row: 5}, tileName: 'fake-box'}, { position: {col: 7, row: 1}, tileName: 'fake-box'} ] },
-      { level: 12, rounds: 5, hiddens: 5, tileOverride: [{ position: {col: 11, row: 5}, tileName: 'fake-box'}, { position: {col: 7, row: 1}, tileName: 'fake-box'}, { position: {col: 8, row: 5}, tileName: 'fake-box'}, { position: {col: 7, row: 4}, tileName: 'fake-box'} ] },
+      {
+        level: 11,
+        rounds: 5,
+        hiddens: 5,
+        tileOverride: [
+          { position: { col: 11, row: 5 }, tileName: 'fake-box' },
+          { position: { col: 7, row: 1 }, tileName: 'fake-box' },
+        ],
+      },
+      {
+        level: 12,
+        rounds: 5,
+        hiddens: 5,
+        tileOverride: [
+          { position: { col: 11, row: 5 }, tileName: 'fake-box' },
+          { position: { col: 7, row: 1 }, tileName: 'fake-box' },
+          { position: { col: 8, row: 5 }, tileName: 'fake-box' },
+          { position: { col: 7, row: 4 }, tileName: 'fake-box' },
+        ],
+      },
     ],
     tileConfig: {
       width: 64,
@@ -88,7 +146,7 @@ export const GAME_WORLDS: Array<GameWorld> = [
       },
       {
         name: 'fake-box',
-        tile: TILES.BOX,
+        tile: TILES.BLUE_BOX,
         collidable: true,
         textures: [{ texture: 'world-2-grass' }, { texture: SPRITE_NAME.SOKOBAN, frame: '8' }],
         tileType: TileGameWorldType.TILE,
@@ -260,21 +318,10 @@ export const GAME_WORLDS: Array<GameWorld> = [
         collidable: false,
         textures: [{ texture: 'world-2-grass' }, { texture: 'sign-exit' }],
         tileType: TileGameWorldType.TILE,
-        angle: -20
+        angle: -20,
       },
     ],
-    map: [
-      [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, ],
-      [0x00, 0x00, 0x00, 0x61, 0x00, 0x00, 0x01, 0x00, 0x01, 0x71, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, ],
-      [0x00, 0x00, 0x00, 0x00, 0x08, 0x12, 0x12, 0x12, 0x12, 0x12, 0x17, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, ],
-      [0x00, 0x00, 0x00, 0x01, 0x10, 0x16, 0x11, 0x11, 0x11, 0x15, 0x09, 0x01, 0x51, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, ],
-      [0x00, 0x00, 0x71, 0x72, 0x10, 0x09, 0x01, 0x00, 0x01, 0x10, 0x09, 0x50, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, ],
-      [0x00, 0x00, 0x00, 0x70, 0x10, 0x09, 0x50, 0x51, 0x00, 0x10, 0x09, 0x00, 0x72, 0x51, 0x31, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, ],
-      [0x00, 0x00, 0x00, 0x60, 0x10, 0x09, 0x01, 0x51, 0x01, 0x10, 0x09, 0x01, 0x00, 0x32, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, ],
-      [0x03, 0x12, 0x12, 0x90, 0x13, 0x14, 0x12, 0x12, 0x12, 0x13, 0x14, 0x12, 0x12, 0x12, 0x12, 0x91, 0x12, 0x12, 0x12, 0x12, 0x12, ],
-      [0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, ],
-      [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, ],
-    ],
+    map: maps[0],
   },
   {
     key: '2',
@@ -282,15 +329,126 @@ export const GAME_WORLDS: Array<GameWorld> = [
     playerClazz: PlayerMario,
     targetClazz: Box,
     levels: [
-      { level: 1, rounds: 5, hiddens: 1 },
-      { level: 2, rounds: 5, hiddens: 2 },
-      { level: 3, rounds: 5, hiddens: 3 },
-      { level: 4, rounds: 5, hiddens: 4 },
-      { level: 5, rounds: 5, hiddens: 5 },
-      { level: 6, rounds: 5, hiddens: 6 },
-      { level: 7, rounds: 5, hiddens: 7 },
-      { level: 8, rounds: 5, hiddens: 8 },
-      { level: 9, rounds: 5, hiddens: 9 },
+      { level: 1, rounds: 5, hiddens: 3 },
+      {
+        level: 2,
+        rounds: 5,
+        hiddens: 3,
+        tileOverride: [
+          { position: { col: 5, row: 4 }, tileName: 'fake-box' },
+          { position: { col: 6, row: 4 }, tileName: 'fake-box' },
+          { position: { col: 8, row: 6 }, tileName: 'fake-box' },
+          { position: { col: 9, row: 6 }, tileName: 'fake-box' },
+        ],
+      },
+      {
+        level: 3,
+        rounds: 5,
+        hiddens: 3,
+        tileOverride: [
+          { position: { col: 5, row: 4 }, tileName: 'fake-box' },
+          { position: { col: 6, row: 4 }, tileName: 'fake-box' },
+          { position: { col: 8, row: 6 }, tileName: 'fake-box' },
+          { position: { col: 9, row: 6 }, tileName: 'fake-box' },
+        ],
+      },
+      {
+        level: 4,
+        rounds: 5,
+        hiddens: 4,
+        tileOverride: [
+          { position: { col: 5, row: 4 }, tileName: 'fake-box' },
+          { position: { col: 6, row: 4 }, tileName: 'fake-box' },
+          { position: { col: 8, row: 6 }, tileName: 'fake-box' },
+          { position: { col: 9, row: 6 }, tileName: 'fake-box' },
+        ],
+      },
+      {
+        level: 5,
+        rounds: 5,
+        hiddens: 4,
+        tileOverride: [
+          { position: { col: 5, row: 4 }, tileName: 'fake-box' },
+          { position: { col: 6, row: 4 }, tileName: 'fake-box' },
+          { position: { col: 8, row: 6 }, tileName: 'fake-box' },
+          { position: { col: 9, row: 6 }, tileName: 'fake-box' },
+          { position: { col: 5, row: 6 }, tileName: 'fake-box' },
+          { position: { col: 10, row: 5 }, tileName: 'fake-box' },
+        ],
+      },
+      {
+        level: 6,
+        rounds: 5,
+        hiddens: 4,
+        tileOverride: [
+          { position: { col: 5, row: 4 }, tileName: 'fake-box' },
+          { position: { col: 6, row: 4 }, tileName: 'fake-box' },
+          { position: { col: 8, row: 6 }, tileName: 'fake-box' },
+          { position: { col: 9, row: 6 }, tileName: 'fake-box' },
+          { position: { col: 5, row: 6 }, tileName: 'fake-box' },
+          { position: { col: 10, row: 5 }, tileName: 'fake-box' },
+        ],
+      },
+      {
+        level: 7,
+        rounds: 5,
+        hiddens: 5,
+        tileOverride: [
+          { position: { col: 5, row: 4 }, tileName: 'fake-box' },
+          { position: { col: 6, row: 4 }, tileName: 'fake-box' },
+        ],
+      },
+      {
+        level: 8,
+        rounds: 5,
+        hiddens: 5,
+        tileOverride: [
+          { position: { col: 5, row: 4 }, tileName: 'fake-box' },
+          { position: { col: 6, row: 4 }, tileName: 'fake-box' },
+          { position: { col: 8, row: 6 }, tileName: 'fake-box' },
+          { position: { col: 9, row: 6 }, tileName: 'fake-box' },
+        ],
+      },
+      {
+        level: 9,
+        rounds: 5,
+        hiddens: 5,
+        tileOverride: [
+          { position: { col: 5, row: 4 }, tileName: 'fake-box' },
+          { position: { col: 6, row: 4 }, tileName: 'fake-box' },
+          { position: { col: 8, row: 6 }, tileName: 'fake-box' },
+          { position: { col: 9, row: 6 }, tileName: 'fake-box' },
+          { position: { col: 5, row: 6 }, tileName: 'fake-box' },
+          { position: { col: 10, row: 5 }, tileName: 'fake-box' },
+        ],
+      },
+      {
+        level: 10,
+        rounds: 5,
+        hiddens: 5,
+        tileOverride: [
+          { position: { col: 5, row: 4 }, tileName: 'fake-box' },
+          { position: { col: 6, row: 4 }, tileName: 'fake-box' },
+          { position: { col: 8, row: 6 }, tileName: 'fake-box' },
+          { position: { col: 9, row: 6 }, tileName: 'fake-box' },
+          { position: { col: 5, row: 6 }, tileName: 'fake-box' },
+          { position: { col: 10, row: 5 }, tileName: 'fake-box' },
+        ],
+      },
+      {
+        level: 11,
+        rounds: 5,
+        hiddens: 6,
+      },
+      {
+        level: 12,
+        rounds: 5,
+        hiddens: 6,
+        tileOverride: [
+          { position: { col: 5, row: 4 }, tileName: 'fake-box' },
+          { position: { col: 6, row: 4 }, tileName: 'fake-box' },
+        ],
+      },
     ],
     tileConfig: {
       width: 64,
@@ -313,6 +471,18 @@ export const GAME_WORLDS: Array<GameWorld> = [
       {
         name: 'Gray-Ground',
         tile: TILES.GROUND,
+        collidable: true,
+        textures: [
+          {
+            texture: SPRITE_NAME.SOKOBAN,
+            frame: '89',
+          },
+        ],
+        tileType: TileGameWorldType.TILE,
+      },
+      {
+        name: 'Gray-Ground-Path',
+        tile: TILES.GROUND_PATH,
         collidable: false,
         textures: [
           {
@@ -323,7 +493,7 @@ export const GAME_WORLDS: Array<GameWorld> = [
         tileType: TileGameWorldType.TILE,
       },
       {
-        name: 'Blue-Box',
+        name: 'fake-box',
         tile: TILES.BLUE_BOX,
         collidable: true,
         textures: [
@@ -343,10 +513,10 @@ export const GAME_WORLDS: Array<GameWorld> = [
           {
             texture: SPRITE_NAME.SOKOBAN,
             frame: '89',
-          }, 
-          { 
-            texture: 'world-2-flower-three-points' 
-          }
+          },
+          {
+            texture: 'world-2-flower-three-points',
+          },
         ],
         tileType: TileGameWorldType.TILE,
       },
@@ -354,10 +524,13 @@ export const GAME_WORLDS: Array<GameWorld> = [
         name: 'Flower-Six-Grass',
         tile: TILES.FLOWER_SIX_POINTS,
         collidable: true,
-        textures: [{
-          texture: SPRITE_NAME.SOKOBAN,
-          frame: '89',
-        }, { texture: 'world-2-flower-six-points' }],
+        textures: [
+          {
+            texture: SPRITE_NAME.SOKOBAN,
+            frame: '89',
+          },
+          { texture: 'world-2-flower-six-points' },
+        ],
         tileType: TileGameWorldType.TILE,
       },
       {
@@ -381,19 +554,46 @@ export const GAME_WORLDS: Array<GameWorld> = [
         textures: [{ texture: SPRITE_NAME.SOKOBAN, frame: '89' }],
         tileType: TileGameWorldType.TILE,
       },
+      {
+        name: 'Door-top',
+        tile: TILES.DOOR_TOP,
+        collidable: false,
+        textures: [
+          {
+            texture: SPRITE_NAME.SOKOBAN,
+            frame: '89',
+          },
+        ],
+        tileType: TileGameWorldType.TILE,
+      },
+      {
+        name: 'Door-mid',
+        tile: TILES.DOOR_MID,
+        collidable: false,
+        textures: [
+          {
+            texture: SPRITE_NAME.SOKOBAN,
+            frame: '89',
+          },
+        ],
+        tileType: TileGameWorldType.TILE,
+      },
+      {
+        name: 'Sign-exit',
+        tile: TILES.SIGN_EXIT,
+        collidable: true,
+        textures: [
+          {
+            texture: SPRITE_NAME.SOKOBAN,
+            frame: '89',
+          },
+          { texture: 'sign-exit' },
+        ],
+        tileType: TileGameWorldType.TILE,
+        angle: -20,
+      },
     ],
-    map: [
-      [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
-      [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
-      [0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
-      [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
-      [0x00, 0x00, 0x00, 0x01, 0x18, 0x18, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
-      [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
-      [0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x01, 0x18, 0x18, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
-      [0x90, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x91, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
-      [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
-      [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
-    ],
+    map: maps[1],
   },
 ]
 
@@ -446,7 +646,7 @@ export enum BUTTON {
   PAUSE = 'pause-button',
   CLOSE = 'close-button',
   CONFIG = 'config-button',
-  INFO = 'info-button'
+  INFO = 'info-button',
 }
 
 export enum BUTTON_PREFIX {
