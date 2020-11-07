@@ -15,21 +15,14 @@ export default class BackgroundParallax extends Phaser.GameObjects.TileSprite {
     this.setScale(scale).setScrollFactor(0)
 
     if (showTitle) {
-      const titleShadow = scene.add
-      .text(width * 0.5, height * 0.3, GAME_NAME, {
-        fontFamily: FONTS.ALLOY_INK,
-        fontSize: '158px',
-        color: 'black',
-      })
-      .setOrigin(0.5, 0.5)
-
-    this._title = scene.add
-      .text(width * 0.5, height * 0.3, GAME_NAME, {
-        fontFamily: FONTS.ALLOY_INK,
-        fontSize: '156px',
-        color: 'yellow',
-      })
-      .setOrigin(0.5, 0.5)
+      this._title = scene.add
+        .text(width * 0.5, height * 0.3, GAME_NAME, {
+          fontFamily: FONTS.ALLOY_INK,
+          fontSize: '156px',
+          color: 'yellow',
+        })
+        .setOrigin(0.5, 0.5)
+        .setShadow(3, 3, 'rgba(0,0,0)', 5)
     }
 
     scene.events.on('update', this.update, this)
@@ -37,12 +30,11 @@ export default class BackgroundParallax extends Phaser.GameObjects.TileSprite {
 
   update() {
     if (this.enableParallax) {
-      this.tilePositionX += 5;
+      this.tilePositionX += 5
     }
   }
-  
-  public get title() : Phaser.GameObjects.Text {
-    return this._title 
+
+  public get title(): Phaser.GameObjects.Text {
+    return this._title
   }
-  
 }
