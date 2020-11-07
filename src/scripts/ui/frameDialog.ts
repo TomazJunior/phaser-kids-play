@@ -7,8 +7,8 @@ export class FrameDialog extends Phaser.GameObjects.Sprite {
   private lineIndex = 0
   private text: Phaser.GameObjects.Text
   private group: Phaser.GameObjects.Group
-  wordDelay = 50
-  lineDelay = 100
+  wordDelay = 25
+  lineDelay = 75
   closeButton: ButtonSmall
 
   constructor(scene: Phaser.Scene, x: number, y: number, private content: Array<string>, onClose?: () => void) {

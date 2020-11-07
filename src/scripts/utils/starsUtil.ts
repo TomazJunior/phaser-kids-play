@@ -1,5 +1,5 @@
-export const calculateStars = (round: number): number => {
-  if (round === 5) {
+export const calculateStars = (round: number, totalRounds: number): number => {
+  if (round >= totalRounds) {
     return 3
   } else if (round > 3) {
     return 2

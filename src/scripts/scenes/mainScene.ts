@@ -33,7 +33,6 @@ export default class MainScene extends Phaser.Scene {
   gameover = false
   currentWorld: GameWorld
   level: Level
-  round: number
   hiddenCharOnTheirPosition = false
   scoreText: ScoreText
   backgroundAudio: Phaser.Sound.BaseSound
@@ -42,8 +41,18 @@ export default class MainScene extends Phaser.Scene {
   targetQueue: TargetQueue
   roundInProgress: boolean
   door: Door
+  _round: number
   constructor() {
     super({ key: SCENES.MAIN_SCENE })
+  }
+
+  private set round(v: number) {
+    this._round = v
+    if (this.frameLevel) this.frameLevel.round = v
+  }
+
+  private get round(): number {
+    return this._round
   }
 
   init(config: MainSceneConfig) {
@@ -93,9 +102,9 @@ export default class MainScene extends Phaser.Scene {
     this.frameLevel = new FrameLevel(
       this,
       width - 200,
-      90,
+      120,
+      this.currentWorld.name,
       this.isInTutorialMode ? 'Tutorial' : `Level ${this.level.level}`,
-      0,
       this.handleLoseFocus
     )
     this.backgroundAudio = getOrAddAudio(this, SOUNDS.BACKGROUND, { volume: 0.4, loop: true })
@@ -173,7 +182,8 @@ export default class MainScene extends Phaser.Scene {
       return
     }
     setTutorialSeen(this.currentWorld.key, this.level.level, true)
-    this.frameLevel.title = `Level ${this.level.level}`
+    this.frameLevel.levelName = this.currentWorld.name
+    this.frameLevel.levelName = `Level ${this.level.level}`
   }
 
   showFinishGameDialog = (text: string, finishedLevel: boolean, stars: number) => {
@@ -219,7 +229,7 @@ export default class MainScene extends Phaser.Scene {
         width * 0.5,
         height * 0.5,
         text,
-        this.frameLevel.starsFormated,
+        `${calculateStars(this.round, this.level.rounds)} / 3`,
         finishedLevel,
         {
           name: BUTTON.HOME,
@@ -271,7 +281,6 @@ export default class MainScene extends Phaser.Scene {
   setToGameOverState(cb: () => void) {
     this.time.delayedCall(300, () => {
       if (!this.gameover) {
-        this.round = 0
         this.gameover = true
         this.player.active = false
         this.player.visible = false
@@ -308,7 +317,6 @@ export default class MainScene extends Phaser.Scene {
     }
     this.gameMap.overrideTiles(this.level)
     this.roundInProgress = false
-    this.frameLevel.stars = calculateStars(this.round)
     // it will go to next round when reach the final position
     this.playerGotoFinalPosition()
     return Promise.resolve()
@@ -548,7 +556,7 @@ export default class MainScene extends Phaser.Scene {
       this.closeTarget(target)
       if (!this.isInTutorialMode) {
         await this.showMissedHidden()
-        const stars = calculateStars(this.round)
+        const stars = calculateStars(this.round, this.level.rounds)
         setLevel({ level: this.level.level, stars, key: this.currentWorld.key })
         this.showFinishGameDialog('Game over', false, stars)
       }

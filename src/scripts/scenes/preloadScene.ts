@@ -39,6 +39,8 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('stars-one', 'assets/img/stars-one.png')
     this.load.image('stars-two', 'assets/img/stars-two.png')
     this.load.image('stars-three', 'assets/img/stars-three.png')
+    this.load.image('round-indicator-normal', 'assets/img/round-indicator-normal.png')
+    this.load.image('round-indicator-inactive', 'assets/img/round-indicator-inactive.png')
 
     this.load.image('level-complete-dialog', 'assets/img/level-complete-dialog.png')
     this.load.image('big-frame-window', 'assets/img/big-frame-window.png')
@@ -97,7 +99,7 @@ export default class PreloadScene extends Phaser.Scene {
       // this.scene.start(SCENES.CONFIG_SCENE)
       // this.scene.start(SCENES.MAIN_SCENE, <MainSceneConfig>{
       //   gameWorld: GAME_WORLDS[0],
-      //   level: GAME_WORLDS[0].levels[1]
+      //   level: GAME_WORLDS[0].levels[0]
       // })
       // this.scene.start(SCENES.PAUSE_SCENE)
     })
