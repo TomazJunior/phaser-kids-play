@@ -22,7 +22,7 @@ export default class BackgroundParallax extends Phaser.GameObjects.TileSprite {
           color: 'yellow',
         })
         .setOrigin(0.5, 0.5)
-        .setShadow(3, 3, 'rgba(0,0,0)', 5)
+        .setStroke('#000', 10)
     }
 
     scene.events.on('update', this.update, this)

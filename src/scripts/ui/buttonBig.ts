@@ -21,10 +21,11 @@ export class ButtonBig extends ButtonSmall {
     if (config.text?.title) {
       const paddingX = config.text.padding?.x || 0
       const paddingY = config.text.padding?.y || 0
-      this.scene.add.text(x - this.width * 0.3 + paddingX, y - this.height * 0.2 + paddingY, config.text.title, {
+      this.scene.add.text(x - this.width * 0.3 + paddingX, y - this.height * 0.3 + paddingY, config.text.title, {
         fontFamily: FONTS.ALLOY_INK,
         fontSize: config.text.fontSize || '72px',
       })
+      .setStroke('#04ccff', 20)
     }
   }
 }

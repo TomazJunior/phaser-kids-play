@@ -30,9 +30,9 @@ export class FrameDialog extends Phaser.GameObjects.Sprite {
     this.group.add(background)
 
     this.text = scene.add
-      .text(this.x - this.width * 0.44, this.y - this.height * 0.44, '', { font: '32px Arial' })
+      .text(this.x - this.width * 0.44, this.y - this.height * 0.44, '', { font: '26px Arial' })
+      .setStroke('#bb956d', 10)
       .setDepth(9)
-    this.text.setShadow(3, 3, 'rgba(0,0,0)', 5)
 
     this.group.add(this.text)
 

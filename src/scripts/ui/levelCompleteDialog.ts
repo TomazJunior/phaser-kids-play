@@ -27,21 +27,24 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
         fontFamily: FONTS.ALLOY_INK,
         fontSize: '40px',
       })
+      .setStroke('#901215', 10)
       .setOrigin(0.5, 0)
 
     const middleTitle = this.scene.add
-      .text(this.x - this.displayWidth * 0.5 + 10, this.y + 10, title, {
+      .text(this.x - this.displayWidth * 0.5 + 10, this.y, title, {
         fontFamily: FONTS.ALLOY_INK,
         fontSize: '52px',
       })
+      .setStroke('#efb469', 10)
       .setOrigin(0, 0)
-      .setShadow(3, 3, 'rgba(255, 195, 131)', 5)
+      
 
     const textScore = this.scene.add
-      .text(this.x + this.displayWidth * 0.3 - 30, this.y + 10, score, {
+      .text(this.x + this.displayWidth * 0.3 - 30, this.y, score, {
         fontFamily: FONTS.ALLOY_INK,
         fontSize: '48px',
       })
+      .setStroke('#efb469', 10)
       .setOrigin(0.5, 0)
 
     const firstButton = new ButtonSmall(

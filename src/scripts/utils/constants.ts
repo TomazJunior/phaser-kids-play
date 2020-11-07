@@ -75,7 +75,7 @@ export const GAME_WORLDS: Array<GameWorld> = [
         rounds: 5,
         hiddens: 2,
         tutorial: {
-          text: ['Oh no!', 'Now it’s more than one!', 'Could you please help me', 'to find them in the correct', 'order?'],
+          text: ['Oh no!', 'Now it’s more than one!', 'Could you please help me to find', 'them in the correct order?'],
         },
       },
       { level: 3, rounds: 5, hiddens: 3 },
@@ -86,9 +86,8 @@ export const GAME_WORLDS: Array<GameWorld> = [
         hiddens: 3,
         tutorial: {
           text: [
-            'Oh... look!',
-            'They’re trying to trick us,',
-            'adding more boxes!',
+            'Oh... look! They’re trying',
+            'to trick us, adding more boxes!',
             'I\'m sure it won’t be',
             'a problem for you...',
           ],

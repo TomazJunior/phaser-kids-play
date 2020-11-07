@@ -42,6 +42,7 @@ export default class LevelScene extends Phaser.Scene {
         fontFamily: FONTS.ALLOY_INK,
         fontSize: '58px',
       })
+      .setStroke('#901215', 10)
       .setOrigin(0.5, 0)
 
     const previousWorld = getPreviousWorld(this.gameWorld)
