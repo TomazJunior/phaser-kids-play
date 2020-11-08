@@ -1,4 +1,4 @@
-import { BUTTON, FONTS } from '../utils/constants'
+import { BUTTON, FONTS, MAX_TIMER_DURATION } from '../utils/constants'
 import { ButtonSmall } from './buttonSmall'
 import RoundIndicator from './roundIndicator'
 
@@ -7,6 +7,9 @@ export class FrameLevel extends Phaser.GameObjects.Sprite {
   private levelText: Phaser.GameObjects.Text
   private rounds: Phaser.GameObjects.Group
   private _round: number = 0
+  private _timers: Array<number> = []
+
+  clockText: Phaser.GameObjects.Text
   constructor(scene: Phaser.Scene, x: number, y: number, title: string, level: string, onPause: () => void) {
     super(scene, x, y, 'small-frame-level')
     scene.add.existing(this)
@@ -43,10 +46,10 @@ export class FrameLevel extends Phaser.GameObjects.Sprite {
     }
 
     // TODO: calculate time
-    const clockText = this.scene.add
-      .text(this.x - this.displayWidth * 0.35, this.y + 20, '0:00', {
+    this.clockText = this.scene.add
+      .text(this.x - this.displayWidth * 0.36, this.y + 25, '0.00', {
         fontFamily: FONTS.ALLOY_INK,
-        fontSize: '36px',
+        fontSize: '32px',
       })
       .setStroke('#efb469', 10)
       .setOrigin(0, 0)
@@ -67,5 +70,25 @@ export class FrameLevel extends Phaser.GameObjects.Sprite {
 
   public set levelName(v: string) {
     this.levelText.text = v
+  }
+
+  public set timer(seconds: number) {
+    if (seconds >= MAX_TIMER_DURATION) {
+      this.clockText.text = '60.0'
+    } else {
+      this.clockText.text = seconds.toFixed(2)
+    }
+  }
+
+  public addTimer(ts: number) {
+    this._timers.push(ts)
+  }
+
+  public clearTimer() {
+    this._timers = []
+  }
+
+  public get timers(): Array<number> {
+    return this._timers
   }
 }

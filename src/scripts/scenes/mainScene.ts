@@ -22,6 +22,7 @@ import { TargetQueue } from '../controllers/targetQueue'
 import Door from '../objects/door'
 import { FrameDialog } from '../ui/frameDialog'
 import FingerPoint from '../objects/fingerPoint'
+import { Timer } from '../controllers/Timer'
 
 export default class MainScene extends Phaser.Scene {
   targets: Phaser.Physics.Arcade.StaticGroup
@@ -41,6 +42,7 @@ export default class MainScene extends Phaser.Scene {
   targetQueue: TargetQueue
   roundInProgress: boolean
   door: Door
+  timer: Timer
   _round: number
   constructor() {
     super({ key: SCENES.MAIN_SCENE })
@@ -127,6 +129,9 @@ export default class MainScene extends Phaser.Scene {
     // this.physics.add.collider(this.hiddenChars, this.targets, undefined, undefined, this)
 
     this.door = this.createDoor()
+    this.timer = new Timer(this, (seconds: number) => {
+      this.frameLevel.timer = seconds
+    })
   }
 
   private get isInTutorialMode(): boolean {
@@ -326,21 +331,19 @@ export default class MainScene extends Phaser.Scene {
     const { height, width } = this.scale
 
     if (this.isInTutorialMode && this.level.tutorial) {
-      let finderPointer: FingerPoint
+      let fingerPointer: FingerPoint
       if (this.level.tutorial.showPointer) {
         const { row, col } = this.level.tutorial.showPointer
         const { x, y } = this.gameMap.getTilePosition(row, col)
-        finderPointer = new FingerPoint(this, x + this.currentWorld.tileConfig.height * 0.5, y)
-        finderPointer.setVisible(true)
+        fingerPointer = new FingerPoint(this, x + this.currentWorld.tileConfig.height * 0.5, y)
+        fingerPointer.setVisible(true)
       }
       new FrameDialog(this, width * 0.5, height * 0.5, this.level.tutorial.text, () => {
-        finderPointer?.destroy()
-        this.targetQueue.clear()
-        this.targetQueue.inTutorialMode = this.isInTutorialMode
+        fingerPointer?.destroy()
+        this.startRound()
       })
     } else {
-      this.targetQueue.clear()
-      this.targetQueue.inTutorialMode = this.isInTutorialMode
+      this.startRound()
     }
   }
 
@@ -370,6 +373,7 @@ export default class MainScene extends Phaser.Scene {
       this.time.delayedCall(1000, () => {
         this.resetTargets()
         this.door.open = false
+        this.frameLevel.timer = 0
         this.createHiddenChars(this.level)
         this.player.active = true
       })
@@ -504,10 +508,19 @@ export default class MainScene extends Phaser.Scene {
   goToNextHiddenChar = () => {
     const target = this.targetQueue.dequeue()
     if (target) {
+      this.frameLevel.addTimer(this.timer.seconds)
+      this.timer.stop()
       this.player.active = true
       const pathToGo = this.gameMap.getPathTo(this.player.objectPosition, target.objectPosition, true)
       this.player.goTo(target, pathToGo)
     }
+  }
+
+  // aftre player is reqdy and all hiddens are on their targets
+  startRound() {
+    this.targetQueue.clear()
+    this.targetQueue.inTutorialMode = this.isInTutorialMode
+    this.timer.start()
   }
 
   handleHiddenCharReachedTarget = () => {
@@ -520,8 +533,7 @@ export default class MainScene extends Phaser.Scene {
           this.playerGotoInitialPosition()
         }
         if (this.player.isReady) {
-          this.targetQueue.clear()
-          this.targetQueue.inTutorialMode = this.isInTutorialMode
+          this.startRound()
         }
       })
     }

@@ -10,7 +10,7 @@ export enum SCENES {
   PAUSE_SCENE = 'PauseScene',
   PRELOAD_SCENE = 'PreloadScene',
 }
-
+export const MAX_TIMER_DURATION = 60
 export const SCORE_PER_HIDDEN_CHAR = 10
 export const GAME_NAME = 'Find them all'
 export enum TILES {
