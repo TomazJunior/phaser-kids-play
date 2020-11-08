@@ -15,7 +15,7 @@ import { ButtonSmall } from '../ui/buttonSmall'
 import { LevelCompleteDialog } from '../ui/levelCompleteDialog'
 import { getTutorialSeen, setLevel, setTutorialSeen } from '../utils/fileStorage'
 import { getOrAddAudio, playSound } from '../utils/audioUtil'
-import { getGameWorld, getLevel, isLevelExist } from '../utils/worldUtil'
+import { getGameWorld, getLevel, getNextLevel } from '../utils/worldUtil'
 import { FrameLevel } from '../ui/frameLevel'
 import { calculateStars } from '../utils/starsUtil'
 import { TargetQueue } from '../controllers/targetQueue'
@@ -162,15 +162,15 @@ export default class MainScene extends Phaser.Scene {
       },
       onRestart: () => {
         this.resumePausedScene()
-        this.restartScene(this.level)
+        this.restartScene(this.currentWorld, this.level)
       },
     })
   }
 
-  restartScene = (level: Level) => {
+  restartScene = (gameWorld: GameWorld, level: Level) => {
     this.setToGameOverState(() => {
       this.scene.restart(<MainSceneConfig>{
-        gameWorld: this.currentWorld,
+        gameWorld,
         level,
       })
     })
@@ -191,22 +191,22 @@ export default class MainScene extends Phaser.Scene {
     this.frameLevel.levelName = `Level ${this.level.level}`
   }
 
-  showFinishGameDialog = (text: string, finishedLevel: boolean, stars: number) => {
+  showFinishGameDialog = (text: string, finishedLevel: boolean) => {
     const { width, height } = this.scale
     const restartButtonConfig: ButtonConfig = {
       name: BUTTON.RESTART,
       onClick: () => {
-        this.restartScene(this.level)
+        this.restartScene(this.currentWorld, this.level)
       },
     }
     const currentLevel = { ...this.level }
-    const nextLevelExists = isLevelExist(this.currentWorld, currentLevel.level + 1)
+    const nextLevel = getNextLevel(this.currentWorld, currentLevel.level)
 
     const nextLevelButtonConfig: ButtonConfig = {
       name: BUTTON.RIGHT,
       onClick: () => {
-        if (nextLevelExists) {
-          this.restartScene(getLevel(this.currentWorld.levels, currentLevel.level + 1))
+        if (!!nextLevel) {
+          this.restartScene(nextLevel.gameWorld, getLevel(nextLevel.gameWorld.levels, nextLevel.level))
         }
       },
     }
@@ -221,8 +221,8 @@ export default class MainScene extends Phaser.Scene {
     let thirdButtonConfig: ButtonConfig
 
     if (finishedLevel) {
-      secondButtonConfig = nextLevelExists ? levelSceneButtonConfig : { ...levelSceneButtonConfig, visible: false }
-      thirdButtonConfig = nextLevelExists ? nextLevelButtonConfig : levelSceneButtonConfig
+      secondButtonConfig = !!nextLevel ? levelSceneButtonConfig : { ...levelSceneButtonConfig, visible: false }
+      thirdButtonConfig = !!nextLevel ? nextLevelButtonConfig : levelSceneButtonConfig
     } else {
       secondButtonConfig = this.round > 1 ? restartButtonConfig : levelSceneButtonConfig
       thirdButtonConfig = this.round > 1 ? nextLevelButtonConfig : restartButtonConfig
@@ -366,7 +366,7 @@ export default class MainScene extends Phaser.Scene {
       if (this.round > this.level.rounds) {
         this.backgroundAudio.stop()
         setLevel({ level: this.level.level, stars: 3, key: this.currentWorld.key })
-        this.showFinishGameDialog('You Win!', true, 3)
+        this.showFinishGameDialog('You Win!', true)
         return Promise.resolve()
       }
 
@@ -570,7 +570,7 @@ export default class MainScene extends Phaser.Scene {
         await this.showMissedHidden()
         const stars = calculateStars(this.round, this.level.rounds)
         setLevel({ level: this.level.level, stars, key: this.currentWorld.key })
-        this.showFinishGameDialog('Game over', false, stars)
+        this.showFinishGameDialog('Game over', false)
       }
       return
     }

@@ -5,6 +5,22 @@ export const isLevelExist = (gameWorld: GameWorld, level: number): boolean => {
   return !!gameWorld.levels.find((levelConfig) => level === levelConfig.level)
 }
 
+export const getNextLevel = (gameWorld: GameWorld, level: number): NextLevel | undefined => {
+  let nextLevelExists = isLevelExist(gameWorld, level + 1)
+  if (nextLevelExists) {
+    return {
+      gameWorld,
+      level: level + 1,
+    }
+  }
+  const nextWorld = getNextWorld(gameWorld)
+  if (!nextWorld) return undefined
+  return {
+    gameWorld: nextWorld,
+    level: 1,
+  }
+}
+
 export const getLevel = (levels: Array<Level>, level: number): Level => {
   const levelFound = levels.find((levelConfig) => level === levelConfig.level)
   if (!levelFound) throw new Error(`level ${level} not found`)
@@ -70,7 +86,8 @@ export const getPreviousWorld = (gameWorld: GameWorld): GameWorld | undefined =>
 export const allLevelsCompleted = (gameWorld: GameWorld): boolean => {
   const fileStorageData: FileStorageConfig = getFileStorageConfig()
 
-  return gameWorld.levels.every((level) =>
-    !!fileStorageData.levels.find((lvl) => lvl.key === gameWorld.key && lvl.level === level.level && lvl.stars >= 1)
+  return gameWorld.levels.every(
+    (level) =>
+      !!fileStorageData.levels.find((lvl) => lvl.key === gameWorld.key && lvl.level === level.level && lvl.stars >= 1)
   )
 }

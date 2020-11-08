@@ -9,6 +9,11 @@ declare interface TilePosition {
   tile?: import('../src/scripts/utils/constants').TILES
 }
 
+declare interface NextLevel {
+  gameWorld: GameWorld
+  level: number
+}
+
 declare interface ButtonConfig {
   text?: {
     title?: string
