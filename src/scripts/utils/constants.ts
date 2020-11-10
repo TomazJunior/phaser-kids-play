@@ -12,6 +12,10 @@ export enum SCENES {
 }
 export const MAX_TIMER_DURATION = 60
 export const SCORE_PER_HIDDEN_CHAR = 10
+export const BEST_TIME_BY_BOX_IN_SEC = 1
+export const MINIMUM_ROUNDS_TO_GAIN_ONE_STAR = 2
+export const MINIMUM_ROUNDS_TO_GAIN_TWO_STARS = 3
+
 export const GAME_NAME = 'Find them all'
 export enum TILES {
   GROUND = 0x00,
@@ -740,4 +744,10 @@ export enum ANIMAL_SKINS {
   WALRUS = 'walrus.png',
   WHALE = 'whale.png',
   ZEBRA = 'zebra.png',
+}
+
+export enum COLORS {
+  DARK_RED = '#901215',
+  LIGHT_GREEN = '#63d31b',
+  DARK_YELLOW = '#efb469'
 }

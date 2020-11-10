@@ -1,4 +1,4 @@
-import { BUTTON, FONTS, MAX_TIMER_DURATION } from '../utils/constants'
+import { BUTTON, COLORS, FONTS, MAX_TIMER_DURATION } from '../utils/constants'
 import { ButtonSmall } from './buttonSmall'
 import RoundIndicator from './roundIndicator'
 
@@ -19,7 +19,7 @@ export class FrameLevel extends Phaser.GameObjects.Sprite {
         fontFamily: FONTS.ALLOY_INK,
         fontSize: '28px',
       })
-      .setStroke('#901215', 10)
+      .setStroke(COLORS.DARK_RED, 10)
 
     this.levelText = this.scene.add
       .text(this.x - 25, this.worldText.y + this.worldText.displayHeight + 3, level, {
@@ -27,7 +27,7 @@ export class FrameLevel extends Phaser.GameObjects.Sprite {
         fontSize: '38px',
         color: '#ef7c7f',
       })
-      .setStroke('#901215', 10)
+      .setStroke(COLORS.DARK_RED, 10)
 
     new ButtonSmall(scene, this.x - this.displayWidth * 0.3, this.y - this.displayHeight * 0.2, {
       onClick: onPause,
@@ -45,13 +45,12 @@ export class FrameLevel extends Phaser.GameObjects.Sprite {
       offsetX += 35
     }
 
-    // TODO: calculate time
     this.clockText = this.scene.add
       .text(this.x - this.displayWidth * 0.36, this.y + 25, '0.00', {
         fontFamily: FONTS.ALLOY_INK,
         fontSize: '32px',
       })
-      .setStroke('#efb469', 10)
+      .setStroke(COLORS.DARK_YELLOW, 10)
       .setOrigin(0, 0)
   }
 
@@ -80,8 +79,8 @@ export class FrameLevel extends Phaser.GameObjects.Sprite {
     }
   }
 
-  public addTimer(ts: number) {
-    this._timers.push(ts)
+  public addTimer(seconds: number) {
+    this._timers.push(seconds)
   }
 
   public clearTimer() {

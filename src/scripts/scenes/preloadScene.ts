@@ -41,6 +41,8 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('stars-three', 'assets/img/stars-three.png')
     this.load.image('round-indicator-normal', 'assets/img/round-indicator-normal.png')
     this.load.image('round-indicator-inactive', 'assets/img/round-indicator-inactive.png')
+    this.load.image('icon-checked', 'assets/img/icon-checked.png')
+    this.load.image('icon-x', 'assets/img/icon-x.png')
 
     this.load.image('level-complete-dialog', 'assets/img/level-complete-dialog.png')
     this.load.image('big-frame-window', 'assets/img/big-frame-window.png')

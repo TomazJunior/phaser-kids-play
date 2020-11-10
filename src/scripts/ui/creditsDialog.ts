@@ -1,4 +1,4 @@
-import { BUTTON, FONTS } from '../utils/constants'
+import { BUTTON, COLORS, FONTS } from '../utils/constants'
 import { ButtonSmall } from './buttonSmall'
 
 export class InfoDialog extends Phaser.GameObjects.Sprite {
@@ -14,7 +14,7 @@ export class InfoDialog extends Phaser.GameObjects.Sprite {
         fontFamily: FONTS.ALLOY_INK,
         fontSize: '58px',
       })
-      .setStroke('#901215', 10)
+      .setStroke(COLORS.DARK_RED, 10)
       .setOrigin(0.5, 0)
 
     const closeButton = new ButtonSmall(scene, this.x + this.displayWidth * 0.48, this.y - this.displayHeight * 0.35, {
@@ -30,7 +30,7 @@ export class InfoDialog extends Phaser.GameObjects.Sprite {
         fontSize: '42px',
       })
       .setOrigin(0.5, 0)
-      .setStroke('#efb469', 10)
+      .setStroke(COLORS.DARK_YELLOW, 10)
 
     const versionText = scene.add
       .text(this.x + this.displayWidth * 0.35, this.y + this.displayHeight * 0.35, 'v.0.3', {
@@ -38,7 +38,7 @@ export class InfoDialog extends Phaser.GameObjects.Sprite {
         fontSize: '32px',
       })
       .setOrigin(0.5, 0)
-      .setStroke('#efb469', 10)
+      .setStroke(COLORS.DARK_YELLOW, 10)
 
     this.group.add(this).add(textTitle).add(closeButton).add(creditsTitle).add(versionText)
   }

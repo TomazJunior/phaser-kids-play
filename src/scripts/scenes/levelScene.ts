@@ -1,7 +1,8 @@
 import BackgroundParallax from '../ui/backgroundParallax'
 import { ButtonSmall } from '../ui/buttonSmall'
-import { BUTTON, BUTTON_PREFIX, FONTS, SCENES } from '../utils/constants'
+import { BUTTON, BUTTON_PREFIX, COLORS, FONTS, SCENES } from '../utils/constants'
 import { getFileStorageConfig } from '../utils/fileStorage'
+import { getStarImageName } from '../utils/scoresUtil'
 import { allLevelsCompleted, getGameWorld, getNextWorld, getPreviousWorld } from '../utils/worldUtil'
 
 export default class LevelScene extends Phaser.Scene {
@@ -42,7 +43,7 @@ export default class LevelScene extends Phaser.Scene {
         fontFamily: FONTS.ALLOY_INK,
         fontSize: '58px',
       })
-      .setStroke('#901215', 10)
+      .setStroke(COLORS.DARK_RED, 10)
       .setOrigin(0.5, 0)
 
     const previousWorld = getPreviousWorld(this.gameWorld)
@@ -101,22 +102,8 @@ export default class LevelScene extends Phaser.Scene {
         },
       })
 
-      //TODO: create constants
-      let stars = 'stars-zero'
-      if (levelFileData) {
-        switch (levelFileData.stars) {
-          case 3:
-            stars = 'stars-three'
-            break
-          case 2:
-            stars = 'stars-two'
-            break
-          case 1:
-            stars = 'stars-one'
-            break
-        }
-      }
-      this.add.image(button.x, button.y + button.displayHeight * 0.35, stars).setScale(0.2, 0.2)
+      const starImageName = getStarImageName(levelFileData?.stars)
+      this.add.image(button.x, button.y + button.displayHeight * 0.35, starImageName).setScale(0.2, 0.2)
     })
 
     new ButtonSmall(this, initialX - 175, initialY + 125, {

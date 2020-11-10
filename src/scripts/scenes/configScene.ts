@@ -2,7 +2,7 @@ import BackgroundParallax from '../ui/backgroundParallax'
 import { ButtonSmall } from '../ui/buttonSmall'
 import { InfoDialog } from '../ui/creditsDialog'
 import { updateSoundState } from '../utils/audioUtil'
-import { BUTTON, BUTTON_PREFIX, BUTTON_PREFIX_EXTRA, FONTS, SCENES } from '../utils/constants'
+import { BUTTON, BUTTON_PREFIX, BUTTON_PREFIX_EXTRA, COLORS, FONTS, SCENES } from '../utils/constants'
 import {
   clearTutorial,
   isBackgroundSoundEnabled,
@@ -30,7 +30,7 @@ export default class ConfigScene extends Phaser.Scene {
         fontFamily: FONTS.ALLOY_INK,
         fontSize: '58px',
       })
-      .setStroke('#901215', 10)
+      .setStroke(COLORS.DARK_RED, 10)
       .setOrigin(0.5, 0.5)
 
     this.createSoundButton(
