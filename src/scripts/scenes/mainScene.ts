@@ -253,6 +253,7 @@ export default class MainScene extends Phaser.Scene {
         this.clearHiddenChars()
         this.closeTargets()
         this.backgroundAudio.stop()
+        this.timer.stop()
       }
       cb()
     })
@@ -468,11 +469,13 @@ export default class MainScene extends Phaser.Scene {
   goToNextHiddenChar = () => {
     const target = this.targetQueue.dequeue()
     if (target) {
-      this.frameLevel.addTimer(this.timer.seconds)
       this.timer.stop()
       this.player.active = true
       const pathToGo = this.gameMap.getPathTo(this.player.objectPosition, target.objectPosition, true)
       this.player.goTo(target, pathToGo)
+    }
+    if (this.targetQueue.isEmpty) {
+      this.frameLevel.addTimer(this.timer.seconds)
     }
   }
 
