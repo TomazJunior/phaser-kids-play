@@ -2,12 +2,13 @@ import { getOrAddAudio, playSound } from '../utils/audioUtil'
 import {
   BEST_TIME_BY_BOX_IN_SEC,
   BUTTON,
+  BUTTON_PREFIX,
   COLORS,
   FONTS,
   MINIMUM_ROUNDS_TO_GAIN_ONE_STAR,
   SOUNDS,
 } from '../utils/constants'
-import { setLevel } from '../utils/fileStorage'
+import { getLevelStorage, setLevelStorage } from '../utils/fileStorage'
 import { calculateGems, calculateStars, getStarImageName } from '../utils/scoresUtil'
 import { getLevel, getNextLevel } from '../utils/worldUtil'
 import { ButtonSmall } from './buttonSmall'
@@ -17,7 +18,6 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
   private group: Phaser.Physics.Arcade.StaticGroup
   private starsImage: Phaser.GameObjects.Image
   private background: Phaser.GameObjects.Rectangle
-  private stars: number = 0
   private textGems: Phaser.GameObjects.Text
   private listOftweens: Array<Phaser.Tweens.Tween> = []
 
@@ -28,6 +28,7 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
   private readonly DELAY: number = 250
   private readonly TOTAL_DELAY: number
   private readonly BEST_TIME_IN_SECS: number
+  currentLevelStorage: LevelFileStorageConfig | undefined
 
   constructor(
     scene: Phaser.Scene,
@@ -38,8 +39,7 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
     private timers: Array<number | undefined>,
     private finishedRounds: number,
     private onRestartScene: (gameworld: GameWorld, level: Level) => void,
-    private onGoToLevelScene: () => void,
-    private onGoToMenuScene: () => void
+    private onGoToLevelScene: () => void
   ) {
     super(scene, x, y, 'level-complete-dialog')
     scene.add.existing(this)
@@ -90,74 +90,87 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
 
     this.addButtons()
 
+    //TODO: move to a method - calculate record stars
+    const recordStarTitle = this.scene.add
+      .text(this.x + this.width * 0.5 - 290, this.y + this.height * 0.5 - 295, 'last record', {
+        fontFamily: FONTS.ALLOY_INK,
+        fontSize: '26px',
+      })
+      .setStroke(COLORS.DARK_YELLOW, 10)
+
+    this.currentLevelStorage = getLevelStorage(this.level.level, this.gameworld.key)
+    const starImageName = getStarImageName(this.currentLevelStorage?.stars)
+    const recordStarImage = scene.add
+      .image(
+        recordStarTitle.x + recordStarTitle.width * 0.5,
+        recordStarTitle.y + recordStarTitle.height + 20,
+        starImageName
+      )
+      .setScale(0.2, 0.2)
+
+    setLevelStorage({ level: this.level.level, stars: this.stars, key: this.gameworld.key })
+
     this.addRoundText().then(async () => {
       await this.addStarsBasedOnRounds()
       await this.addTimerByRound()
       await this.addStarsBasedOnTimer()
-      await this.calculateGems()
+      await this.showGems()
       this.isRoundPassed(this.level.rounds) && playSound(this.scene, this.nextLevelAudio)
-      setLevel({ level: this.level.level, stars: this.stars, key: this.gameworld.key })
     })
 
-    this.group.add(this).add(textTitle).add(gemsTitle).add(this.textGems).add(this.starsImage).setDepth(20)
+    this.group
+      .add(this)
+      .add(textTitle)
+      .add(gemsTitle)
+      .add(this.textGems)
+      .add(this.starsImage)
+      .add(recordStarTitle)
+      .add(recordStarImage)
+      .setDepth(20)
   }
 
   addButtons = (): void => {
     const currentLevel = { ...this.level }
     const nextLevel = getNextLevel(this.gameworld, currentLevel.level)
+    const ableToGoNextLevel = this.finishedRounds >= MINIMUM_ROUNDS_TO_GAIN_ONE_STAR && !!nextLevel
 
-    const menuButtonConfig: ButtonConfig = {
-      name: BUTTON.HOME,
-      onClick: this.onGoToMenuScene,
-    }
     const restartButtonConfig: ButtonConfig = {
       name: BUTTON.RESTART,
       onClick: () => this.onRestartScene(this.gameworld, this.level),
     }
     const nextLevelButtonConfig: ButtonConfig = {
       name: BUTTON.RIGHT,
+      prefix: ableToGoNextLevel ? BUTTON_PREFIX.NORMAL : BUTTON_PREFIX.BLOCKED,
       onClick: () => {
-        if (!!nextLevel) {
+        if (ableToGoNextLevel && nextLevel) {
           this.onRestartScene(nextLevel.gameWorld, getLevel(nextLevel.gameWorld.levels, nextLevel.level))
         }
       },
     }
+
     const levelSceneButtonConfig: ButtonConfig = {
       name: BUTTON.LEVEL,
       onClick: this.onGoToLevelScene,
     }
 
-    let secondButtonConfig: ButtonConfig
-    let thirdButtonConfig: ButtonConfig
-    const finishedLevel = this.isRoundPassed(this.level.rounds)
-    if (finishedLevel) {
-      secondButtonConfig = !!nextLevel ? levelSceneButtonConfig : { ...levelSceneButtonConfig, visible: false }
-      thirdButtonConfig = !!nextLevel ? nextLevelButtonConfig : levelSceneButtonConfig
-    } else {
-      secondButtonConfig =
-        this.finishedRounds >= MINIMUM_ROUNDS_TO_GAIN_ONE_STAR ? restartButtonConfig : levelSceneButtonConfig
-      thirdButtonConfig =
-        this.finishedRounds >= MINIMUM_ROUNDS_TO_GAIN_ONE_STAR ? nextLevelButtonConfig : restartButtonConfig
-    }
-
     const buttonY = this.y + this.height * 0.5 - 70
-    const firstButton = new ButtonSmall(
+    const levelSceneButton = new ButtonSmall(
       this.scene,
       this.x - this.displayWidth * 0.4 + 40,
       buttonY,
-      menuButtonConfig
+      levelSceneButtonConfig
     ).setOrigin(0, 0)
 
-    const secondButton = new ButtonSmall(this.scene, this.x - 50, buttonY, secondButtonConfig).setOrigin(0, 0)
+    const restartSceneButton = new ButtonSmall(this.scene, this.x - 50, buttonY, restartButtonConfig).setOrigin(0, 0)
 
-    const thridButton = new ButtonSmall(
+    const nextLevelButton = new ButtonSmall(
       this.scene,
       this.x + this.displayWidth * 0.2,
       buttonY,
-      thirdButtonConfig
+      nextLevelButtonConfig
     ).setOrigin(0, 0)
 
-    this.group.add(firstButton).add(secondButton).add(thridButton).setDepth(20)
+    this.group.add(levelSceneButton).add(restartSceneButton).add(nextLevelButton).setDepth(20)
   }
 
   addRoundText = async (): Promise<void> => {
@@ -234,7 +247,6 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
   }
 
   addStarsBasedOnRounds = async (): Promise<void> => {
-    this.stars = calculateStars(this.finishedRounds)
     console.log('stars', this.stars)
     const starImageName = getStarImageName(this.stars)
     this.starsImage.setTexture(starImageName)
@@ -245,39 +257,29 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
 
   addStarsBasedOnTimer = async (): Promise<void> => {
     // do not add the third star if the rounds was not perfect
-    if (this.stars !== 2) return
+    if (this.stars !== 3) return
 
-    const beatTheBestTime = this.timers.every(
-      (timerInSeconds: number | undefined, index: number) =>
-        this.isRoundPassed(index) && this.isBeatTheBestTime(timerInSeconds)
-    )
-
-    if (beatTheBestTime) {
-      this.starsImage.setTexture('stars-three')
-      this.stars++
-    }
+    this.starsImage.setTexture('stars-three')
 
     // TODO: add animation / sound
     return Promise.resolve()
   }
 
-  calculateGems = async (): Promise<void> => {
+  showGems = async (): Promise<void> => {
     return new Promise((resolve, reject) => {
       // TODO: check if it is the first time
       const firstTime = true
-
-      let gems = calculateGems(this.stars, firstTime)
       let duration = 1000
 
       const tween = this.scene.tweens.addCounter({
         from: 0,
-        to: gems,
+        to: this.gems,
         duration,
         onUpdate: (tween: Phaser.Tweens.Tween, { value }: any) => {
           this.textGems.text = Math.trunc(value).toFixed(0)
         },
         onComplete: () => {
-          this.textGems.text = gems.toString()
+          this.textGems.text = this.gems.toString()
           resolve()
         },
       })
@@ -294,6 +296,22 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
     let scale = Math.max(scaleX, scaleY)
     this.background.setScale(scale).setScrollFactor(0)
     this.background.setDepth(18)
+  }
+
+  private get stars(): number {
+    let value = calculateStars(this.finishedRounds)
+    const beatTheBestTime = this.timers.every(
+      (timerInSeconds: number | undefined, index: number) =>
+        this.isRoundPassed(index) && this.isBeatTheBestTime(timerInSeconds)
+    )
+    if (value === 2 && beatTheBestTime) {
+      value++
+    }
+    return value
+  }
+
+  private get gems(): number {
+    return calculateGems(this.stars, this.currentLevelStorage)
   }
 
   private isRoundPassed = (currentRound: number) => {

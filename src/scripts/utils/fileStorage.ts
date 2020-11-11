@@ -8,6 +8,7 @@ const initialFileStorageConfig: FileStorageConfig = {
       key: '1',
       level: 1,
       stars: 0,
+      attempts: 0,
     },
   ],
 }
@@ -85,15 +86,22 @@ export const isBackgroundSoundEnabled = (): boolean => {
   return getFileStorageConfig().backgroudSound
 }
 
-export const setLevel = (level: LevelFileStorageConfig) => {
+export const getLevelStorage = (level: number, key: string): LevelFileStorageConfig | undefined => {
   const { levels } = getFileStorageConfig()
-  const currentLevel = levels.find((item) => item.level === level.level && item.key === level.key)
-  if (!currentLevel || level.stars > currentLevel.stars) {
-    setFileStorageConfig({
-      ...getFileStorageConfig(),
-      levels: [...levels.filter((item) => !(item.key === level.key && item.level === level.level)), level],
-    })
-  }
+  const levelFound = levels.find((item) => item.level === level && item.key === key)
+  return levelFound ? { ...levelFound } : undefined
+}
+
+export const setLevelStorage = (data: LevelFileStorageConfig) => {
+  const { levels } = getFileStorageConfig()
+  const currentLevel = levels.find((item) => item.level === data.level && item.key === data.key)
+  const maxStars = Math.max(data.stars, currentLevel?.stars || 0)
+  const level: LevelFileStorageConfig = {...data, attempts: (currentLevel?.attempts || 0) + 1, stars: maxStars}
+
+  setFileStorageConfig({
+    ...getFileStorageConfig(),
+    levels: [...levels.filter((item) => !(item.key === level.key && item.level === level.level)), level],
+  })
 }
 
 const setFileStorageConfig = (fileStorage: FileStorageConfig) => {

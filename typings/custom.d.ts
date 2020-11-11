@@ -45,7 +45,8 @@ declare interface FileStorageConfig {
 declare interface LevelFileStorageConfig {
   key: string
   level: number
-  stars: number
+  stars: number,
+  attempts?: number
 }
 
 declare interface TutorialFileStorageConfig {

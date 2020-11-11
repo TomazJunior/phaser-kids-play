@@ -15,6 +15,11 @@ export const SCORE_PER_HIDDEN_CHAR = 10
 export const BEST_TIME_BY_BOX_IN_SEC = 1
 export const MINIMUM_ROUNDS_TO_GAIN_ONE_STAR = 2
 export const MINIMUM_ROUNDS_TO_GAIN_TWO_STARS = 3
+export const SCORE_BY_STAR = {
+  1: 5,
+  2: 10,
+  3: 15,
+}
 
 export const GAME_NAME = 'Find them all'
 export enum TILES {
@@ -92,10 +97,10 @@ export const GAME_WORLDS: Array<GameWorld> = [
           text: [
             'Oh... look! They’re trying',
             'to trick us, adding more boxes!',
-            'I\'m sure it won’t be',
+            'I\'m sure it won\'t be',
             'a problem for you...',
           ],
-          showPointer: { col: 7, row: 1 }
+          showPointer: { col: 7, row: 1 },
         },
         tileOverride: [{ position: { col: 7, row: 1 }, tileName: 'fake-box' }],
       },
@@ -749,5 +754,5 @@ export enum ANIMAL_SKINS {
 export enum COLORS {
   DARK_RED = '#901215',
   LIGHT_GREEN = '#63d31b',
-  DARK_YELLOW = '#efb469'
+  DARK_YELLOW = '#efb469',
 }

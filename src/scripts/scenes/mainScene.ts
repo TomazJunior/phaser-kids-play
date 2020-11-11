@@ -202,8 +202,7 @@ export default class MainScene extends Phaser.Scene {
         this.frameLevel.timers,
         this.round - 1,
         this.restartScene,
-        this.goToLevelScene,
-        this.goToMenuScene
+        this.goToLevelScene
       )
     })
   }
@@ -238,14 +237,14 @@ export default class MainScene extends Phaser.Scene {
     })
   }
 
-  goToLevelScene() {
+  goToLevelScene = () => {
     this.setToGameOverState(() => {
       this.backgroundAudio.stop()
       this.scene.start(SCENES.LEVEL_SCENE)
     })
   }
 
-  setToGameOverState(cb: () => void) {
+  setToGameOverState = (cb: () => void) => {
     this.time.delayedCall(300, () => {
       if (!this.gameover) {
         this.gameover = true
