@@ -1,7 +1,15 @@
 import { getOrAddAudio, playSound } from '../utils/audioUtil'
-import { BEST_TIME_BY_BOX_IN_SEC, COLORS, FONTS, MINIMUM_ROUNDS_TO_GAIN_ONE_STAR, SOUNDS } from '../utils/constants'
+import {
+  BEST_TIME_BY_BOX_IN_SEC,
+  BUTTON,
+  COLORS,
+  FONTS,
+  MINIMUM_ROUNDS_TO_GAIN_ONE_STAR,
+  SOUNDS,
+} from '../utils/constants'
 import { setLevel } from '../utils/fileStorage'
 import { calculateGems, calculateStars, getStarImageName } from '../utils/scoresUtil'
+import { getLevel, getNextLevel } from '../utils/worldUtil'
 import { ButtonSmall } from './buttonSmall'
 
 export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
@@ -29,10 +37,9 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
     private level: Level,
     private timers: Array<number | undefined>,
     private finishedRounds: number,
-    shouldPlaySound: boolean,
-    firstButtonConfig: ButtonConfig,
-    secondButtonConfig: ButtonConfig,
-    thirdButtonConfig: ButtonConfig
+    private onRestartScene: (gameworld: GameWorld, level: Level) => void,
+    private onGoToLevelScene: () => void,
+    private onGoToMenuScene: () => void
   ) {
     super(scene, x, y, 'level-complete-dialog')
     scene.add.existing(this)
@@ -79,43 +86,78 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
       .setStroke(COLORS.DARK_YELLOW, 10)
       .setOrigin(0.5, 0)
 
-    const buttonY = this.y + this.height * 0.5 - 70
-    const firstButton = new ButtonSmall(
-      scene,
-      this.x - this.displayWidth * 0.4 + 40,
-      buttonY,
-      firstButtonConfig
-    ).setOrigin(0, 0)
-
-    const secondButton = new ButtonSmall(scene, this.x - 50, buttonY, secondButtonConfig).setOrigin(0, 0)
-
-    const thridButton = new ButtonSmall(scene, this.x + this.displayWidth * 0.2, buttonY, thirdButtonConfig).setOrigin(
-      0,
-      0
-    )
-
-    shouldPlaySound && playSound(this.scene, this.nextLevelAudio)
-
     this.createBackground()
+
+    this.addButtons()
 
     this.addRoundText().then(async () => {
       await this.addStarsBasedOnRounds()
       await this.addTimerByRound()
       await this.addStarsBasedOnTimer()
       await this.calculateGems()
+      this.isRoundPassed(this.level.rounds) && playSound(this.scene, this.nextLevelAudio)
       setLevel({ level: this.level.level, stars: this.stars, key: this.gameworld.key })
     })
 
-    this.group
-      .add(this)
-      .add(textTitle)
-      .add(gemsTitle)
-      .add(firstButton)
-      .add(secondButton)
-      .add(thridButton)
-      .add(this.textGems)
-      .add(this.starsImage)
-      .setDepth(20)
+    this.group.add(this).add(textTitle).add(gemsTitle).add(this.textGems).add(this.starsImage).setDepth(20)
+  }
+
+  addButtons = (): void => {
+    const currentLevel = { ...this.level }
+    const nextLevel = getNextLevel(this.gameworld, currentLevel.level)
+
+    const menuButtonConfig: ButtonConfig = {
+      name: BUTTON.HOME,
+      onClick: this.onGoToMenuScene,
+    }
+    const restartButtonConfig: ButtonConfig = {
+      name: BUTTON.RESTART,
+      onClick: () => this.onRestartScene(this.gameworld, this.level),
+    }
+    const nextLevelButtonConfig: ButtonConfig = {
+      name: BUTTON.RIGHT,
+      onClick: () => {
+        if (!!nextLevel) {
+          this.onRestartScene(nextLevel.gameWorld, getLevel(nextLevel.gameWorld.levels, nextLevel.level))
+        }
+      },
+    }
+    const levelSceneButtonConfig: ButtonConfig = {
+      name: BUTTON.LEVEL,
+      onClick: this.onGoToLevelScene,
+    }
+
+    let secondButtonConfig: ButtonConfig
+    let thirdButtonConfig: ButtonConfig
+    const finishedLevel = this.isRoundPassed(this.level.rounds)
+    if (finishedLevel) {
+      secondButtonConfig = !!nextLevel ? levelSceneButtonConfig : { ...levelSceneButtonConfig, visible: false }
+      thirdButtonConfig = !!nextLevel ? nextLevelButtonConfig : levelSceneButtonConfig
+    } else {
+      secondButtonConfig =
+        this.finishedRounds >= MINIMUM_ROUNDS_TO_GAIN_ONE_STAR ? restartButtonConfig : levelSceneButtonConfig
+      thirdButtonConfig =
+        this.finishedRounds >= MINIMUM_ROUNDS_TO_GAIN_ONE_STAR ? nextLevelButtonConfig : restartButtonConfig
+    }
+
+    const buttonY = this.y + this.height * 0.5 - 70
+    const firstButton = new ButtonSmall(
+      this.scene,
+      this.x - this.displayWidth * 0.4 + 40,
+      buttonY,
+      menuButtonConfig
+    ).setOrigin(0, 0)
+
+    const secondButton = new ButtonSmall(this.scene, this.x - 50, buttonY, secondButtonConfig).setOrigin(0, 0)
+
+    const thridButton = new ButtonSmall(
+      this.scene,
+      this.x + this.displayWidth * 0.2,
+      buttonY,
+      thirdButtonConfig
+    ).setOrigin(0, 0)
+
+    this.group.add(firstButton).add(secondButton).add(thridButton).setDepth(20)
   }
 
   addRoundText = async (): Promise<void> => {

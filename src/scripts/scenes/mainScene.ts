@@ -7,7 +7,7 @@ import {
   PLAYER_REACHED_INITIAL_POS,
 } from '../events/events'
 import { getAllSkins, getARandomSkinFrom } from '../utils/skinUtils'
-import { ANIMAL_SKINS, BUTTON, SOUNDS, SCENES, MINIMUM_ROUNDS_TO_GAIN_ONE_STAR } from '../utils/constants'
+import { ANIMAL_SKINS, BUTTON, SOUNDS, SCENES } from '../utils/constants'
 import HiddenThumbChars from '../objects/hiddenThumbChars'
 import ScoreText from '../ui/scoreText'
 import { GameMap } from '../controllers/gameMap'
@@ -15,7 +15,7 @@ import { ButtonSmall } from '../ui/buttonSmall'
 import { LevelCompleteDialog } from '../ui/levelCompleteDialog'
 import { getTutorialSeen, setTutorialSeen } from '../utils/fileStorage'
 import { getOrAddAudio, playSound } from '../utils/audioUtil'
-import { getGameWorld, getLevel, getNextLevel } from '../utils/worldUtil'
+import { getGameWorld, getLevel } from '../utils/worldUtil'
 import { FrameLevel } from '../ui/frameLevel'
 import { TargetQueue } from '../controllers/targetQueue'
 import Door from '../objects/door'
@@ -190,43 +190,8 @@ export default class MainScene extends Phaser.Scene {
     this.frameLevel.levelName = `Level ${this.level.level}`
   }
 
-  showFinishGameDialog = (finishedLevel: boolean) => {
+  showFinishGameDialog = () => {
     const { width, height } = this.scale
-    const restartButtonConfig: ButtonConfig = {
-      name: BUTTON.RESTART,
-      onClick: () => {
-        this.restartScene(this.currentWorld, this.level)
-      },
-    }
-    const currentLevel = { ...this.level }
-    const nextLevel = getNextLevel(this.currentWorld, currentLevel.level)
-
-    const nextLevelButtonConfig: ButtonConfig = {
-      name: BUTTON.RIGHT,
-      onClick: () => {
-        if (!!nextLevel) {
-          this.restartScene(nextLevel.gameWorld, getLevel(nextLevel.gameWorld.levels, nextLevel.level))
-        }
-      },
-    }
-    const levelSceneButtonConfig: ButtonConfig = {
-      name: BUTTON.LEVEL,
-      onClick: () => {
-        this.goToLevelScene()
-      },
-    }
-
-    let secondButtonConfig: ButtonConfig
-    let thirdButtonConfig: ButtonConfig
-
-    if (finishedLevel) {
-      secondButtonConfig = !!nextLevel ? levelSceneButtonConfig : { ...levelSceneButtonConfig, visible: false }
-      thirdButtonConfig = !!nextLevel ? nextLevelButtonConfig : levelSceneButtonConfig
-    } else {
-      secondButtonConfig = this.round > MINIMUM_ROUNDS_TO_GAIN_ONE_STAR ? restartButtonConfig : levelSceneButtonConfig
-      thirdButtonConfig = this.round > MINIMUM_ROUNDS_TO_GAIN_ONE_STAR ? nextLevelButtonConfig : restartButtonConfig
-    }
-
     this.setToGameOverState(() => {
       new LevelCompleteDialog(
         this,
@@ -236,13 +201,9 @@ export default class MainScene extends Phaser.Scene {
         this.level,
         this.frameLevel.timers,
         this.round - 1,
-        finishedLevel,
-        {
-          name: BUTTON.HOME,
-          onClick: this.goToMenuScene,
-        },
-        secondButtonConfig,
-        thirdButtonConfig
+        this.restartScene,
+        this.goToLevelScene,
+        this.goToMenuScene
       )
     })
   }
@@ -366,7 +327,7 @@ export default class MainScene extends Phaser.Scene {
       ++this.round
       if (this.round > this.level.rounds) {
         this.backgroundAudio.stop()
-        this.showFinishGameDialog(true)
+        this.showFinishGameDialog()
         return Promise.resolve()
       }
 
@@ -568,7 +529,7 @@ export default class MainScene extends Phaser.Scene {
       this.closeTarget(target)
       if (!this.isInTutorialMode) {
         await this.showMissedHidden()
-        this.showFinishGameDialog(false)
+        this.showFinishGameDialog()
       }
       return
     }
