@@ -1,6 +1,6 @@
 import { PLAYER_TOUCHED_TARGET } from '../events/events'
 import { getOrAddAudio, playSound } from '../utils/audioUtil'
-import { ANIMAL_SKINS, FONTS, IMAGE_NAME, SOUNDS, SPRITE_NAME } from '../utils/constants'
+import { ANIMAL_SKINS, FONTS, OBJECT_DEPTHS, SOUNDS, SPRITE_NAME } from '../utils/constants'
 import FingerPoint from './fingerPoint'
 
 export default abstract class Target extends Phaser.Physics.Arcade.Sprite implements TargetInterface {
@@ -30,7 +30,8 @@ export default abstract class Target extends Phaser.Physics.Arcade.Sprite implem
     super(scene, objectPosition.x, objectPosition.y, texture, frame)
     scene.add.existing(this)
     container.add(this)
-
+    this.setDepth(OBJECT_DEPTHS.TARGET)
+    
     if (tileGameWorld?.angle) {
       this.setAngle(tileGameWorld?.angle)
     }
@@ -127,5 +128,7 @@ export default abstract class Target extends Phaser.Physics.Arcade.Sprite implem
       })
       .setVisible(false)
       .setOrigin(0.5, 0)
+      .setDepth(OBJECT_DEPTHS.TARGET_QUEUE_POSITION)  
+      
   }
 }

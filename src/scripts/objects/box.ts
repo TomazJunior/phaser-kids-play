@@ -1,5 +1,5 @@
 import { playSound } from '../utils/audioUtil'
-import { ANIMAL_SKINS } from '../utils/constants'
+import { ANIMAL_SKINS, OBJECT_DEPTHS } from '../utils/constants'
 import Target from './target'
 
 export class Box extends Target {
@@ -25,6 +25,7 @@ export class Box extends Target {
       .setTint(0x000000)
       .setAlpha(0.6)
       .setVisible(false)
+      .setDepth(OBJECT_DEPTHS.TARGET_SHADOW)
   }
 
   public close() {

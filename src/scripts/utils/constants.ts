@@ -23,11 +23,14 @@ export const SCORE_BY_STAR = {
 
 export enum OBJECT_DEPTHS {
   MAP = 0,
-  HIDDEN_CHAR = 1,
-  HIDDEN_THUMB_CHAR = 5,
-  BACKGROUND = 10,
-  FRAME_DIALOG = 15,
-  PLAYER = 20
+  TARGET = 1,
+  TARGET_SHADOW = 2,
+  TARGET_QUEUE_POSITION = 3,
+  HIDDEN_CHAR = 5,
+  HIDDEN_THUMB_CHAR = 10,
+  BACKGROUND = 15,
+  FRAME_DIALOG = 20,
+  PLAYER = 25
 }
 
 export const GAME_NAME = 'Find them all'
