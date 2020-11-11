@@ -1,6 +1,6 @@
 import { PLAYER_CHAR_REACHED_TARGET, PLAYER_TOUCHED_TARGET } from '../events/events'
 import { deepCopy } from '../utils/arrayUtil'
-import { TILES } from '../utils/constants'
+import { OBJECT_DEPTHS, TILES } from '../utils/constants'
 import { findPath, findNeighbors } from '../utils/findPath'
 import {
   getCollidableTiles,
@@ -297,7 +297,7 @@ export class GameMap {
       frame
     )
     image.setScale(scale, scale)
-
+    image.setDepth(OBJECT_DEPTHS.MAP)
     if (angle) {
       image.setAngle(angle)
     }

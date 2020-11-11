@@ -4,7 +4,7 @@ import {
   HIDDEN_CHAR_REACHED_TARGET,
 } from '../events/events'
 import { getOrAddAudio, playSound } from '../utils/audioUtil'
-import { ANIMAL_SKINS, SOUNDS, SPRITE_NAME, TILES } from '../utils/constants'
+import { ANIMAL_SKINS, OBJECT_DEPTHS, SOUNDS, SPRITE_NAME, TILES } from '../utils/constants'
 import { GameMap } from '../controllers/gameMap'
 import Door from './door'
 
@@ -39,6 +39,7 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
     this.setCollideWorldBounds(true)
     this.pathToGo = []
     this.speed = 300
+    this.setDepth(OBJECT_DEPTHS.HIDDEN_CHAR)
     this.enterOnTargetAudio = getOrAddAudio(scene, SOUNDS.ENTER_THE_BOX)
     this.enterOnDoorAudio = getOrAddAudio(scene, SOUNDS.ENTER_THE_DOOR)
     scene.events.on('update', this.update, this)

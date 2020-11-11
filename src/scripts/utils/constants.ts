@@ -21,6 +21,15 @@ export const SCORE_BY_STAR = {
   3: 15,
 }
 
+export enum OBJECT_DEPTHS {
+  MAP = 0,
+  HIDDEN_CHAR = 1,
+  HIDDEN_THUMB_CHAR = 5,
+  BACKGROUND = 10,
+  FRAME_DIALOG = 15,
+  PLAYER = 20
+}
+
 export const GAME_NAME = 'Find them all'
 export enum TILES {
   GROUND = 0x00,

@@ -6,6 +6,7 @@ import {
   COLORS,
   FONTS,
   MINIMUM_ROUNDS_TO_GAIN_ONE_STAR,
+  OBJECT_DEPTHS,
   SOUNDS,
 } from '../utils/constants'
 import { getLevelStorage, setLevelStorage } from '../utils/fileStorage'
@@ -122,7 +123,7 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
       .add(this.starsImage)
       .add(recordStarTitle)
       .add(recordStarText)
-      .setDepth(20)
+      .setDepth(OBJECT_DEPTHS.FRAME_DIALOG)
   }
 
   addButtons = (): void => {
@@ -166,7 +167,7 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
       nextLevelButtonConfig
     ).setOrigin(0, 0)
 
-    this.group.add(levelSceneButton).add(restartSceneButton).add(nextLevelButton).setDepth(20)
+    this.group.add(levelSceneButton).add(restartSceneButton).add(nextLevelButton).setDepth(OBJECT_DEPTHS.FRAME_DIALOG)
   }
 
   addRoundText = async (): Promise<void> => {
@@ -187,7 +188,7 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
             .image(text.x + text.width, y, this.isRoundPassed(index) ? 'icon-checked' : 'icon-x')
             .setScale(0.5, 0.5)
             .setOrigin(0, 0)
-          this.group.add(text).add(imgChecker).setDepth(20)
+          this.group.add(text).add(imgChecker).setDepth(OBJECT_DEPTHS.FRAME_DIALOG)
           resolve()
         })
       })
@@ -208,7 +209,7 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
           fontFamily: FONTS.ALLOY_INK,
           fontSize: '24px',
         })
-        this.group.add(timerText).setDepth(20)
+        this.group.add(timerText).setDepth(OBJECT_DEPTHS.FRAME_DIALOG)
         if (timerInSeconds) {
           const tween = this.scene.tweens.addCounter({
             from: 0,
@@ -308,7 +309,7 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
       )
       .setStroke(COLORS.DARK_YELLOW, 10)
       .setOrigin(0.5, 1)
-    this.group.add(tryAgainTitle).setDepth(20)
+    this.group.add(tryAgainTitle).setDepth(OBJECT_DEPTHS.FRAME_DIALOG)
 
     const tween = this.scene.tweens.add({
       targets: tryAgainTitle,
@@ -331,7 +332,7 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
     let scaleY = height / this.background.height
     let scale = Math.max(scaleX, scaleY)
     this.background.setScale(scale).setScrollFactor(0)
-    this.background.setDepth(18)
+    this.background.setDepth(OBJECT_DEPTHS.BACKGROUND)
   }
 
   private get stars(): number {

@@ -1,4 +1,4 @@
-import { BUTTON, BUTTON_PREFIX } from '../utils/constants'
+import { BUTTON, BUTTON_PREFIX, OBJECT_DEPTHS } from '../utils/constants'
 import { ButtonSmall } from './buttonSmall'
 
 export class FrameDialog extends Phaser.GameObjects.Sprite {
@@ -18,7 +18,7 @@ export class FrameDialog extends Phaser.GameObjects.Sprite {
     this.group.add(this)
     scene.add.existing(this)
 
-    this.setDepth(9)
+    this.setDepth(OBJECT_DEPTHS.FRAME_DIALOG)
     const { width, height } = scene.scale
     const background = scene.add.rectangle(width * 0.5, height * 0.5, 500, 500, 0x00000).setInteractive()
     background.setAlpha(0.5)
@@ -26,13 +26,13 @@ export class FrameDialog extends Phaser.GameObjects.Sprite {
     let scaleY = height / background.height
     let scale = Math.max(scaleX, scaleY)
     background.setScale(scale).setScrollFactor(0)
-    background.setDepth(8)
+    background.setDepth(OBJECT_DEPTHS.BACKGROUND)
     this.group.add(background)
 
     this.text = scene.add
       .text(this.x - this.width * 0.44, this.y - this.height * 0.44, '', { font: '26px Arial' })
       .setStroke('#bb956d', 10)
-      .setDepth(9)
+      .setDepth(OBJECT_DEPTHS.FRAME_DIALOG)
 
     this.group.add(this.text)
 
@@ -47,7 +47,7 @@ export class FrameDialog extends Phaser.GameObjects.Sprite {
         if (onClose) onClose()
         this.group.destroy(true)
       },
-    }).setDepth(9)
+    }).setDepth(OBJECT_DEPTHS.FRAME_DIALOG)
 
     this.group.add(this.closeButton)
 

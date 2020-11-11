@@ -1,5 +1,5 @@
 import { PLAYER_CHAR_REACHED_TARGET, PLAYER_REACHED_FINAL_POS, PLAYER_REACHED_INITIAL_POS } from '../events/events'
-import { PLAYER, SOUNDS, TILES } from '../utils/constants'
+import { OBJECT_DEPTHS, PLAYER, SOUNDS, TILES } from '../utils/constants'
 import { getOrAddAudio, playSound } from '../utils/audioUtil'
 import HiddenChar from './hiddenChar'
 import { GameMap } from '../controllers/gameMap'
@@ -35,7 +35,7 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
     this.gameMap = gameMap
     this.objectPosition = objectPosition
     scene.physics.add.existing(this)
-    this.setDepth(10)
+    this.setDepth(OBJECT_DEPTHS.PLAYER)
     this.setCollideWorldBounds(true)
     this.active = false
     this.createAnimations()
