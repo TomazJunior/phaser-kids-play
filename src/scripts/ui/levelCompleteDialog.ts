@@ -20,6 +20,8 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
   private background: Phaser.GameObjects.Rectangle
   private textGems: Phaser.GameObjects.Text
   private listOftweens: Array<Phaser.Tweens.Tween> = []
+  private currentLevelStorage: LevelFileStorageConfig | undefined
+  private _forceCompleteTweens: boolean
 
   private readonly FIRST_COLUMN_X: number
   private readonly SECOND_COLUMN_X: number
@@ -28,7 +30,6 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
   private readonly DELAY: number = 250
   private readonly TOTAL_DELAY: number
   private readonly BEST_TIME_IN_SECS: number
-  currentLevelStorage: LevelFileStorageConfig | undefined
 
   constructor(
     scene: Phaser.Scene,
@@ -43,11 +44,7 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
   ) {
     super(scene, x, y, 'level-complete-dialog')
     scene.add.existing(this)
-    this.setInteractive().on('pointerdown', (pointer, localX, localY, event) => {
-      this.listOftweens.forEach((tween) => {
-        tween.isPlaying() && tween.complete()
-      })
-    })
+    this.setInteractive().on('pointerdown', () => (this.forceCompleteTweens = true))
 
     // set default positions
     this.FIRST_COLUMN_X = this.x - this.width * 0.5 + 80
@@ -69,12 +66,12 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
       })
       .setStroke(COLORS.DARK_RED, 10)
 
-    this.starsImage = this.scene.add.image(this.x, this.y - 80, 'stars-zero').setScale(0.7, 0.7)
+    this.starsImage = this.scene.add.image(this.x, this.y - 100, 'stars-zero').setScale(0.5, 0.5)
 
     const gemsTitle = this.scene.add
-      .text(this.x + this.width * 0.5 - 290, this.y + this.height * 0.5 - 210, 'gems', {
+      .text(this.x + this.width * 0.5 - 290, this.y + 105, 'gems', {
         fontFamily: FONTS.ALLOY_INK,
-        fontSize: '42px',
+        fontSize: '32px',
       })
       .setStroke(COLORS.DARK_YELLOW, 10)
 
@@ -90,23 +87,7 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
 
     this.addButtons()
 
-    //TODO: move to a method - calculate record stars
-    const recordStarTitle = this.scene.add
-      .text(this.x + this.width * 0.5 - 290, this.y + this.height * 0.5 - 295, 'last record', {
-        fontFamily: FONTS.ALLOY_INK,
-        fontSize: '26px',
-      })
-      .setStroke(COLORS.DARK_YELLOW, 10)
-
     this.currentLevelStorage = getLevelStorage(this.level.level, this.gameworld.key)
-    const starImageName = getStarImageName(this.currentLevelStorage?.stars)
-    const recordStarImage = scene.add
-      .image(
-        recordStarTitle.x + recordStarTitle.width * 0.5,
-        recordStarTitle.y + recordStarTitle.height + 20,
-        starImageName
-      )
-      .setScale(0.2, 0.2)
 
     setLevelStorage({ level: this.level.level, stars: this.stars, key: this.gameworld.key })
 
@@ -116,7 +97,22 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
       await this.addStarsBasedOnTimer()
       await this.showGems()
       this.isRoundPassed(this.level.rounds) && playSound(this.scene, this.nextLevelAudio)
+      if (this.currentLevelStorage?.stars !== 3 && this.stars !== 3) this.showTryAgainMessage()
     })
+
+    const recordStarTitle = this.scene.add
+      .text(gemsTitle.x, this.y - 5, 'record', {
+        fontFamily: FONTS.ALLOY_INK,
+        fontSize: '32px',
+      })
+      .setStroke(COLORS.DARK_YELLOW, 10)
+
+    const recordStarText = this.scene.add
+      .text(this.textGems.x - 15, recordStarTitle.y + 45, `${this.currentLevelStorage?.stars || 0} / 3`, {
+        fontFamily: FONTS.ALLOY_INK,
+        fontSize: '48px',
+      })
+      .setStroke(COLORS.DARK_YELLOW, 10)
 
     this.group
       .add(this)
@@ -125,7 +121,7 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
       .add(this.textGems)
       .add(this.starsImage)
       .add(recordStarTitle)
-      .add(recordStarImage)
+      .add(recordStarText)
       .setDepth(20)
   }
 
@@ -174,9 +170,10 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
   }
 
   addRoundText = async (): Promise<void> => {
-    return new Promise((resolve) => {
-      for (let index = 0; index < this.level.rounds; index++) {
-        this.scene.time.delayedCall(this.DELAY * index, () => {
+    const updateRoundText = async (index) => {
+      return new Promise((resolve) => {
+        const delay = this.forceCompleteTweens ? 0 : this.DELAY
+        this.scene.time.delayedCall(delay, () => {
           const x = this.FIRST_COLUMN_X
           const y = this.INITIAL_Y + index * this.OFFSET_Y
           const text = this.scene.add
@@ -191,13 +188,14 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
             .setScale(0.5, 0.5)
             .setOrigin(0, 0)
           this.group.add(text).add(imgChecker).setDepth(20)
+          resolve()
         })
-      }
-
-      this.scene.time.delayedCall(this.TOTAL_DELAY, () => {
-        resolve()
       })
-    })
+    }
+
+    for (let index = 0; index < this.level.rounds; index++) {
+      await updateRoundText(index)
+    }
   }
 
   addTimerByRound = async (): Promise<void> => {
@@ -215,7 +213,7 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
           const tween = this.scene.tweens.addCounter({
             from: 0,
             to: timerInSeconds,
-            duration: 500,
+            duration: this.forceCompleteTweens ? 0 : 500,
             onUpdate: (tween: Phaser.Tweens.Tween, { value }: any) => {
               timerText.text = value.toFixed(2) + ' sec'
               if (this.isBeatTheBestTime(value)) {
@@ -246,13 +244,24 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
     }
   }
 
-  addStarsBasedOnRounds = async (): Promise<void> => {
-    console.log('stars', this.stars)
-    const starImageName = getStarImageName(this.stars)
-    this.starsImage.setTexture(starImageName)
+  private updateStarsImage = async (numberOfStars: number, delay: number) => {
+    return new Promise((resolve) => {
+      this.scene.time.delayedCall(delay, () => {
+        const starImageName = getStarImageName(numberOfStars)
+        this.starsImage.setTexture(starImageName)
 
-    // TODO: add animation
-    return Promise.resolve()
+        resolve()
+      })
+    })
+  }
+
+  addStarsBasedOnRounds = async (): Promise<void> => {
+    const maxStars = Math.min(2, this.stars)
+    // add star by star
+    for (let index = 1; index <= maxStars; index++) {
+      const delay = this.forceCompleteTweens ? 0 : this.DELAY * index
+      await this.updateStarsImage(index, delay)
+    }
   }
 
   addStarsBasedOnTimer = async (): Promise<void> => {
@@ -268,8 +277,7 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
   showGems = async (): Promise<void> => {
     return new Promise((resolve, reject) => {
       // TODO: check if it is the first time
-      const firstTime = true
-      let duration = 1000
+      const duration = this.forceCompleteTweens ? 0 : 1000
 
       const tween = this.scene.tweens.addCounter({
         from: 0,
@@ -285,6 +293,34 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
       })
       this.listOftweens.push(tween)
     })
+  }
+
+  showTryAgainMessage = (): void => {
+    const tryAgainTitle = this.scene.add
+      .text(
+        this.starsImage.x,
+        this.starsImage.y + this.starsImage.displayHeight - 25,
+        'try again to get all stars and collect more gems',
+        {
+          fontFamily: FONTS.ALLOY_INK,
+          fontSize: '18px',
+        }
+      )
+      .setStroke(COLORS.DARK_YELLOW, 10)
+      .setOrigin(0.5, 1)
+    this.group.add(tryAgainTitle).setDepth(20)
+
+    const tween = this.scene.tweens.add({
+      targets: tryAgainTitle,
+      scale: 1.1,
+      duration: this.forceCompleteTweens ? 0 : 500,
+      repeat: -1,
+      yoyo: true,
+      onComplete: () => {
+        tryAgainTitle.setScale(1, 1)
+      },
+    })
+    this.listOftweens.push(tween)
   }
 
   createBackground = () => {
@@ -308,6 +344,17 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
       value++
     }
     return value
+  }
+
+  private get forceCompleteTweens(): boolean {
+    return this._forceCompleteTweens
+  }
+
+  private set forceCompleteTweens(v: boolean) {
+    this.listOftweens.forEach((tween) => {
+      tween.isPlaying() && tween.complete()
+    })
+    this._forceCompleteTweens = v
   }
 
   private get gems(): number {
