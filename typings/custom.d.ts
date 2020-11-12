@@ -40,6 +40,7 @@ declare interface FileStorageConfig {
   backgroudSound: boolean
   tutorials: Array<TutorialFileStorageConfig>
   levels: Array<LevelFileStorageConfig>
+  gems: number
 }
 
 declare interface LevelFileStorageConfig {

@@ -9,7 +9,7 @@ import {
   OBJECT_DEPTHS,
   SOUNDS,
 } from '../utils/constants'
-import { getLevelStorage, setLevelStorage } from '../utils/fileStorage'
+import { getLevelStorage, incPlayerGems, setLevelStorage } from '../utils/fileStorage'
 import { calculateGems, calculateStars, getStarImageName } from '../utils/scoresUtil'
 import { getLevel, getNextLevel } from '../utils/worldUtil'
 import { ButtonSmall } from './buttonSmall'
@@ -91,6 +91,7 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
     this.currentLevelStorage = getLevelStorage(this.level.level, this.gameworld.key)
 
     setLevelStorage({ level: this.level.level, stars: this.stars, key: this.gameworld.key })
+    incPlayerGems(this.gems)
 
     this.addRoundText().then(async () => {
       await this.addStarsBasedOnRounds()

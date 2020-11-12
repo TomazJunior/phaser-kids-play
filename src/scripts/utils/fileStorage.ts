@@ -3,6 +3,7 @@ const initialFileStorageConfig: FileStorageConfig = {
   tutorials: [],
   sound: true,
   backgroudSound: true,
+  gems: 0,
   levels: [
     {
       key: '1',
@@ -62,6 +63,19 @@ export const setTutorialSeen = (key: string, level: number, seen: boolean) => {
       tutorial,
     ],
   })
+}
+
+export const incPlayerGems = (value: number): void => {
+  const newValue = getGems() + value
+  if (newValue < 0) throw new Error('Gems became negative, something wrong happened')
+   setFileStorageConfig({
+    ...getFileStorageConfig(),
+    gems: newValue,
+  })
+}
+
+export const getGems = (): number => {
+  return getFileStorageConfig().gems
 }
 
 export const setSoundEnabled = (isSoundEnabled: boolean) => {
