@@ -17,6 +17,7 @@ export default class SelectItemsScene extends Phaser.Scene {
   private level: Level
   private gemScore: GemScore
   private isOpeningItemToBuy: boolean = false
+  backButton: ButtonSmall
 
   constructor() {
     super({ key: SCENES.SELECT_ITEMS_SCENE })
@@ -51,7 +52,7 @@ export default class SelectItemsScene extends Phaser.Scene {
   }
 
   createBackButton() {
-    new ButtonSmall(this, 50, 50, {
+    this.backButton = new ButtonSmall(this, 50, 50, {
       name: BUTTON.LEFT,
       onClick: () => {
         this.scene.start(SCENES.LEVEL_SCENE, this.gameWorld)
@@ -74,7 +75,7 @@ export default class SelectItemsScene extends Phaser.Scene {
       this.tweens.add({
         targets: this.frameSkillItem.getChildren(),
         duration: 500,
-        y: '+=655',
+        y: '+=720',
         onComplete: () => {
           resolve()
         },
@@ -94,14 +95,16 @@ export default class SelectItemsScene extends Phaser.Scene {
         this.tweens.add({
           targets: this.frameSkillItem.getChildren(),
           duration: 500,
-          y: '-=655',
+          y: '-=720',
           onComplete: async () => {
             this.frameSkillItem.setVisible(false)
             resolve()
           },
         })
       }),
-    ])
+    ]).then(() => {
+      this.backButton.setVisible(true)
+    })
   }
 
   createSelectSkillItemFrame() {
@@ -130,6 +133,7 @@ export default class SelectItemsScene extends Phaser.Scene {
   handleBuyItem = (skillItem: SkillItem) => {
     if (this.isOpeningItemToBuy) return
 
+    this.backButton.setVisible(false)
     this.isOpeningItemToBuy = true
     Promise.all([this.gemScore.show(), this.createBuySkillItemFrame(skillItem)]).finally(
       () => (this.isOpeningItemToBuy = false)
