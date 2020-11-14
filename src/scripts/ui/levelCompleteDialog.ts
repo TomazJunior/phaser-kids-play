@@ -151,24 +151,28 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
       onClick: this.onGoToLevelScene,
     }
 
-    const buttonY = this.y + this.height * 0.5 - 70
+    const buttonY = this.y + this.height * 0.5 - 10
     const levelSceneButton = new ButtonSmall(
       this.scene,
-      this.x - this.displayWidth * 0.4 + 40,
+      this.x - this.displayWidth * 0.5 + 130,
       buttonY,
       levelSceneButtonConfig
     ).setOrigin(0, 0)
 
-    const restartSceneButton = new ButtonSmall(this.scene, this.x - 50, buttonY, restartButtonConfig).setOrigin(0, 0)
+    const restartSceneButton = new ButtonSmall(this.scene, this.x, buttonY, restartButtonConfig).setOrigin(0, 0)
 
     const nextLevelButton = new ButtonSmall(
       this.scene,
-      this.x + this.displayWidth * 0.2,
+      this.x + this.displayWidth * 0.5 - 130,
       buttonY,
       nextLevelButtonConfig
     ).setOrigin(0, 0)
 
-    this.group.add(levelSceneButton).add(restartSceneButton).add(nextLevelButton).setDepth(OBJECT_DEPTHS.FRAME_DIALOG)
+    this.group
+    .addMultiple(levelSceneButton.getChildren())
+    .addMultiple(restartSceneButton.getChildren())
+    .addMultiple(nextLevelButton.getChildren())
+    .setDepth(OBJECT_DEPTHS.FRAME_DIALOG)
   }
 
   addRoundText = async (): Promise<void> => {

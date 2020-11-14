@@ -40,6 +40,6 @@ export class InfoDialog extends Phaser.GameObjects.Sprite {
       .setOrigin(0.5, 0)
       .setStroke(COLORS.DARK_YELLOW, 10)
 
-    this.group.add(this).add(textTitle).add(closeButton).add(creditsTitle).add(versionText)
+    this.group.add(this).add(textTitle).addMultiple(closeButton.getChildren()).add(creditsTitle).add(versionText)
   }
 }

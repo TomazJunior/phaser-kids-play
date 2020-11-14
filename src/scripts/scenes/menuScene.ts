@@ -18,7 +18,7 @@ export default class MenuScene extends Phaser.Scene {
       },
     }).setOrigin(0.5, 0.5)
 
-    new ButtonSmall(this, width - 100, 10, {
+    new ButtonSmall(this, width - 100, 50, {
       name: BUTTON.CONFIG,
       onClick: () => {
         this.scene.start(SCENES.CONFIG_SCENE)

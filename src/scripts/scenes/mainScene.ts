@@ -9,7 +9,6 @@ import {
 import { getAllSkins, getARandomSkinFrom } from '../utils/skinUtils'
 import { ANIMAL_SKINS, BUTTON, SOUNDS, SCENES } from '../utils/constants'
 import HiddenThumbChars from '../objects/hiddenThumbChars'
-import ScoreText from '../ui/scoreText'
 import { GameMap } from '../controllers/gameMap'
 import { ButtonSmall } from '../ui/buttonSmall'
 import { LevelCompleteDialog } from '../ui/levelCompleteDialog'
@@ -34,7 +33,6 @@ export default class MainScene extends Phaser.Scene {
   currentWorld: GameWorld
   level: Level
   hiddenCharOnTheirPosition = false
-  scoreText: ScoreText
   backgroundAudio: Phaser.Sound.BaseSound
   gameMap: GameMap
   frameLevel: FrameLevel
@@ -56,7 +54,7 @@ export default class MainScene extends Phaser.Scene {
     return this._round
   }
 
-  init(config: MainSceneConfig) {
+  init(config: CurrentWorldAndLevelConfig) {
     this.gameover = false
     if (!config.gameWorld?.key) {
       this.currentWorld = getGameWorld()
@@ -168,7 +166,7 @@ export default class MainScene extends Phaser.Scene {
 
   restartScene = (gameWorld: GameWorld, level: Level) => {
     this.setToGameOverState(() => {
-      this.scene.restart(<MainSceneConfig>{
+      this.scene.restart(<CurrentWorldAndLevelConfig>{
         gameWorld,
         level,
       })
@@ -221,12 +219,12 @@ export default class MainScene extends Phaser.Scene {
   }
 
   createBackButton() {
-    new ButtonSmall(this, 10, 10, {
+    new ButtonSmall(this, 50, 50, {
       onClick: () => {
         this.goToLevelScene()
       },
       name: BUTTON.LEFT,
-    }).setOrigin(0, 0)
+    }).setOrigin(0.5, 0.5)
   }
 
   goToMenuScene = () => {

@@ -27,12 +27,12 @@ export default class LevelScene extends Phaser.Scene {
   }
 
   createBackButton() {
-    new ButtonSmall(this, 10, 10, {
+    new ButtonSmall(this, 50, 50, {
       name: BUTTON.LEFT,
       onClick: () => {
         this.scene.start(SCENES.MENU_SCENE)
       },
-    }).setOrigin(0, 0)
+    }).setOrigin(0.5, 0.5)
   }
 
   createSelectLevelFrame() {
@@ -60,7 +60,7 @@ export default class LevelScene extends Phaser.Scene {
     if (!!previousWorld) {
       initialLevel = allLevelsCompleted(previousWorld) ? 1 : 0
     }
-    
+
     this.gameWorld.levels.forEach((level, index) => {
       if (index) {
         posX += 150
@@ -87,7 +87,7 @@ export default class LevelScene extends Phaser.Scene {
       const button = new ButtonSmall(this, posX, posY, {
         name: BUTTON.EMPTY,
         onClick: () => {
-          this.scene.start(SCENES.MAIN_SCENE, <MainSceneConfig>{
+          this.scene.start(SCENES.SELECT_ITEMS_SCENE, <CurrentWorldAndLevelConfig>{
             gameWorld: this.gameWorld,
             level,
           })

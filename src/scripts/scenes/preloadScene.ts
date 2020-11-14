@@ -1,6 +1,16 @@
 import ProgressBar from '../ui/progressBar'
 import { updateSoundState } from '../utils/audioUtil'
-import { BUTTON, BUTTON_PREFIX, BUTTON_PREFIX_EXTRA, FONTS, GAME_WORLDS, SCENES, SOUNDS, SPRITE_NAME } from '../utils/constants'
+import {
+  BUTTON,
+  BUTTON_PREFIX,
+  BUTTON_PREFIX_EXTRA,
+  FONTS,
+  GAME_WORLDS,
+  SCENES,
+  SOUNDS,
+  SPRITE_NAME,
+} from '../utils/constants'
+import { SKILL_ITEM_SKINS } from '../utils/skillItems'
 
 export default class PreloadScene extends Phaser.Scene {
   progressBar: ProgressBar
@@ -26,13 +36,13 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('box-opened', 'assets/img/box-opened.png')
     this.load.image('box-closed', 'assets/img/box-closed.png')
     this.load.image('box-wrong', 'assets/img/box-wrong.png')
-    
+
     this.load.image('door-closed-mid', 'assets/img/door-closed-mid.png')
     this.load.image('door-closed-top', 'assets/img/door-closed-top.png')
     this.load.image('door-open-mid', 'assets/img/door-open-mid.png')
     this.load.image('door-open-top', 'assets/img/door-open-top.png')
     this.load.image('sign-exit', 'assets/img/sign-exit.png')
-    
+
     this.load.image('finger-point', 'assets/img/finger-point-gesture.png')
 
     this.load.image('stars-zero', 'assets/img/stars-zero.png')
@@ -50,7 +60,7 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('small-frame', 'assets/img/small-frame.png')
     this.load.image('small-frame-level', 'assets/img/small-frame-level.png')
     this.load.image('frame-char-dialog', 'assets/img/frame-char-dialog.png')
-    
+
     this.load.bitmapFont(FONTS.PIXEL_FONT, 'assets/fonts/pixelFont.png', 'assets/fonts/pixelFont.xml')
 
     this.load.audio(SOUNDS.CLICK, 'assets/audio/click5.mp3')
@@ -61,12 +71,26 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.audio(SOUNDS.WALKING, 'assets/audio/430708_juandamb_running.mp3')
     this.load.audio(SOUNDS.ENTER_THE_DOOR, 'assets/audio/enter-the-door.mp3')
     this.load.audio(SOUNDS.ENTER_THE_BOX, 'assets/audio/enter-the-box.mp3')
-    
+
     //tiles from worlds
     this.loadSpritesGameWorld()
-    
+
     //buttons
     this.loadImageButtons()
+
+    this.load.image('frame-skill-item', 'assets/img/frame-skill-item.png')
+    this.load.image('frame-skill-item-selected', 'assets/img/frame-skill-item-selected.png')
+    
+    this.load.image('circle-green-checkmark', 'assets/img/circle-green-checkmark.png')
+    this.load.image('circle-red', 'assets/img/circle-red.png')
+    this.load.image('circle-green', 'assets/img/circle-green.png')
+    this.load.image('circle-blue', 'assets/img/circle-blue.png')
+    this.load.image('circle-grey', 'assets/img/circle-grey.png')
+    this.load.image('gem-score', 'assets/img/gem-score.png')
+    this.load.image('skill-gem-cost', 'assets/img/skill-gem-cost.png')
+
+    //skill items
+    this.loadSkillItemsImages()
 
     //TODO: add credits
     /*
@@ -86,20 +110,35 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.image(buttonKey, `assets/img/${buttonKey}.png`)
       })
     })
-    this.load.image(`${BUTTON.SOUND}-${BUTTON_PREFIX_EXTRA.INACTIVE}`, `assets/img/${BUTTON.SOUND}-${BUTTON_PREFIX_EXTRA.INACTIVE}.png`)
-    this.load.image(`${BUTTON.SOUND_BG}-${BUTTON_PREFIX_EXTRA.INACTIVE}`, `assets/img/${BUTTON.SOUND_BG}-${BUTTON_PREFIX_EXTRA.INACTIVE}.png`)
+    this.load.image(
+      `${BUTTON.SOUND}-${BUTTON_PREFIX_EXTRA.INACTIVE}`,
+      `assets/img/${BUTTON.SOUND}-${BUTTON_PREFIX_EXTRA.INACTIVE}.png`
+    )
+    this.load.image(
+      `${BUTTON.SOUND_BG}-${BUTTON_PREFIX_EXTRA.INACTIVE}`,
+      `assets/img/${BUTTON.SOUND_BG}-${BUTTON_PREFIX_EXTRA.INACTIVE}.png`
+    )
   }
 
+  private loadSkillItemsImages() {
+    Object.keys(SKILL_ITEM_SKINS).forEach((key) => {
+      this.load.image(SKILL_ITEM_SKINS[key], `assets/img/${SKILL_ITEM_SKINS[key]}.png`)
+    })
+  }
   private loadAssetsProgress = () => {
     this.load.on('progress', this.progressBar.updateValue)
     // this.load.on('fileprogress', (file) => {
     //   console.log(file.src)
     // })
     this.load.on('complete', () => {
+      // this.scene.start(SCENES.SELECT_ITEMS_SCENE, <CurrentWorldAndLevelConfig>{
+      //   gameWorld: GAME_WORLDS[0],
+      //   level: GAME_WORLDS[0].levels[0],
+      // })
       // this.scene.start(SCENES.LEVEL_SCENE)
       this.scene.start(SCENES.MENU_SCENE)
       // this.scene.start(SCENES.CONFIG_SCENE)
-      // this.scene.start(SCENES.MAIN_SCENE, <MainSceneConfig>{
+      // this.scene.start(SCENES.MAIN_SCENE, <CurrentWorldAndLevelConfig>{
       //   gameWorld: GAME_WORLDS[0],
       //   level: GAME_WORLDS[0].levels[0]
       // })
@@ -119,13 +158,13 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('world-2-dirt-right-top', 'assets/img/world/world-2/dirt-right-top.png')
     this.load.image('world-2-dirt-left-bottom', 'assets/img/world/world-2/dirt-left-bottom.png')
     this.load.image('world-2-dirt-left-top', 'assets/img/world/world-2/dirt-left-top.png')
-    
+
     this.load.image('world-2-grass-top-left', 'assets/img/world/world-2/grass-top-left.png')
     this.load.image('world-2-grass-top-right', 'assets/img/world/world-2/grass-top-right.png')
-    
+
     this.load.image('world-2-flower-six-points', 'assets/img/world/world-2/flower-six-points.png')
     this.load.image('world-2-flower-three-points', 'assets/img/world/world-2/flower-three-points.png')
-    
+
     this.load.image('world-2-tree-big', 'assets/img/world/world-2/tree-big.png')
     this.load.image('world-2-tree-tiny', 'assets/img/world/world-2/tree-tiny.png')
 

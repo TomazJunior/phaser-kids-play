@@ -49,7 +49,7 @@ export class FrameDialog extends Phaser.GameObjects.Sprite {
       },
     }).setDepth(OBJECT_DEPTHS.FRAME_DIALOG)
 
-    this.group.add(this.closeButton)
+    this.group.addMultiple(this.closeButton.getChildren())
 
     this.nextLine()
   }

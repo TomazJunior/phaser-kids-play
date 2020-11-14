@@ -5,6 +5,7 @@ import { maps } from './maps'
 export enum SCENES {
   CONFIG_SCENE = 'ConfigScene',
   LEVEL_SCENE = 'LevelScene',
+  SELECT_ITEMS_SCENE = 'SelectItemsScene',
   MAIN_SCENE = 'MainScene',
   MENU_SCENE = 'MenuScene',
   PAUSE_SCENE = 'PauseScene',
@@ -688,6 +689,8 @@ export const PLAYER = {
 export const FONTS = {
   PIXEL_FONT: 'pixelFont',
   ALLOY_INK: 'AlloyInk',
+  KEN_VECTOR: 'kenvector',
+  
 }
 
 export enum SOUNDS {

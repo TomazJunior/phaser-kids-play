@@ -18,6 +18,10 @@ declare interface ButtonConfig {
   text?: {
     title?: string
     fontSize?: string
+    stroke?: {
+      color: string, 
+      thickness: number
+    },
     padding?: {
       x?: number
       y?: number
@@ -105,7 +109,7 @@ declare interface PauseSceneConfig {
   onRestart: () => void
 }
 
-declare interface MainSceneConfig {
+declare interface CurrentWorldAndLevelConfig {
   gameWorld: GameWorld
   level: Level
 }
@@ -164,4 +168,36 @@ declare interface Neighbors {
   right?: { x: number; y: number }
   bottom?: { x: number; y: number }
   left?: { x: number; y: number }
+}
+
+
+declare interface SkillItemConstructor {
+  new (
+    scene: Phaser.Scene,
+  ): import('../src/scripts/objects/skillItems/skillItem').default
+}
+
+declare interface SkillItemListInterface {
+  clazz: SkillItemConstructor
+  skin: import('../src/scripts/utils/skillItems').SKILL_ITEM_SKINS
+}
+
+declare interface SkillItemDefinition {
+    skin: import('../src/scripts/utils/skillItems').SKILL_ITEM_SKINS,
+    maxPerLevel: number,
+    gems: number,
+    title: string,
+    description: Array<string>
+}
+
+declare interface FrameBigInterface {
+  title: string
+  visible: boolean
+  subTitle?: string
+  onCloseButton?: () => Promise<void>
+}
+
+declare interface SkillItemBuyFrameInterface extends FrameBigInterface {
+  gems: number
+  onConfirmButton: () => Promise<void>
 }

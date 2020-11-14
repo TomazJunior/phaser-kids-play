@@ -13,19 +13,25 @@ export class ButtonBig extends ButtonSmall {
     })
     scene.add.existing(this)
     if (config.scale) {
-      this.setScale(config.scale.x, config.scale.y)
+      this.button.setScale(config.scale.x, config.scale.y)
     } else {
-      this.setScale(0.8, 0.8)
+      this.button.setScale(0.8, 0.8)
     }
 
     if (config.text?.title) {
       const paddingX = config.text.padding?.x || 0
       const paddingY = config.text.padding?.y || 0
-      this.scene.add.text(x - this.width * 0.3 + paddingX, y - this.height * 0.3 + paddingY, config.text.title, {
+      const text = this.scene.add.text(x - this.button.width * 0.3 + paddingX, y - this.button.height * 0.3 + paddingY, config.text.title, {
         fontFamily: FONTS.ALLOY_INK,
         fontSize: config.text.fontSize || '72px',
       })
-      .setStroke('#04ccff', 20)
+      if (config.text.stroke) {
+        const {color, thickness} = config.text.stroke
+        text.setStroke(color, thickness)
+      } else {
+        text.setStroke('#04ccff', 20)
+      }
+      this.add(text)
     }
   }
 }
