@@ -33,7 +33,7 @@ export class InfoDialog extends Phaser.GameObjects.Sprite {
       .setStroke(COLORS.DARK_YELLOW, 10)
 
     const versionText = scene.add
-      .text(this.x + this.displayWidth * 0.35, this.y + this.displayHeight * 0.35, 'v.0.4', {
+      .text(this.x + this.displayWidth * 0.35, this.y + this.displayHeight * 0.35, 'v.0.5', {
         fontFamily: FONTS.ALLOY_INK,
         fontSize: '32px',
       })
