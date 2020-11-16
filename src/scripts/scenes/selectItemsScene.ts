@@ -19,6 +19,8 @@ export default class SelectItemsScene extends Phaser.Scene {
   private isOpeningItemToBuy: boolean = false
   backButton: ButtonSmall
 
+  HIDDEN_FRAME_START_POSITION = 300
+
   constructor() {
     super({ key: SCENES.SELECT_ITEMS_SCENE })
   }
@@ -64,7 +66,7 @@ export default class SelectItemsScene extends Phaser.Scene {
     const { width } = this.scale
     const { skillItemDefinition } = skillItem
     // start position is outside of the screen
-    this.frameSkillItem = new SkillItemBuyFrame(this, width * 0.5, -300, skillItem, {
+    this.frameSkillItem = new SkillItemBuyFrame(this, width * 0.5, -this.HIDDEN_FRAME_START_POSITION, skillItem, {
       title: skillItemDefinition.title,
       visible: false,
       gems: getGems(),
@@ -75,7 +77,7 @@ export default class SelectItemsScene extends Phaser.Scene {
       this.tweens.add({
         targets: this.frameSkillItem.getChildren(),
         duration: 500,
-        y: '+=720',
+        y: `+=${this.HIDDEN_FRAME_START_POSITION + this.frame.y}`,
         onComplete: () => {
           resolve()
         },
@@ -95,7 +97,7 @@ export default class SelectItemsScene extends Phaser.Scene {
         this.tweens.add({
           targets: this.frameSkillItem.getChildren(),
           duration: 500,
-          y: '-=720',
+          y: `-=${this.HIDDEN_FRAME_START_POSITION + this.frame.y}`,
           onComplete: async () => {
             this.frameSkillItem.setVisible(false)
             resolve()
