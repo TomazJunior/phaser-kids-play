@@ -6,7 +6,7 @@ import { GemScore } from '../ui/gemScore'
 import SkillItem from '../objects/skillItems/skillItem'
 import { FrameBig } from '../ui/frameBIg'
 import { SkillItemBuyFrame } from '../objects/skillItemBuyFrame'
-import { getGems } from '../utils/fileStorage'
+import { buySkillItem, getGems } from '../utils/fileStorage'
 import { ButtonSmall } from '../ui/buttonSmall'
 
 export default class SelectItemsScene extends Phaser.Scene {
@@ -85,9 +85,15 @@ export default class SelectItemsScene extends Phaser.Scene {
     })
   }
 
-  handleBuySkillItemFrame = (): Promise<void> => {
-    //TODO: implement buy item
-    return Promise.resolve()
+  handleBuySkillItemFrame = (skillItem: SkillItemDefinition): Promise<void> => {
+    return new Promise(async (resolve) => {
+      buySkillItem(skillItem)
+      await this.gemScore.refreshValue()
+      this.time.delayedCall(500, async () => {
+        await this.handleHideBuySkillItemFrame()
+        resolve()
+      })
+    })
   }
 
   handleHideBuySkillItemFrame = (): Promise<any> => {

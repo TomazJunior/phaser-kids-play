@@ -4,6 +4,8 @@ import { BUTTON_PREFIX, COLORS, FONTS } from '../utils/constants'
 import SkillItem from './skillItems/skillItem'
 
 export class SkillItemBuyFrame extends Phaser.GameObjects.Group {
+  private _buyingItem: boolean = false
+
   frame: FrameBig<Phaser.GameObjects.GameObject>
   constructor(
     scene: Phaser.Scene,
@@ -18,7 +20,7 @@ export class SkillItemBuyFrame extends Phaser.GameObjects.Group {
     this.frame = new FrameBig(scene, x, y, config)
     this.addMultiple(this.frame.getChildren())
 
-    const { description, gems } = skillItem.skillItemDefinition
+    const { description, itemCost } = skillItem.skillItemDefinition
 
     const image = scene.add.image(this.x, this.y - 50, skillItem.skillItemDefinition.skin).setScale(2)
     this.add(image)
@@ -27,7 +29,7 @@ export class SkillItemBuyFrame extends Phaser.GameObjects.Group {
     this.add(skillGemCostImage)
 
     const skillGemCostText = scene.add
-      .text(skillGemCostImage.x, skillGemCostImage.y, gems.toString(), {
+      .text(skillGemCostImage.x, skillGemCostImage.y, itemCost.toString(), {
         fontFamily: FONTS.ALLOY_INK,
         fontSize: '32px',
       })
@@ -45,11 +47,15 @@ export class SkillItemBuyFrame extends Phaser.GameObjects.Group {
       .setOrigin(0.5, 0)
     this.add(descriptionText)
 
-    const hasBalanceToBuy = config.gems >= gems
+    const hasBalanceToBuy = config.gems >= itemCost
 
     const confirmButton = new ButtonBig(scene, this.x + 225, this.y + 180, {
       onClick: async () => {
-        await config.onConfirmButton()
+        if (this._buyingItem) return
+        
+        this._buyingItem = true
+        await config.onConfirmButton(skillItem.skillItemDefinition)
+        this._buyingItem = false
       },
       prefix: hasBalanceToBuy ? BUTTON_PREFIX.NORMAL : BUTTON_PREFIX.BLOCKED,
       scale: {

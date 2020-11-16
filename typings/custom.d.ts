@@ -44,7 +44,13 @@ declare interface FileStorageConfig {
   backgroudSound: boolean
   tutorials: Array<TutorialFileStorageConfig>
   levels: Array<LevelFileStorageConfig>
-  gems: number
+  gems: number,
+  skillItems: Array<SkillItemFileStorageConfig>
+}
+
+declare interface SkillItemFileStorageConfig {
+  quantity: number
+  skin: import('../src/scripts/utils/skillItems').SKILL_ITEM_SKINS
 }
 
 declare interface LevelFileStorageConfig {
@@ -185,7 +191,7 @@ declare interface SkillItemListInterface {
 declare interface SkillItemDefinition {
     skin: import('../src/scripts/utils/skillItems').SKILL_ITEM_SKINS,
     maxPerLevel: number,
-    gems: number,
+    itemCost: number,
     title: string,
     description: Array<string>
 }
@@ -199,5 +205,5 @@ declare interface FrameBigInterface {
 
 declare interface SkillItemBuyFrameInterface extends FrameBigInterface {
   gems: number
-  onConfirmButton: () => Promise<void>
+  onConfirmButton: (skillItem: SkillItemDefinition) => Promise<void>
 }

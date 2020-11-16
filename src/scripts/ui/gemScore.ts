@@ -47,6 +47,7 @@ export class GemScore extends Phaser.GameObjects.Group {
   }
 
   async show() {
+    this.value = getGems()
     return new Promise((resolve) => {
       this.setVisible(true)
       this.scene.tweens.add({
@@ -68,6 +69,26 @@ export class GemScore extends Phaser.GameObjects.Group {
         y: '-=160',
         onComplete: () => {
           this.setVisible(false)
+          resolve()
+        },
+      })
+    })
+  }
+
+  refreshValue = (): Promise<void> => {
+    return new Promise((resolve) => {
+      const currentValue = this._value
+      const updatedValue = getGems()
+
+      this.scene.tweens.addCounter({
+        from: currentValue,
+        to: updatedValue,
+        duration: 500,
+        onUpdate: (tween: Phaser.Tweens.Tween, { value }: any) => {
+          this.value = Math.trunc(value)
+        },
+        onComplete: () => {
+          this.value = updatedValue
           resolve()
         },
       })

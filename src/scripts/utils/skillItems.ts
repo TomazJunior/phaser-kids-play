@@ -7,21 +7,21 @@ export enum SKILL_ITEM_SKINS {
 const SKILL_ITEMS: Record<SKILL_ITEM_SKINS, SkillItemDefinition> = {
   [SKILL_ITEM_SKINS.KEY]: {
     maxPerLevel: 1,
-    gems: 50,
+    itemCost: 50,
     title: 'key',
     description: ['description'],
     skin: SKILL_ITEM_SKINS.KEY
   },
   [SKILL_ITEM_SKINS.STAR]: {
     maxPerLevel: 1,
-    gems: 60,
+    itemCost: 60,
     title: 'star',
     description: ['description'],
     skin: SKILL_ITEM_SKINS.STAR
   },
   [SKILL_ITEM_SKINS.BOX]: {
     maxPerLevel: 1,
-    gems: 20,
+    itemCost: 20,
     title: 'box',
     description: ['Close one box, ', 'and no animal can hide there.'],
     skin: SKILL_ITEM_SKINS.BOX

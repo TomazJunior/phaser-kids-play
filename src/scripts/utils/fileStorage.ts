@@ -12,6 +12,7 @@ const initialFileStorageConfig: FileStorageConfig = {
       attempts: 0,
     },
   ],
+  skillItems: [],
 }
 
 export const getFileStorageConfig = (): FileStorageConfig => {
@@ -68,7 +69,7 @@ export const setTutorialSeen = (key: string, level: number, seen: boolean) => {
 export const incPlayerGems = (value: number): void => {
   const newValue = getGems() + value
   if (newValue < 0) throw new Error('Gems became negative, something wrong happened')
-   setFileStorageConfig({
+  setFileStorageConfig({
     ...getFileStorageConfig(),
     gems: newValue,
   })
@@ -110,7 +111,7 @@ export const setLevelStorage = (data: LevelFileStorageConfig) => {
   const { levels } = getFileStorageConfig()
   const currentLevel = levels.find((item) => item.level === data.level && item.key === data.key)
   const maxStars = Math.max(data.stars, currentLevel?.stars || 0)
-  const level: LevelFileStorageConfig = {...data, attempts: (currentLevel?.attempts || 0) + 1, stars: maxStars}
+  const level: LevelFileStorageConfig = { ...data, attempts: (currentLevel?.attempts || 0) + 1, stars: maxStars }
 
   setFileStorageConfig({
     ...getFileStorageConfig(),
@@ -120,4 +121,22 @@ export const setLevelStorage = (data: LevelFileStorageConfig) => {
 
 const setFileStorageConfig = (fileStorage: FileStorageConfig) => {
   localStorage.setItem(FILE_STORAGE_KEY, JSON.stringify(fileStorage))
+}
+
+export const buySkillItem = (item: SkillItemDefinition) => {
+  const gems = getGems()
+  if (item.itemCost > gems) throw new Error(`Cost of the item is higher than the ${item.skin} item`)
+  
+  const { skillItems } = getFileStorageConfig()
+  const skillItemFound = skillItems.find((s) => s.skin === item.skin)
+  let skillItem: SkillItemFileStorageConfig = {
+    skin: item.skin,
+    quantity: skillItemFound ? skillItemFound.quantity + 1 : 1
+  }
+
+  setFileStorageConfig({
+    ...getFileStorageConfig(),
+    skillItems: [...skillItems.filter((s) => !(s.skin === item.skin)), skillItem],
+  })
+  incPlayerGems(-item.itemCost)
 }
