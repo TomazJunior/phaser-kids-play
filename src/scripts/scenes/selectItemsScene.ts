@@ -6,7 +6,7 @@ import { GemScore } from '../ui/gemScore'
 import SkillItem from '../objects/skillItems/skillItem'
 import { FrameBig } from '../ui/frameBIg'
 import { SkillItemBuyFrame } from '../objects/skillItemBuyFrame'
-import { buySkillItem, getGems } from '../utils/fileStorage'
+import { buySkillItem, getFileStorageConfig, getGems } from '../utils/fileStorage'
 import { ButtonSmall } from '../ui/buttonSmall'
 
 export default class SelectItemsScene extends Phaser.Scene {
@@ -17,9 +17,9 @@ export default class SelectItemsScene extends Phaser.Scene {
   private level: Level
   private gemScore: GemScore
   private isOpeningItemToBuy: boolean = false
-  backButton: ButtonSmall
-
-  HIDDEN_FRAME_START_POSITION = 300
+  private backButton: ButtonSmall
+  private HIDDEN_FRAME_START_POSITION = 300
+  private cards: Array<SkillItemFrame>
 
   constructor() {
     super({ key: SCENES.SELECT_ITEMS_SCENE })
@@ -112,6 +112,7 @@ export default class SelectItemsScene extends Phaser.Scene {
       }),
     ]).then(() => {
       this.backButton.setVisible(true)
+      this.refreshCards()
     })
   }
 
@@ -123,19 +124,20 @@ export default class SelectItemsScene extends Phaser.Scene {
       title: 'Select boosters',
     })
 
-    const cards = SkillItemList.skills.map((skillItem, index) => {
+    this.cards = SkillItemList.skills.map((skillItem, index) => {
       return this.frame.addItem((x, y) => {
         return new SkillItemFrame(
           this,
           x,
           y,
           skillItem.skin,
-          index === 1 ? 2 : 0,
+          0,
           new skillItem.clazz(this),
           this.handleBuyItem
         )
       })
     })
+    this.refreshCards()
   }
 
   handleBuyItem = (skillItem: SkillItem) => {
@@ -143,8 +145,22 @@ export default class SelectItemsScene extends Phaser.Scene {
 
     this.backButton.setVisible(false)
     this.isOpeningItemToBuy = true
-    Promise.all([this.gemScore.show(), this.createBuySkillItemFrame(skillItem)]).finally(
-      () => (this.isOpeningItemToBuy = false)
-    )
+    Promise.all([this.gemScore.show(), this.createBuySkillItemFrame(skillItem)]).finally(() => {
+      this.isOpeningItemToBuy = false
+    })
+  }
+
+  refreshCards = () => {
+    const { skillItems } = getFileStorageConfig()
+
+    if (!skillItems?.length) return
+    if (!this.cards?.length) return
+
+    this.cards.forEach((card) => {
+      const foundSkillItem = skillItems.find((s) => s.skin === card.skin)
+      if (foundSkillItem) {
+        card.quantity = foundSkillItem.quantity
+      }
+    })
   }
 }

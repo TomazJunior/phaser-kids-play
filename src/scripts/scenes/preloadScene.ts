@@ -79,13 +79,16 @@ export default class PreloadScene extends Phaser.Scene {
     this.loadImageButtons()
 
     this.load.image('frame-skill-item', 'assets/img/frame-skill-item.png')
-    this.load.image('frame-skill-item-selected', 'assets/img/frame-skill-item-selected.png')
+    this.load.image('frame-skill-item-selected', 'assets/img/frame-skill-item-selected1.png')
     
     this.load.image('circle-green-checkmark', 'assets/img/circle-green-checkmark.png')
+    this.load.image('circle-yellow-checkmark', 'assets/img/circle-yellow-checkmark.png')
+    
     this.load.image('circle-red', 'assets/img/circle-red.png')
     this.load.image('circle-green', 'assets/img/circle-green.png')
     this.load.image('circle-blue', 'assets/img/circle-blue.png')
     this.load.image('circle-grey', 'assets/img/circle-grey.png')
+    this.load.image('circle-yellow', 'assets/img/circle-yellow.png')
     this.load.image('gem-score', 'assets/img/gem-score.png')
     this.load.image('skill-gem-cost', 'assets/img/skill-gem-cost.png')
 
@@ -131,13 +134,13 @@ export default class PreloadScene extends Phaser.Scene {
     //   console.log(file.src)
     // })
     this.load.on('complete', () => {
+      // this.scene.start(SCENES.LEVEL_SCENE)
+      this.scene.start(SCENES.MENU_SCENE)
+      // this.scene.start(SCENES.CONFIG_SCENE)
       // this.scene.start(SCENES.SELECT_ITEMS_SCENE, <CurrentWorldAndLevelConfig>{
       //   gameWorld: GAME_WORLDS[0],
       //   level: GAME_WORLDS[0].levels[0],
       // })
-      // this.scene.start(SCENES.LEVEL_SCENE)
-      this.scene.start(SCENES.MENU_SCENE)
-      // this.scene.start(SCENES.CONFIG_SCENE)
       // this.scene.start(SCENES.MAIN_SCENE, <CurrentWorldAndLevelConfig>{
       //   gameWorld: GAME_WORLDS[0],
       //   level: GAME_WORLDS[0].levels[0]

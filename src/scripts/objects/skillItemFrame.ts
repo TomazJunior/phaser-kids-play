@@ -9,6 +9,7 @@ export default class SkillItemFrame extends Phaser.GameObjects.Image {
   private addButton: ButtonCircle
   private quantityButton: ButtonCircle
   private selectButton: ButtonCircle
+  public readonly skin: SKILL_ITEM_SKINS
 
   constructor(
     scene: Phaser.Scene,
@@ -22,8 +23,9 @@ export default class SkillItemFrame extends Phaser.GameObjects.Image {
     super(scene, x, y, 'frame-skill-item')
     this.scene.add.existing(this)
 
-    this.quantity = quantity
+    this.skin = skin
     const cardImage = scene.add.image(this.x, this.y, skin)
+
     this.addButton = new ButtonCircle(scene, this.x + 25, this.y + 60, 'circle-blue', '+', this.handleAddClick)
     this.selectButton = new ButtonCircle(
       scene,
@@ -34,7 +36,16 @@ export default class SkillItemFrame extends Phaser.GameObjects.Image {
       this.handleSelectClick
     ).setVisible(false)
 
-    this.quantityButton = new ButtonCircle(scene, this.x - 35, this.y - 40, 'circle-red', this.quantity.toString())
+    this.quantityButton = new ButtonCircle(scene, this.x - 35, this.y - 40, 'circle-red', '0')
+    this.quantity = quantity
+
+    this.setInteractive().on('pointerdown', () => {
+      if (this.addButton?.visible) {
+        this.handleAddClick()
+      } else {
+        this.selected = !this.selected
+      }
+    })
   }
 
   public set quantity(v: number) {
@@ -45,6 +56,7 @@ export default class SkillItemFrame extends Phaser.GameObjects.Image {
     const isSkillItemFull = v >= this.skillItem.skillItemDefinition.maxPerLevel
     this.addButton?.setVisible(!isSkillItemFull)
     this.selectButton?.setVisible(isSkillItemFull)
+    this.quantityButton.text = this._quantity.toString()
     if (!this._quantity) {
       this.selected = false
     }
@@ -54,11 +66,17 @@ export default class SkillItemFrame extends Phaser.GameObjects.Image {
     return this._quantity
   }
 
+  private get selected(): boolean {
+    return this._selected
+  }
+
   private set selected(v: boolean) {
     this._selected = v
     if (this._selected) {
+      this.selectButton.texture = 'circle-green-checkmark'
       this.setTexture('frame-skill-item-selected')
     } else {
+      this.selectButton.texture = 'circle-yellow-checkmark'
       this.setTexture('frame-skill-item')
     }
   }

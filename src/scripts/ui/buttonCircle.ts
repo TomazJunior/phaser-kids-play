@@ -20,6 +20,9 @@ export class ButtonCircle extends Phaser.GameObjects.Group {
     this.add(this.button).add(this.buttonText)
   }
 
+  public get visible(): boolean {
+    return this.button.visible
+  }
   public set texture(v: string) {
     this.button.setTexture(v)
   }

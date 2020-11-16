@@ -126,12 +126,12 @@ const setFileStorageConfig = (fileStorage: FileStorageConfig) => {
 export const buySkillItem = (item: SkillItemDefinition) => {
   const gems = getGems()
   if (item.itemCost > gems) throw new Error(`Cost of the item is higher than the ${item.skin} item`)
-  
+
   const { skillItems } = getFileStorageConfig()
   const skillItemFound = skillItems.find((s) => s.skin === item.skin)
   let skillItem: SkillItemFileStorageConfig = {
     skin: item.skin,
-    quantity: skillItemFound ? skillItemFound.quantity + 1 : 1
+    quantity: skillItemFound ? skillItemFound.quantity + 1 : 1,
   }
 
   setFileStorageConfig({
