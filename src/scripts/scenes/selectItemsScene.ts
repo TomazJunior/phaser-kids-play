@@ -6,7 +6,7 @@ import { GemScore } from '../ui/gemScore'
 import SkillItem from '../objects/skillItems/skillItem'
 import { FrameBig } from '../ui/frameBIg'
 import { SkillItemBuyFrame } from '../objects/skillItemBuyFrame'
-import { buySkillItem, getFileStorageConfig, getGems } from '../utils/fileStorage'
+import { buySkillItem, getFileStorageConfig, getGems, removeSkillItems } from '../utils/fileStorage'
 import { ButtonSmall } from '../ui/buttonSmall'
 
 export default class SelectItemsScene extends Phaser.Scene {
@@ -39,15 +39,20 @@ export default class SelectItemsScene extends Phaser.Scene {
     this.level = config.level
   }
 
-  createGoToLevelButton() {
+  createGoToLevelButton = () => {
     const { width, height } = this.scale
+
     new ButtonSmall(this, width * 0.5 + 270, height * 0.5 + 170, {
       name: BUTTON.RIGHT,
       onClick: () => {
+        const selectedSkillItems = this.getSelectedItems()
+        removeSkillItems(selectedSkillItems)
+
         this.scene.stop(SCENES.SELECT_ITEMS_SCENE)
-        this.scene.start(SCENES.MAIN_SCENE, <CurrentWorldAndLevelConfig>{
+        this.scene.start(SCENES.MAIN_SCENE, <MainSceneConfig>{
           gameWorld: this.gameWorld,
           level: this.level,
+          skillItems: selectedSkillItems,
         })
       },
     })
@@ -89,7 +94,7 @@ export default class SelectItemsScene extends Phaser.Scene {
     return new Promise(async (resolve) => {
       buySkillItem(skillItem)
       await this.gemScore.refreshValue()
-      this.time.delayedCall(500, async () => {
+      this.time.delayedCall(250, async () => {
         await this.handleHideBuySkillItemFrame()
         resolve()
       })
@@ -126,15 +131,7 @@ export default class SelectItemsScene extends Phaser.Scene {
 
     this.cards = SkillItemList.skills.map((skillItem, index) => {
       return this.frame.addItem((x, y) => {
-        return new SkillItemFrame(
-          this,
-          x,
-          y,
-          skillItem.skin,
-          0,
-          new skillItem.clazz(this),
-          this.handleBuyItem
-        )
+        return new SkillItemFrame(this, x, y, skillItem.skin, new skillItem.clazz(this), this.handleBuyItem)
       })
     })
     this.refreshCards()
@@ -162,5 +159,16 @@ export default class SelectItemsScene extends Phaser.Scene {
         card.quantity = foundSkillItem.quantity
       }
     })
+  }
+
+  getSelectedItems = (): Array<SkillItemFileStorageConfig> => {
+    return this.cards
+      .filter((c) => c.selected)
+      .map((c) => {
+        return <SkillItemFileStorageConfig>{
+          quantity: c.quantity,
+          skin: c.skin,
+        }
+      })
   }
 }

@@ -141,9 +141,10 @@ export default class PreloadScene extends Phaser.Scene {
       //   gameWorld: GAME_WORLDS[0],
       //   level: GAME_WORLDS[0].levels[0],
       // })
-      // this.scene.start(SCENES.MAIN_SCENE, <CurrentWorldAndLevelConfig>{
+      // this.scene.start(SCENES.MAIN_SCENE, <MainSceneConfig>{
       //   gameWorld: GAME_WORLDS[0],
-      //   level: GAME_WORLDS[0].levels[0]
+      //   level: GAME_WORLDS[0].levels[0],
+      //   skillItems: []
       // })
       // this.scene.start(SCENES.PAUSE_SCENE)
     })

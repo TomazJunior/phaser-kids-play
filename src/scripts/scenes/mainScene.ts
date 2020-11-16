@@ -40,6 +40,7 @@ export default class MainScene extends Phaser.Scene {
   roundInProgress: boolean
   door: Door
   timer: Timer
+  skillItems: SkillItemFileStorageConfig[]
   _round: number
   constructor() {
     super({ key: SCENES.MAIN_SCENE })
@@ -54,7 +55,7 @@ export default class MainScene extends Phaser.Scene {
     return this._round
   }
 
-  init(config: CurrentWorldAndLevelConfig) {
+  init(config: MainSceneConfig) {
     this.gameover = false
     if (!config.gameWorld?.key) {
       this.currentWorld = getGameWorld()
@@ -67,6 +68,8 @@ export default class MainScene extends Phaser.Scene {
     } else {
       this.level = { ...config.level }
     }
+
+    this.skillItems = [...config.skillItems]
     this.round = 1
     this.currentHiddenSkins = []
     this.availableHiddenSkins = []

@@ -16,7 +16,6 @@ export default class SkillItemFrame extends Phaser.GameObjects.Image {
     x: number,
     y: number,
     skin: SKILL_ITEM_SKINS,
-    quantity: number,
     private skillItem: SkillItem,
     private onAddClick: (skillItem: SkillItem) => void
   ) {
@@ -37,7 +36,7 @@ export default class SkillItemFrame extends Phaser.GameObjects.Image {
     ).setVisible(false)
 
     this.quantityButton = new ButtonCircle(scene, this.x - 35, this.y - 40, 'circle-red', '0')
-    this.quantity = quantity
+    this.quantity = 0
 
     this.setInteractive().on('pointerdown', () => {
       if (this.addButton?.visible) {
@@ -66,11 +65,11 @@ export default class SkillItemFrame extends Phaser.GameObjects.Image {
     return this._quantity
   }
 
-  private get selected(): boolean {
+  public get selected(): boolean {
     return this._selected
   }
 
-  private set selected(v: boolean) {
+  public set selected(v: boolean) {
     this._selected = v
     if (this._selected) {
       this.selectButton.texture = 'circle-green-checkmark'

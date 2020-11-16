@@ -83,7 +83,7 @@ export class GemScore extends Phaser.GameObjects.Group {
       this.scene.tweens.addCounter({
         from: currentValue,
         to: updatedValue,
-        duration: 500,
+        duration: 250,
         onUpdate: (tween: Phaser.Tweens.Tween, { value }: any) => {
           this.value = Math.trunc(value)
         },

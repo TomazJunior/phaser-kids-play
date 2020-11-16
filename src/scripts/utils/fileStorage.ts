@@ -119,10 +119,6 @@ export const setLevelStorage = (data: LevelFileStorageConfig) => {
   })
 }
 
-const setFileStorageConfig = (fileStorage: FileStorageConfig) => {
-  localStorage.setItem(FILE_STORAGE_KEY, JSON.stringify(fileStorage))
-}
-
 export const buySkillItem = (item: SkillItemDefinition) => {
   const gems = getGems()
   if (item.itemCost > gems) throw new Error(`Cost of the item is higher than the ${item.skin} item`)
@@ -139,4 +135,25 @@ export const buySkillItem = (item: SkillItemDefinition) => {
     skillItems: [...skillItems.filter((s) => !(s.skin === item.skin)), skillItem],
   })
   incPlayerGems(-item.itemCost)
+}
+
+export const removeSkillItems = (items: Array<SkillItemFileStorageConfig>) => {
+  items.forEach((item) => removeSkillItem(item))
+}
+
+const removeSkillItem = (item: SkillItemFileStorageConfig) => {
+  const { skillItems } = getFileStorageConfig()
+  let skillItemFound = skillItems.find((s) => s.skin === item.skin)
+  if (!skillItemFound) {
+    throw new Error(`Skill ${item.skin} item not found in the list ${skillItems}`)
+  }
+  skillItemFound.quantity--
+  setFileStorageConfig({
+    ...getFileStorageConfig(),
+    skillItems: [...skillItems.filter((s) => !(s.skin === item.skin)), skillItemFound],
+  })
+}
+
+const setFileStorageConfig = (fileStorage: FileStorageConfig) => {
+  localStorage.setItem(FILE_STORAGE_KEY, JSON.stringify(fileStorage))
 }

@@ -19,9 +19,9 @@ declare interface ButtonConfig {
     title?: string
     fontSize?: string
     stroke?: {
-      color: string, 
+      color: string
       thickness: number
-    },
+    }
     padding?: {
       x?: number
       y?: number
@@ -44,7 +44,7 @@ declare interface FileStorageConfig {
   backgroudSound: boolean
   tutorials: Array<TutorialFileStorageConfig>
   levels: Array<LevelFileStorageConfig>
-  gems: number,
+  gems: number
   skillItems: Array<SkillItemFileStorageConfig>
 }
 
@@ -56,7 +56,7 @@ declare interface SkillItemFileStorageConfig {
 declare interface LevelFileStorageConfig {
   key: string
   level: number
-  stars: number,
+  stars: number
   attempts?: number
 }
 
@@ -104,7 +104,7 @@ declare interface Level {
   level: number
   rounds: number
   hiddens: number
-  tutorial?: { text: Array<string>, showPointer?: TilePosition }
+  tutorial?: { text: Array<string>; showPointer?: TilePosition }
   tileOverride?: Array<{ position: TilePosition; tileName: string }>
   extraHiddens?: number
 }
@@ -113,6 +113,10 @@ declare interface PauseSceneConfig {
   onHome: () => void
   onResume: () => void
   onRestart: () => void
+}
+
+declare interface MainSceneConfig extends CurrentWorldAndLevelConfig {
+  skillItems: Array<SkillItemFileStorageConfig>
 }
 
 declare interface CurrentWorldAndLevelConfig {
@@ -176,11 +180,8 @@ declare interface Neighbors {
   left?: { x: number; y: number }
 }
 
-
 declare interface SkillItemConstructor {
-  new (
-    scene: Phaser.Scene,
-  ): import('../src/scripts/objects/skillItems/skillItem').default
+  new (scene: Phaser.Scene): import('../src/scripts/objects/skillItems/skillItem').default
 }
 
 declare interface SkillItemListInterface {
@@ -189,11 +190,11 @@ declare interface SkillItemListInterface {
 }
 
 declare interface SkillItemDefinition {
-    skin: import('../src/scripts/utils/skillItems').SKILL_ITEM_SKINS,
-    maxPerLevel: number,
-    itemCost: number,
-    title: string,
-    description: Array<string>
+  skin: import('../src/scripts/utils/skillItems').SKILL_ITEM_SKINS
+  maxPerLevel: number
+  itemCost: number
+  title: string
+  description: Array<string>
 }
 
 declare interface FrameBigInterface {
