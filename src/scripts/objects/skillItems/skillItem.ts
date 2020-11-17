@@ -29,9 +29,7 @@ export default abstract class SkillItem {
   addThumbnail = (x: number, y: number) => {
     const { skin } = this.skillItemDefinition
    
-    this.shadow = this.scene.add.sprite(x, y, skin).setScale(1.1).setVisible(false)
-    this.shadow.tint = 0x000000;
-    this.shadow.alpha = 0.6;
+    this.shadow = this.scene.add.sprite(x, y, 'skill-item-spot-shadow').setVisible(false)
 
     this.image = this.scene.add
       .image(x, y, skin)

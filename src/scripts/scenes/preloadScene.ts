@@ -91,6 +91,7 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('circle-yellow', 'assets/img/circle-yellow.png')
     this.load.image('gem-score', 'assets/img/gem-score.png')
     this.load.image('skill-gem-cost', 'assets/img/skill-gem-cost.png')
+    this.load.image('skill-item-spot-shadow', 'assets/img/skill-item-spot-shadow.png')
 
     //skill items
     this.loadSkillItemsImages()

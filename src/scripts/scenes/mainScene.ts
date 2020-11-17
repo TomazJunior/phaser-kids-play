@@ -7,7 +7,7 @@ import {
   PLAYER_REACHED_INITIAL_POS,
 } from '../events/events'
 import { getAllSkins, getARandomSkinFrom } from '../utils/skinUtils'
-import { ANIMAL_SKINS, BUTTON, SOUNDS, SCENES } from '../utils/constants'
+import { ANIMAL_SKINS, BUTTON, SOUNDS, SCENES, MAIN_SCENE_STATE } from '../utils/constants'
 import HiddenThumbChars from '../objects/hiddenThumbChars'
 import { GameMap } from '../controllers/gameMap'
 import { ButtonSmall } from '../ui/buttonSmall'
@@ -20,9 +20,10 @@ import { TargetQueue } from '../controllers/targetQueue'
 import Door from '../objects/door'
 import { FrameDialog } from '../ui/frameDialog'
 import FingerPoint from '../objects/fingerPoint'
-import { Timer } from '../controllers/Timer'
+import { Timer } from '../controllers/timer'
 import SkillItem from '../objects/skillItems/skillItem'
 import { SkillItemList } from '../objects/skillItemList'
+import { StateController } from '../controllers/stateController'
 
 export default class MainScene extends Phaser.Scene {
   targets: Phaser.Physics.Arcade.StaticGroup
@@ -76,6 +77,7 @@ export default class MainScene extends Phaser.Scene {
     this.currentHiddenSkins = []
     this.availableHiddenSkins = []
     this.hiddenCharOnTheirPosition = false
+    StateController.getInstance().changeState(MAIN_SCENE_STATE.INIT)
   }
 
   create() {
@@ -114,6 +116,8 @@ export default class MainScene extends Phaser.Scene {
     )
     this.backgroundAudio = getOrAddAudio(this, SOUNDS.BACKGROUND, { volume: 0.4, loop: true })
     playSound(this, this.backgroundAudio)
+
+    StateController.getInstance().changeState(MAIN_SCENE_STATE.STARTED)
 
     this.createHiddenChars(this.level)
 
@@ -181,9 +185,10 @@ export default class MainScene extends Phaser.Scene {
 
   restartScene = (gameWorld: GameWorld, level: Level) => {
     this.setToGameOverState(() => {
-      this.scene.restart(<CurrentWorldAndLevelConfig>{
+      this.scene.restart(<MainSceneConfig>{
         gameWorld,
         level,
+        skillItems: []
       })
     })
   }
@@ -258,6 +263,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   setToGameOverState = (cb: () => void) => {
+    StateController.getInstance().changeState(MAIN_SCENE_STATE.GAME_OVER)
     this.time.delayedCall(300, () => {
       if (!this.gameover) {
         this.gameover = true
@@ -272,9 +278,29 @@ export default class MainScene extends Phaser.Scene {
     })
   }
 
+  addHiddenChar(hiddenChar: HiddenChar) {
+    this.hiddenChars.add(hiddenChar)
+    if (this.hiddenCharsReachedTargets()) {
+      StateController.getInstance().changeState(MAIN_SCENE_STATE.HIDDEN_CHAR_IN_SCENE)
+    }
+  }
+
+  hiddenCharsReachedTargets(): boolean {
+    return this.currentHiddenSkins.length === this.hiddenChars.getLength()
+  }
+
+  hiddenCharsReachedTheDoor(): boolean {
+    return (
+      this.hiddenCharsReachedTargets() &&
+      this.hiddenChars.getChildren().every((hiddenChar: any) => {
+        return <HiddenChar>hiddenChar.enteredTheDoor
+      })
+    )
+  }
+
   hiddenCharsAreReady(): boolean {
     return (
-      this.currentHiddenSkins.length === this.hiddenChars.getLength() &&
+      this.hiddenCharsReachedTargets() &&
       this.hiddenChars.getChildren().every((hiddenChar: any) => <HiddenChar>hiddenChar.reachedTarget)
     )
   }
@@ -306,6 +332,7 @@ export default class MainScene extends Phaser.Scene {
     const { height, width } = this.scale
 
     if (this.isInTutorialMode && this.level.tutorial) {
+      StateController.getInstance().changeState(MAIN_SCENE_STATE.IN_TUTORIAL)
       let fingerPointer: FingerPoint
       if (this.level.tutorial.showPointer) {
         const { row, col } = this.level.tutorial.showPointer
@@ -322,10 +349,13 @@ export default class MainScene extends Phaser.Scene {
     }
   }
 
-  handleHiddenReachedFinalPosition = (hiddenChar: HiddenChar) => {
-    hiddenChar.goToDoor(this.door)
+  handleHiddenReachedFinalPosition = async (hiddenChar: HiddenChar) => {
+    await hiddenChar.goToDoor(this.door)
 
     if (hiddenChar.followingPlayer) {
+      if (this.hiddenCharsReachedTheDoor()) {
+        StateController.getInstance().changeState(MAIN_SCENE_STATE.HIDDEN_CHAR_IN_THER_DOOR)
+      }
       this.time.delayedCall(600, () => {
         this.handlePlayerReachedFinalPosition()
       })
@@ -335,6 +365,7 @@ export default class MainScene extends Phaser.Scene {
   handlePlayerReachedFinalPosition = () => {
     this.door.open = true
     if (this.hiddenCharsAreReady() && !this.roundInProgress) {
+      StateController.getInstance().changeState(MAIN_SCENE_STATE.STARTED)
       this.roundInProgress = true
 
       ++this.round
@@ -384,6 +415,9 @@ export default class MainScene extends Phaser.Scene {
   }
 
   createHiddenChars(level: Level) {
+    //TODO: show dialog to choose skill items from STARTED scene if exists
+    // console.log('show dialog STARTED scene')
+
     const { hiddens, extraHiddens } = level
     const extraSkins: Array<ANIMAL_SKINS> = []
     this.clearHiddenChars()
@@ -448,7 +482,7 @@ export default class MainScene extends Phaser.Scene {
       hiddenChar.once(HIDDEN_CHAR_REACHED_TARGET, this.handleHiddenCharReachedTarget)
       hiddenChar.once(HIDDEN_CHAR_REACHED_FINAL_POS, this.handleHiddenReachedFinalPosition)
 
-      this.hiddenChars.add(hiddenChar)
+      this.addHiddenChar(hiddenChar)
 
       const target = this.getFreeTarget()
       const pathToGo = this.gameMap.getPathTo(initialPosition, target.objectPosition, false)
@@ -492,8 +526,9 @@ export default class MainScene extends Phaser.Scene {
     }
   }
 
-  // aftre player is reqdy and all hiddens are on their targets
+  // after player is reqdy and all hiddens are on their targets
   startRound() {
+    StateController.getInstance().changeState(MAIN_SCENE_STATE.PLAYER_READY)
     this.targetQueue.clear()
     this.targetQueue.inTutorialMode = this.isInTutorialMode
     this.timer.start()
@@ -504,6 +539,7 @@ export default class MainScene extends Phaser.Scene {
       this.time.delayedCall(500, () => {
         this.closeTargets()
         this.hiddenCharOnTheirPosition = true
+        StateController.getInstance().changeState(MAIN_SCENE_STATE.HIDDEN_CHAR_IN_TARGET)
         // go to initial position only on the first round
         if (this.round === 1) {
           this.playerGotoInitialPosition()

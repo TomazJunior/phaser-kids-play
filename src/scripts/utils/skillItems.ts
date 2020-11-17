@@ -1,3 +1,5 @@
+import { MAIN_SCENE_STATE } from "./constants"
+
 export enum SKILL_ITEM_SKINS {
   KEY = 'skill-item-key',
   STAR = 'skill-item-star',
@@ -12,6 +14,7 @@ export enum SKILL_ITEM_TYPE {
 
 const SKILL_ITEMS: Record<SKILL_ITEM_SKINS, SkillItemDefinition> = {
   [SKILL_ITEM_SKINS.KEY]: {
+    state: MAIN_SCENE_STATE.PLAYER_READY,
     type: SKILL_ITEM_TYPE.SELECT_BOX,
     maxPerLevel: 1,
     itemCost: 50,
@@ -20,6 +23,7 @@ const SKILL_ITEMS: Record<SKILL_ITEM_SKINS, SkillItemDefinition> = {
     skin: SKILL_ITEM_SKINS.KEY
   },
   [SKILL_ITEM_SKINS.STAR]: {
+    state: MAIN_SCENE_STATE.PLAYER_READY,
     type: SKILL_ITEM_TYPE.SELECT_NONE,
     maxPerLevel: 1,
     itemCost: 60,
@@ -28,11 +32,12 @@ const SKILL_ITEMS: Record<SKILL_ITEM_SKINS, SkillItemDefinition> = {
     skin: SKILL_ITEM_SKINS.STAR
   },
   [SKILL_ITEM_SKINS.BOX]: {
+    state: MAIN_SCENE_STATE.STARTED,
     type: SKILL_ITEM_TYPE.SELECT_BOX,
     maxPerLevel: 1,
     itemCost: 20,
     title: 'box',
-    description: ['Close one box, ', 'and no animal can hide there.'],
+    description: ['Close one box,', 'and no animal can hide there.'],
     skin: SKILL_ITEM_SKINS.BOX
   },
 }

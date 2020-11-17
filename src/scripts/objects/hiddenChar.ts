@@ -18,6 +18,7 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
     roadPosition: boolean
   }
   reachedTarget = false
+  enteredTheDoor = false 
   target: TargetInterface
   objectPosition: ObjectPosition
   pathToGo: Array<ObjectPosition>
@@ -63,24 +64,29 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
     this.setIsGoingTo(pathToGo, true)
   }
 
-  public goToDoor(door: Door) {
-    const { objectPosition } = door
-    if (!this.followingPlayer) door.open = true
-    this.scene.tweens.add({
-      targets: this,
-      x: objectPosition.x,
-      y: objectPosition.y,
-      scale: 0.4,
-      duration: 500,
-      onStart: () => {
-        playSound(this.scene, this.enterOnDoorAudio)
-      },
-      onComplete: async () => {
-        this.visible = false
-        if (!this.followingPlayer) door.open = false
-        this.emit(HIDDEN_CHAR_REACHED_FINAL_POS, this)
-      },
+  public async goToDoor(door: Door) {
+    return new Promise((resolve) => {
+      const { objectPosition } = door
+      if (!this.followingPlayer) door.open = true
+      this.scene.tweens.add({
+        targets: this,
+        x: objectPosition.x,
+        y: objectPosition.y,
+        scale: 0.4,
+        duration: 500,
+        onStart: () => {
+          playSound(this.scene, this.enterOnDoorAudio)
+        },
+        onComplete: async () => {
+          this.visible = false
+          this.enteredTheDoor = true
+          if (!this.followingPlayer) door.open = false
+          this.emit(HIDDEN_CHAR_REACHED_FINAL_POS, this)
+          resolve()
+        },
+      })
     })
+
   }
 
   public getOut(position: ObjectPosition, onComplete: () => Promise<void>) {
