@@ -1,3 +1,5 @@
+import { SKILL_ITEM_SELECTED } from '../events/events'
+import SkillItem from '../objects/skillItems/skillItem'
 import { BUTTON, COLORS, FONTS, MAX_TIMER_DURATION } from '../utils/constants'
 import { ButtonSmall } from './buttonSmall'
 import RoundIndicator from './roundIndicator'
@@ -6,16 +8,27 @@ export class FrameLevel extends Phaser.GameObjects.Sprite {
   private worldText: Phaser.GameObjects.Text
   private levelText: Phaser.GameObjects.Text
   private rounds: Phaser.GameObjects.Group
+  private skillItems: Array<SkillItem>
   private _round: number = 0
   private _timers: Array<number> = []
 
   clockText: Phaser.GameObjects.Text
-  constructor(scene: Phaser.Scene, x: number, y: number, title: string, level: string, onPause: () => void) {
+  constructor(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    title: string,
+    level: string,
+    skillItems: Array<SkillItem>,
+    onPause: () => void
+  ) {
     super(scene, x, y, 'small-frame-level')
     scene.add.existing(this)
 
+    this.skillItems = skillItems
+
     this.worldText = this.scene.add
-      .text(this.x - 25, this.y - 95, title, {
+      .text(this.x - 25, this.y - 135, title, {
         fontFamily: FONTS.ALLOY_INK,
         fontSize: '28px',
       })
@@ -29,7 +42,7 @@ export class FrameLevel extends Phaser.GameObjects.Sprite {
       })
       .setStroke(COLORS.DARK_RED, 10)
 
-    new ButtonSmall(scene, this.x - this.displayWidth * 0.3, this.y - this.displayHeight * 0.2, {
+    new ButtonSmall(scene, this.x - this.displayWidth * 0.3, this.y - 80, {
       onClick: onPause,
       name: BUTTON.PAUSE,
       scale: {
@@ -41,17 +54,19 @@ export class FrameLevel extends Phaser.GameObjects.Sprite {
     this.rounds = scene.add.group()
     let offsetX = 0
     for (let index = 0; index < 5; index++) {
-      this.rounds.add(new RoundIndicator(scene, this.x + offsetX, this.y + 20).setOrigin(0.5, 0))
+      this.rounds.add(new RoundIndicator(scene, this.x + offsetX, this.y + 3).setOrigin(0.5, 0.5))
       offsetX += 35
     }
 
     this.clockText = this.scene.add
-      .text(this.x - this.displayWidth * 0.36, this.y + 25, '0.00', {
+      .text(this.x - this.displayWidth * 0.35, this.y + 3, '0.00', {
         fontFamily: FONTS.ALLOY_INK,
         fontSize: '32px',
       })
       .setStroke(COLORS.DARK_YELLOW, 10)
-      .setOrigin(0, 0)
+      .setOrigin(0, 0.5)
+
+    this.showSkillItems()
   }
 
   public set round(v: number) {
@@ -89,5 +104,19 @@ export class FrameLevel extends Phaser.GameObjects.Sprite {
 
   public get timers(): Array<number> {
     return this._timers
+  }
+
+  private handleSelectedSkillItem = (skillItem: SkillItem) => {
+    if (skillItem.selected) {
+      this.skillItems
+        .filter((s) => s.selected && s.skillItemDefinition.skin !== skillItem.skillItemDefinition.skin)
+        .forEach((s) => (s.selected = false))
+    }
+  }
+
+  private showSkillItems = () => {
+    const itemsOffset = [-125, 0, 125]
+    this.skillItems.forEach((s, index) => s.addThumbnail(this.x + itemsOffset[index], this.y + 77))
+    this.scene.events.on(SKILL_ITEM_SELECTED, this.handleSelectedSkillItem)
   }
 }

@@ -21,6 +21,8 @@ import Door from '../objects/door'
 import { FrameDialog } from '../ui/frameDialog'
 import FingerPoint from '../objects/fingerPoint'
 import { Timer } from '../controllers/Timer'
+import SkillItem from '../objects/skillItems/skillItem'
+import { SkillItemList } from '../objects/skillItemList'
 
 export default class MainScene extends Phaser.Scene {
   targets: Phaser.Physics.Arcade.StaticGroup
@@ -40,7 +42,7 @@ export default class MainScene extends Phaser.Scene {
   roundInProgress: boolean
   door: Door
   timer: Timer
-  skillItems: SkillItemFileStorageConfig[]
+  skillItemsConfig: SkillItemFileStorageConfig[]
   _round: number
   constructor() {
     super({ key: SCENES.MAIN_SCENE })
@@ -69,7 +71,7 @@ export default class MainScene extends Phaser.Scene {
       this.level = { ...config.level }
     }
 
-    this.skillItems = [...config.skillItems]
+    this.skillItemsConfig = [...config.skillItems]
     this.round = 1
     this.currentHiddenSkins = []
     this.availableHiddenSkins = []
@@ -104,9 +106,10 @@ export default class MainScene extends Phaser.Scene {
     this.frameLevel = new FrameLevel(
       this,
       width - 200,
-      120,
+      170,
       this.currentWorld.name,
       this.isInTutorialMode ? 'Tutorial' : `Level ${this.level.level}`,
+      this.getSkillItems(),
       this.handleLoseFocus
     )
     this.backgroundAudio = getOrAddAudio(this, SOUNDS.BACKGROUND, { volume: 0.4, loop: true })
@@ -165,6 +168,15 @@ export default class MainScene extends Phaser.Scene {
         this.restartScene(this.currentWorld, this.level)
       },
     })
+  }
+
+  getSkillItems = (): Array<SkillItem> => {
+    return this.skillItemsConfig
+      .map((s) => {
+        return SkillItemList.getSkillItemBySkill(s.skin)
+      })
+      .filter((s) => !!s?.clazz)
+      .map((s) => new s!.clazz(this))
   }
 
   restartScene = (gameWorld: GameWorld, level: Level) => {

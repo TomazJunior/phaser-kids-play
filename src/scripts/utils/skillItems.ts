@@ -4,8 +4,15 @@ export enum SKILL_ITEM_SKINS {
   BOX = 'skill-item-box',
 }
 
+export enum SKILL_ITEM_TYPE {
+  SELECT_BOX = 'select-box',
+  SELECT_PLAYER = 'select-player',
+  SELECT_NONE = 'select-none',
+}
+
 const SKILL_ITEMS: Record<SKILL_ITEM_SKINS, SkillItemDefinition> = {
   [SKILL_ITEM_SKINS.KEY]: {
+    type: SKILL_ITEM_TYPE.SELECT_BOX,
     maxPerLevel: 1,
     itemCost: 50,
     title: 'key',
@@ -13,6 +20,7 @@ const SKILL_ITEMS: Record<SKILL_ITEM_SKINS, SkillItemDefinition> = {
     skin: SKILL_ITEM_SKINS.KEY
   },
   [SKILL_ITEM_SKINS.STAR]: {
+    type: SKILL_ITEM_TYPE.SELECT_NONE,
     maxPerLevel: 1,
     itemCost: 60,
     title: 'star',
@@ -20,6 +28,7 @@ const SKILL_ITEMS: Record<SKILL_ITEM_SKINS, SkillItemDefinition> = {
     skin: SKILL_ITEM_SKINS.STAR
   },
   [SKILL_ITEM_SKINS.BOX]: {
+    type: SKILL_ITEM_TYPE.SELECT_BOX,
     maxPerLevel: 1,
     itemCost: 20,
     title: 'box',

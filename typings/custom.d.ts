@@ -191,6 +191,7 @@ declare interface SkillItemListInterface {
 
 declare interface SkillItemDefinition {
   skin: import('../src/scripts/utils/skillItems').SKILL_ITEM_SKINS
+  type: import('../src/scripts/utils/skillItems').SKILL_ITEM_TYPE
   maxPerLevel: number
   itemCost: number
   title: string
