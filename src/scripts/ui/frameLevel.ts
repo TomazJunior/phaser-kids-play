@@ -1,5 +1,5 @@
 import { StateController } from '../controllers/stateController'
-import { ALL_SKILL_ITEMS_CURRENT_STATE_DONE, SKILL_ITEM_ACTION_DONE, SKILL_ITEM_SELECTED } from '../events/events'
+import { SKILL_ITEM_ACTION_DONE, SKILL_ITEM_SELECTED } from '../events/events'
 import SkillItem from '../objects/skillItems/skillItem'
 import { BUTTON, COLORS, FONTS, MAX_TIMER_DURATION } from '../utils/constants'
 import { ButtonSmall } from './buttonSmall'
@@ -117,9 +117,6 @@ export class FrameLevel extends Phaser.GameObjects.Sprite {
     const { skillItems } = StateController.getInstance()
     await skillItem.hideThumbnail()
     StateController.getInstance().skillItems = skillItems.filter((s) => s !== skillItem)
-    if (!StateController.getInstance().getSkillItemsOfCurrentState().length) {
-      this.scene.events.emit(ALL_SKILL_ITEMS_CURRENT_STATE_DONE)
-    }
   }
 
   private showSkillItems = () => {

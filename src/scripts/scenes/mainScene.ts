@@ -1,12 +1,12 @@
 import HiddenChar from '../objects/hiddenChar'
 import {
-  ALL_SKILL_ITEMS_CURRENT_STATE_DONE,
   HIDDEN_CHARS_ENQUEUED,
   HIDDEN_CHAR_REACHED_FINAL_POS,
   HIDDEN_CHAR_REACHED_TARGET,
   PLAYER_REACHED_FINAL_POS,
   PLAYER_REACHED_INITIAL_POS,
   removeKnownEvents,
+  SKILL_ITEM_ACTION_DONE,
 } from '../events/events'
 import { getAllSkins, getARandomSkinFrom } from '../utils/skinUtils'
 import { ANIMAL_SKINS, BUTTON, SOUNDS, SCENES, MAIN_SCENE_STATE } from '../utils/constants'
@@ -152,12 +152,11 @@ export default class MainScene extends Phaser.Scene {
           height: this.frameLevel.displayHeight,
         },
         () => {
-          // Remove listener to avoid accumulate events
-          this.events.off(ALL_SKILL_ITEMS_CURRENT_STATE_DONE)
+          this.events.off(SKILL_ITEM_ACTION_DONE)
           callback()
         }
       )
-      this.events.once(ALL_SKILL_ITEMS_CURRENT_STATE_DONE, () => {
+      this.events.once(SKILL_ITEM_ACTION_DONE, () => {
         skillItemFrameDialog.close()
       })
     } else {

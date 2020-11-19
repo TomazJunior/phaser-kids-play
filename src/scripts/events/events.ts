@@ -12,7 +12,6 @@ export const PLAYER_TOUCHED_TARGET = 'PLAYER_TOUCHED_TARGET'
 
 export const SKILL_ITEM_SELECTED = 'SKILL_ITEM_SELECTED'
 export const SKILL_ITEM_ACTION_DONE = 'SKILL_ITEM_ACTION_DONE'
-export const ALL_SKILL_ITEMS_CURRENT_STATE_DONE = 'ALL_SKILL_ITEMS_CURRENT_STATE_DONE'
 
 export const removeKnownEvents = (scene: Phaser.Scene) => {
   ;[
@@ -28,6 +27,5 @@ export const removeKnownEvents = (scene: Phaser.Scene) => {
     PLAYER_TOUCHED_TARGET,
     SKILL_ITEM_SELECTED,
     SKILL_ITEM_ACTION_DONE,
-    ALL_SKILL_ITEMS_CURRENT_STATE_DONE,
   ].forEach((event) => scene.events.removeListener(event))
 }
