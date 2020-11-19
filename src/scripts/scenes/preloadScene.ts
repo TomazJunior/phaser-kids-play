@@ -149,7 +149,7 @@ export default class PreloadScene extends Phaser.Scene {
       //   level: GAME_WORLDS[0].levels[0],
       //   skillItems: [{
       //     skin: SKILL_ITEM_SKINS.BOX,
-      //     quantity: 1
+      //     quantity: 2
       //   },{
       //     skin: SKILL_ITEM_SKINS.KEY,
       //     quantity: 1

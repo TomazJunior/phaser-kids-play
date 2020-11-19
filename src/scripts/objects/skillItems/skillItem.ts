@@ -1,11 +1,14 @@
 import { SKILL_ITEM_ACTION_DONE, SKILL_ITEM_SELECTED } from '../../events/events'
+import { ButtonCircle } from '../../ui/buttonCircle'
 import { getSkillItemDefinition, SKILL_ITEM_SKINS } from '../../utils/skillItems'
 
 export default abstract class SkillItem {
-  protected image: Phaser.GameObjects.Image
+  protected image?: Phaser.GameObjects.Image
   private _enabled: boolean = false
   private _selected: boolean = false
+  private _quantity: number = 0
   private shadow: Phaser.GameObjects.Sprite
+  private badge?: ButtonCircle
 
   public readonly skillItemDefinition: SkillItemDefinition
 
@@ -43,15 +46,36 @@ export default abstract class SkillItem {
     this._enabled = v
     const { skin } = this.skillItemDefinition
     if (v) {
-      this.image.setTexture(skin)
+      this.image?.setTexture(skin)
     } else {
       this.selected = false
-      this.image.setTexture(`${skin}-inactive`)
+      this.image?.setTexture(`${skin}-inactive`)
     }
   }
 
-  public addThumbnail = (x: number, y: number) => {
+  public decreaseThumbnail = (quantity: number): Promise<void> => {
+    return new Promise((resolve) => {
+      if (!this.badge) return resolve()
+
+      this.scene.tweens.addCounter({
+        from: this._quantity,
+        to: quantity,
+        duration: 250,
+        onUpdate: (tween: Phaser.Tweens.Tween, { value }: any) => {
+          this.badge!.text = Math.trunc(value).toString()
+        },
+        onComplete: () => {
+          this.badge!.text = quantity.toString()
+          this._quantity = quantity
+          resolve()
+        },
+      })
+    })
+  }
+  
+  public addThumbnail = (x: number, y: number, quantity: number) => {
     const { skin } = this.skillItemDefinition
+    this._quantity = quantity
 
     this.shadow = this.scene.add.sprite(x, y, 'skill-item-spot-shadow').setVisible(false)
 
@@ -62,6 +86,8 @@ export default abstract class SkillItem {
       .on('pointerdown', () => {
         this.selected = !this.selected
       })
+
+    this.badge = new ButtonCircle(this.scene, x - 30, y - 30, 'circle-green', quantity.toString()).setScale(0.8)
   }
 
   public hideThumbnail = (): Promise<void> => {
@@ -70,12 +96,15 @@ export default abstract class SkillItem {
     this.enabled = false
     return new Promise((resolve) => {
       this.scene.tweens.add({
-        targets: this.image,
+        targets: [this.image, this.badge],
         duration: 500,
         alpha: 0,
         onComplete: () => {
           this.shadow.destroy(true)
-          this.image.destroy(true)
+          this.image?.destroy(true)
+          this.image = undefined
+          this.badge?.destroy(true)
+          this.badge = undefined
           resolve()
         },
       })

@@ -3,7 +3,7 @@ import { MAIN_SCENE_STATE } from '../utils/constants'
 
 export class StateController {
   private _state: MAIN_SCENE_STATE
-  private _skillItems: Array<SkillItem>
+  private _skillItemsInScene: Array<SkillItemInScene>
   private static instance: StateController
   private constructor() {}
   public static getInstance(): StateController {
@@ -14,21 +14,22 @@ export class StateController {
     return StateController.instance
   }
 
-  public set skillItems(skillItems: Array<SkillItem>) {
-    this._skillItems = skillItems
+  public set skillItemsInScene(skillItems: Array<SkillItemInScene>) {
+    this._skillItemsInScene = skillItems
   }
 
-  public get skillItems(): Array<SkillItem> {
-    return this._skillItems
+  public get skillItemsInScene(): Array<SkillItemInScene> {
+    return this._skillItemsInScene
   }
 
   public changeState(state: MAIN_SCENE_STATE) {
     this._state = state
-    this.skillItems?.forEach((s) => {
-      s.enabled = s.skillItemDefinition.state === state
+    this.skillItemsInScene?.forEach((skillItemInScene) => {
+      const { skillItem } = skillItemInScene
+      skillItem.enabled = skillItem.skillItemDefinition.state === state
     })
     if (state === MAIN_SCENE_STATE.GAME_OVER) {
-      this.skillItems = []
+      this.skillItemsInScene = []
     }
   }
 
@@ -37,10 +38,23 @@ export class StateController {
   }
 
   public get selectedSkillItem(): SkillItem | undefined {
-    return this.skillItems?.find((s) => s.selected)
+    return this.skillItemsInScene?.find((s) => s.skillItem.selected)?.skillItem
   }
 
   public getSkillItemsOfCurrentState = (): Array<SkillItem> => {
-    return this.skillItems?.filter((s) => s.skillItemDefinition.state === this.currentState)
+    return this.skillItemsInScene
+      ?.filter((s) => s.quantity && s.skillItem.skillItemDefinition.state === this.currentState)
+      .map((s) => s.skillItem)
+  }
+
+  public decreaseSkillItem = (skillItem: SkillItem): number => {
+    const skinItemInScene = this.skillItemsInScene?.find(
+      (s) => s.skillItem.skillItemDefinition.skin === skillItem.skillItemDefinition.skin
+    )
+    if (skinItemInScene) {
+      skinItemInScene.quantity--
+    }
+
+    return skinItemInScene?.quantity || 0
   }
 }

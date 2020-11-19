@@ -149,7 +149,6 @@ export default class SelectItemsScene extends Phaser.Scene {
 
   refreshCards = () => {
     const { skillItems } = getFileStorageConfig()
-
     if (!skillItems?.length) return
     if (!this.cards?.length) return
 

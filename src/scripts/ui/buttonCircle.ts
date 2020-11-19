@@ -40,4 +40,9 @@ export class ButtonCircle extends Phaser.GameObjects.Group {
     this._text = v
     this.buttonText.text = this._text
   }
+
+  public setScale(v: number) {
+    this.button.setScale(v)
+    return this
+  }
 }

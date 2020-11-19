@@ -13,17 +13,9 @@ export class FrameLevel extends Phaser.GameObjects.Sprite {
   private _timers: Array<number> = []
 
   clockText: Phaser.GameObjects.Text
-  constructor(
-    scene: Phaser.Scene,
-    x: number,
-    y: number,
-    title: string,
-    level: string,
-    onPause: () => void
-  ) {
+  constructor(scene: Phaser.Scene, x: number, y: number, title: string, level: string, onPause: () => void) {
     super(scene, x, y, 'small-frame-level')
     scene.add.existing(this)
-
 
     this.worldText = this.scene.add
       .text(this.x - 25, this.y - 135, title, {
@@ -105,24 +97,32 @@ export class FrameLevel extends Phaser.GameObjects.Sprite {
   }
 
   private handleSelectedSkillItem = (skillItem: SkillItem) => {
-    const { skillItems } = StateController.getInstance()
+    const { skillItemsInScene } = StateController.getInstance()
     if (skillItem.selected) {
-      skillItems
-        .filter((s) => s.selected && s.skillItemDefinition.skin !== skillItem.skillItemDefinition.skin)
-        .forEach((s) => (s.selected = false))
+      skillItemsInScene
+        .map((s) => s.skillItem)
+        .filter(
+          (skillItem) => skillItem.selected && skillItem.skillItemDefinition.skin !== skillItem.skillItemDefinition.skin
+        )
+        .forEach((skillItem) => (skillItem.selected = false))
     }
   }
 
   private handleSkillItemUsed = async (skillItem: SkillItem) => {
-    const { skillItems } = StateController.getInstance()
-    await skillItem.hideThumbnail()
-    StateController.getInstance().skillItems = skillItems.filter((s) => s !== skillItem)
+    const quantity = StateController.getInstance().decreaseSkillItem(skillItem)
+    await skillItem.decreaseThumbnail(quantity)
+    if (!quantity) {
+      await skillItem.hideThumbnail()
+    }
   }
 
   private showSkillItems = () => {
-    const { skillItems } = StateController.getInstance()
+    const { skillItemsInScene } = StateController.getInstance()
     const itemsOffset = [-125, 0, 125]
-    skillItems.forEach((skillItem, index) => skillItem.addThumbnail(this.x + itemsOffset[index], this.y + 77))
+    skillItemsInScene.forEach((skillItemInScene, index) => {
+      const { skillItem, quantity } = skillItemInScene
+      skillItem.addThumbnail(this.x + itemsOffset[index], this.y + 77, quantity)
+    })
     this.scene.events.on(SKILL_ITEM_SELECTED, this.handleSelectedSkillItem)
     this.scene.events.on(SKILL_ITEM_ACTION_DONE, this.handleSkillItemUsed)
   }

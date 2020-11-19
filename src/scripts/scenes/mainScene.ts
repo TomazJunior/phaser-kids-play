@@ -109,7 +109,7 @@ export default class MainScene extends Phaser.Scene {
     this.hiddenChars = this.add.group()
     this.hiddenThumbChars = new HiddenThumbChars(this, width * 0.5, height * 0)
 
-    StateController.getInstance().skillItems = this.getSkillItems()
+    StateController.getInstance().skillItemsInScene = this.getSkillItems()
 
     this.frameLevel = new FrameLevel(
       this,
@@ -152,13 +152,11 @@ export default class MainScene extends Phaser.Scene {
           height: this.frameLevel.displayHeight,
         },
         () => {
-          this.events.off(SKILL_ITEM_ACTION_DONE)
+          this.events.off(SKILL_ITEM_ACTION_DONE, skillItemFrameDialog.close)
           callback()
         }
       )
-      this.events.once(SKILL_ITEM_ACTION_DONE, () => {
-        skillItemFrameDialog.close()
-      })
+      this.events.once(SKILL_ITEM_ACTION_DONE, skillItemFrameDialog.close)
     } else {
       callback()
     }
@@ -215,13 +213,21 @@ export default class MainScene extends Phaser.Scene {
     })
   }
 
-  getSkillItems = (): Array<SkillItem> => {
+  getSkillItems = (): Array<SkillItemInScene> => {
     return this.skillItemsConfig
-      .map((s) => {
-        return SkillItemList.getSkillItemBySkill(s.skin)
+      .map((skillItemConfig) => {
+        return {
+          clazz: SkillItemList.getSkillItemBySkill(skillItemConfig.skin)?.clazz,
+          quantity: skillItemConfig.quantity
+        }
       })
-      .filter((s) => !!s?.clazz)
-      .map((s) => new s!.clazz(this))
+      .filter((skillItemConfig) => !!skillItemConfig?.clazz)
+      .map((skillItemConfig) => {
+        return {
+          skillItem: new skillItemConfig!.clazz!(this),
+          quantity: skillItemConfig.quantity
+        }
+      })
   }
 
   restartScene = (gameWorld: GameWorld, level: Level) => {

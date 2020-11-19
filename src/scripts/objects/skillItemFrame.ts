@@ -43,7 +43,10 @@ export default class SkillItemFrame extends Phaser.GameObjects.Image {
   }
 
   public set quantity(v: number) {
-    if (v >= 0 && v <= this.skillItem.skillItemDefinition.maxPerLevel) {
+    if (v < 0) return
+    if (v > this.skillItem.skillItemDefinition.maxPerLevel) {
+      this._quantity = this.skillItem.skillItemDefinition.maxPerLevel
+    } else {
       this._quantity = v
     }
     this.updateAddButtonStyle()

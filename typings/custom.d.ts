@@ -53,6 +53,10 @@ declare interface SkillItemFileStorageConfig {
   skin: import('../src/scripts/utils/skillItems').SKILL_ITEM_SKINS
 }
 
+declare interface SkillItemInScene {
+  skillItem: import('../src/scripts/objects/skillItems/skillItem').default,
+  quantity: number
+}
 declare interface LevelFileStorageConfig {
   key: string
   level: number

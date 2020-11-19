@@ -154,7 +154,7 @@ const removeSkillItem = (item: SkillItemFileStorageConfig) => {
   if (!skillItemFound) {
     throw new Error(`Skill ${item.skin} item not found in the list ${skillItems}`)
   }
-  skillItemFound.quantity--
+  skillItemFound.quantity -= item.quantity
   setFileStorageConfig({
     ...getFileStorageConfig(),
     skillItems: [...skillItems.filter((s) => !(s.skin === item.skin)), skillItemFound],
