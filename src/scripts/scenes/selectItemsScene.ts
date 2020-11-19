@@ -27,7 +27,7 @@ export default class SelectItemsScene extends Phaser.Scene {
 
   create() {
     this.background = new BackgroundParallax(this, false, false)
-    this.createSelectSkillItemFrame()
+    this.createSkillItemFrames()
     this.gemScore = new GemScore(this, 150).setVisible(true)
 
     this.createBackButton()
@@ -76,7 +76,7 @@ export default class SelectItemsScene extends Phaser.Scene {
       visible: false,
       gems: getGems(),
       onCloseButton: this.handleHideBuySkillItemFrame,
-      onConfirmButton: this.handleBuySkillItemFrame,
+      onConfirmButton: this.handleConfirmBuyingSkillItem,
     })
     return new Promise((resolve) => {
       this.tweens.add({
@@ -90,11 +90,12 @@ export default class SelectItemsScene extends Phaser.Scene {
     })
   }
 
-  handleBuySkillItemFrame = (skillItem: SkillItemDefinition): Promise<void> => {
+  handleConfirmBuyingSkillItem = (skillItem: SkillItemDefinition): Promise<void> => {
     return new Promise(async (resolve) => {
       buySkillItem(skillItem)
       await this.gemScore.refreshValue()
       this.time.delayedCall(250, async () => {
+        this.refreshAndSelectCard(skillItem)
         await this.handleHideBuySkillItemFrame()
         resolve()
       })
@@ -117,11 +118,10 @@ export default class SelectItemsScene extends Phaser.Scene {
       }),
     ]).then(() => {
       this.backButton.setVisible(true)
-      this.refreshCards()
     })
   }
 
-  createSelectSkillItemFrame() {
+  createSkillItemFrames() {
     const { width, height } = this.scale
     this.frame = new FrameBig<SkillItemFrame>(this, width * 0.5, height * 0.5, {
       visible: true,
@@ -131,13 +131,13 @@ export default class SelectItemsScene extends Phaser.Scene {
 
     this.cards = SkillItemList.skills.map((skillItem, index) => {
       return this.frame.addItem((x, y) => {
-        return new SkillItemFrame(this, x, y, skillItem.skin, new skillItem.clazz(this), this.handleBuyItem)
+        return new SkillItemFrame(this, x, y, skillItem.skin, new skillItem.clazz(this), this.handleShowBuySkillItemFrame)
       })
     })
     this.refreshCards()
   }
 
-  handleBuyItem = (skillItem: SkillItem) => {
+  handleShowBuySkillItemFrame = (skillItem: SkillItem) => {
     if (this.isOpeningItemToBuy) return
 
     this.backButton.setVisible(false)
@@ -159,6 +159,23 @@ export default class SelectItemsScene extends Phaser.Scene {
         card.quantity = foundSkillItem.quantity
       }
     })
+  }
+
+  refreshAndSelectCard = (skillItem: SkillItemDefinition) => {
+    const { skillItems } = getFileStorageConfig()
+
+    if (!skillItems?.length) return
+    if (!this.cards?.length) return
+
+    const card = this.cards.find(card => card.skin === skillItem.skin)
+    
+    if (card) {
+      const foundSkillItem = skillItems.find((s) => s.skin === card.skin)
+      if (foundSkillItem) {
+        card.selected = true
+        card.quantity = foundSkillItem.quantity
+      }
+    }
   }
 
   getSelectedItems = (): Array<SkillItemFileStorageConfig> => {
