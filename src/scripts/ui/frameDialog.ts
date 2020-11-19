@@ -7,6 +7,10 @@ export class FrameDialog extends Phaser.GameObjects.Group {
   private wordIndex = 0
   private lineIndex = 0
   private text: Phaser.GameObjects.Text
+  private tweens: Array<Phaser.Tweens.Tween> = []
+  private isClosing = false
+  private skipEvents = false
+
   wordDelay = 25
   lineDelay = 75
   closeButton: ButtonSmall | undefined
@@ -18,11 +22,17 @@ export class FrameDialog extends Phaser.GameObjects.Group {
     private content: Array<string>,
     hideBackground: boolean = false,
     size?: { width: number; height: number },
-    onClose?: () => void
+    private onClose?: () => void
   ) {
     super(scene)
     this.scene = scene
-    this.frame = scene.add.image(x, y, 'frame-char-dialog')
+    this.frame = scene.add
+      .image(x, y, 'frame-char-dialog')
+      .setInteractive()
+      .on('pointerdown', () => {
+        this.skipEvents = true
+      })
+
     scene.add.existing(this)
     this.add(this.frame)
 
@@ -59,15 +69,11 @@ export class FrameDialog extends Phaser.GameObjects.Group {
         this.frame.y - this.frame.displayHeight * 0.45,
         {
           name: BUTTON.CLOSE,
-          prefix: BUTTON_PREFIX.BLOCKED,
           scale: {
             x: 0.3,
             y: 0.3,
           },
-          onClick: () => {
-            if (onClose) onClose()
-            this.destroy(true)
-          },
+          onClick: this.close,
         }
       ).setDepth(OBJECT_DEPTHS.FRAME_DIALOG)
 
@@ -78,32 +84,45 @@ export class FrameDialog extends Phaser.GameObjects.Group {
   }
 
   nextLine = () => {
-    if (this.lineIndex === this.content.length) {
-      this.closeButton?.changeTexture(BUTTON_PREFIX.NORMAL)
-      return
-    }
+    if (this.isClosing) return
+    const hasNextLine = this.content.length >= this.lineIndex + 1
+    if (!hasNextLine) return
 
     this.line = this.content[this.lineIndex++].split(' ')
     this.wordIndex = 0
 
-    this.scene.tweens.addCounter({
-      duration: this.line.length * this.wordDelay,
+    const tween = this.scene.tweens.addCounter({
+      duration: this.skipEvents ? 0 : this.line.length * this.wordDelay,
       repeat: this.line.length,
       onRepeat: () => {
         this.nextWord()
       },
       ease: (v) => Phaser.Math.Easing.Stepped(v, this.line.length),
     })
+    this.tweens.push(tween)
   }
 
   nextWord = () => {
+    if (this.isClosing) return
+
     this.text.text = this.text.text.concat(this.line[this.wordIndex] + ' ')
     this.wordIndex++
 
     //  Last word?
     if (this.wordIndex === this.line.length) {
       this.text.text = this.text.text.concat('\n')
-      this.scene.time.delayedCall(this.lineDelay, this.nextLine)
+      if (this.skipEvents) {
+        this.nextLine()
+      } else {
+        this.scene.time.delayedCall(this.lineDelay, this.nextLine)
+      }
     }
+  }
+
+  close = () => {
+    this.isClosing = true
+    this.tweens.filter((tween) => tween.isPlaying()).forEach((tween) => tween.complete())
+    if (this.onClose) this.onClose()
+    this.destroy(true)
   }
 }

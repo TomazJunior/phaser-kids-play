@@ -145,26 +145,18 @@ export default class MainScene extends Phaser.Scene {
         this,
         this.frameLevel.x,
         this.frameLevel.y + this.frameLevel.displayHeight,
-        [
-          'Great news!',
-          'You have an item to be',
-          "used now!",
-          'You may use it or ',
-          'just close this dialog.'
-        ],
+        ['Great news!', 'You have an item to be', 'used now!', 'Or just close this dialog.'],
         true,
         {
           width: this.frameLevel.displayWidth,
           height: this.frameLevel.displayHeight,
         },
         () => {
-          skillItemFrameDialog.destroy(true)
           callback()
         }
       )
       this.events.once(ALL_SKILL_ITEMS_CURRENT_STATE_DONE, () => {
-        skillItemFrameDialog.destroy(true)
-        callback()
+        skillItemFrameDialog.close()
       })
     } else {
       callback()
@@ -233,10 +225,11 @@ export default class MainScene extends Phaser.Scene {
 
   restartScene = (gameWorld: GameWorld, level: Level) => {
     this.setToGameOverState(() => {
-      this.scene.restart(<MainSceneConfig>{
+      this.scene.stop(SCENES.MAIN_SCENE)
+      this.backgroundAudio.stop()
+      this.scene.start(SCENES.SELECT_ITEMS_SCENE, <CurrentWorldAndLevelConfig>{
         gameWorld,
         level,
-        skillItems: [],
       })
     })
   }

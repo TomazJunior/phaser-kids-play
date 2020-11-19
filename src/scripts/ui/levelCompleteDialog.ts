@@ -169,10 +169,10 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
     ).setOrigin(0, 0)
 
     this.group
-    .addMultiple(levelSceneButton.getChildren())
-    .addMultiple(restartSceneButton.getChildren())
-    .addMultiple(nextLevelButton.getChildren())
-    .setDepth(OBJECT_DEPTHS.FRAME_DIALOG)
+      .addMultiple(levelSceneButton.getChildren())
+      .addMultiple(restartSceneButton.getChildren())
+      .addMultiple(nextLevelButton.getChildren())
+      .setDepth(OBJECT_DEPTHS.FRAME_DIALOG)
   }
 
   addRoundText = async (): Promise<void> => {

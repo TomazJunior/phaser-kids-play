@@ -27,6 +27,9 @@ export class StateController {
     this.skillItems?.forEach((s) => {
       s.enabled = s.skillItemDefinition.state === state
     })
+    if (state === MAIN_SCENE_STATE.GAME_OVER) {
+      this.skillItems = []
+    }
   }
 
   public get currentState(): MAIN_SCENE_STATE {
