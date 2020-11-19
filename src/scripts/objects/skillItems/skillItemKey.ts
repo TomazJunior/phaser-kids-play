@@ -6,7 +6,7 @@ export default class SkillItemKey extends SkillItem {
   constructor(scene: Phaser.Scene) {
     super(scene, SkillItemKey.skin)
   }
-  doAction = async (): Promise<void> => {
+  protected doAction = async (): Promise<void> => {
     return Promise.resolve()
   }
 }

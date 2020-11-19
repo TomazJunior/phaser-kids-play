@@ -6,7 +6,7 @@ export default class SkillItemStar extends SkillItem {
   constructor(scene: Phaser.Scene) {
     super(scene, SkillItemStar.skin)
   }
-  doAction = async (): Promise<void> => {
+  protected doAction = async (): Promise<void> => {
     return Promise.resolve()
   }
 }

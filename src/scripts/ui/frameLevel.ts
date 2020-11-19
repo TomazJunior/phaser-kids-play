@@ -1,4 +1,5 @@
-import { SKILL_ITEM_SELECTED } from '../events/events'
+import { StateController } from '../controllers/stateController'
+import { ALL_SKILL_ITEMS_CURRENT_STATE_DONE, SKILL_ITEM_ACTION_DONE, SKILL_ITEM_SELECTED } from '../events/events'
 import SkillItem from '../objects/skillItems/skillItem'
 import { BUTTON, COLORS, FONTS, MAX_TIMER_DURATION } from '../utils/constants'
 import { ButtonSmall } from './buttonSmall'
@@ -8,7 +9,6 @@ export class FrameLevel extends Phaser.GameObjects.Sprite {
   private worldText: Phaser.GameObjects.Text
   private levelText: Phaser.GameObjects.Text
   private rounds: Phaser.GameObjects.Group
-  private skillItems: Array<SkillItem>
   private _round: number = 0
   private _timers: Array<number> = []
 
@@ -19,13 +19,11 @@ export class FrameLevel extends Phaser.GameObjects.Sprite {
     y: number,
     title: string,
     level: string,
-    skillItems: Array<SkillItem>,
     onPause: () => void
   ) {
     super(scene, x, y, 'small-frame-level')
     scene.add.existing(this)
 
-    this.skillItems = skillItems
 
     this.worldText = this.scene.add
       .text(this.x - 25, this.y - 135, title, {
@@ -107,16 +105,28 @@ export class FrameLevel extends Phaser.GameObjects.Sprite {
   }
 
   private handleSelectedSkillItem = (skillItem: SkillItem) => {
+    const { skillItems } = StateController.getInstance()
     if (skillItem.selected) {
-      this.skillItems
+      skillItems
         .filter((s) => s.selected && s.skillItemDefinition.skin !== skillItem.skillItemDefinition.skin)
         .forEach((s) => (s.selected = false))
     }
   }
 
+  private handleSkillItemUsed = async (skillItem: SkillItem) => {
+    const { skillItems } = StateController.getInstance()
+    await skillItem.hideThumbnail()
+    StateController.getInstance().skillItems = skillItems.filter((s) => s !== skillItem)
+    if (!StateController.getInstance().getSkillItemsOfCurrentState().length) {
+      this.scene.events.emit(ALL_SKILL_ITEMS_CURRENT_STATE_DONE)
+    }
+  }
+
   private showSkillItems = () => {
+    const { skillItems } = StateController.getInstance()
     const itemsOffset = [-125, 0, 125]
-    this.skillItems.forEach((s, index) => s.addThumbnail(this.x + itemsOffset[index], this.y + 77))
+    skillItems.forEach((skillItem, index) => skillItem.addThumbnail(this.x + itemsOffset[index], this.y + 77))
     this.scene.events.on(SKILL_ITEM_SELECTED, this.handleSelectedSkillItem)
+    this.scene.events.on(SKILL_ITEM_ACTION_DONE, this.handleSkillItemUsed)
   }
 }

@@ -100,8 +100,7 @@ export class GameMap {
   }
 
   public createTargets = (
-    targetGroup: Phaser.Physics.Arcade.StaticGroup,
-    onTouchTarget?: (target: TargetInterface) => void
+    targetGroup: Phaser.Physics.Arcade.StaticGroup
   ): Array<TargetInterface> => {
     const targetsPosition = this.getTargetTilePositions()
     return targetsPosition.map((pos, index) => {
@@ -114,9 +113,6 @@ export class GameMap {
         tileGameWorld,
         index
       )
-      if (onTouchTarget) {
-        target.on(PLAYER_TOUCHED_TARGET, onTouchTarget)
-      }
       return target
     })
   }

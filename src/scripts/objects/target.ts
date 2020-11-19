@@ -16,6 +16,7 @@ export default abstract class Target extends Phaser.Physics.Arcade.Sprite implem
   tileConfigGameWorld: TileConfigGameWorld
   queuePositionText: Phaser.GameObjects.Text
   clickOnTargetAudio: Phaser.Sound.BaseSound
+  stuck: boolean
 
   constructor(
     scene: Phaser.Scene,
@@ -31,7 +32,7 @@ export default abstract class Target extends Phaser.Physics.Arcade.Sprite implem
     scene.add.existing(this)
     container.add(this)
     this.setDepth(OBJECT_DEPTHS.TARGET)
-    
+
     if (tileGameWorld?.angle) {
       this.setAngle(tileGameWorld?.angle)
     }
@@ -60,8 +61,8 @@ export default abstract class Target extends Phaser.Physics.Arcade.Sprite implem
 
     this.queuePositionText = this.createQueuePosition()
 
-    this.setInteractive().on('pointerdown', (pointer, localX, localY, event) => {
-      this.emit(PLAYER_TOUCHED_TARGET, this)
+    this.setInteractive().on('pointerdown', () => {
+      this.scene.events.emit(PLAYER_TOUCHED_TARGET, this)
     })
 
     this.clickOnWrongBoxAudio = getOrAddAudio(scene, SOUNDS.WRONG_TARGET)
@@ -92,6 +93,7 @@ export default abstract class Target extends Phaser.Physics.Arcade.Sprite implem
   }
 
   public reset() {
+    this.stuck = false
     this.shadow.setVisible(false)
     this.hiddenCharName = null
     this.openTarget(false)
@@ -108,6 +110,11 @@ export default abstract class Target extends Phaser.Physics.Arcade.Sprite implem
   public hideQueuePosition() {
     this.shadow.setVisible(false)
     this.queuePositionText.setText('').setVisible(false)
+  }
+
+  public stuckTarget() {
+    this.setTexture('skill-item-box')
+    this.stuck = true
   }
 
   protected abstract createShadow(x: number, y: number): Phaser.GameObjects.Sprite
@@ -128,7 +135,6 @@ export default abstract class Target extends Phaser.Physics.Arcade.Sprite implem
       })
       .setVisible(false)
       .setOrigin(0.5, 0)
-      .setDepth(OBJECT_DEPTHS.TARGET_QUEUE_POSITION)  
-      
+      .setDepth(OBJECT_DEPTHS.TARGET_QUEUE_POSITION)
   }
 }

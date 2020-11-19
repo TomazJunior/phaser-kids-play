@@ -17,7 +17,7 @@ const SKILL_ITEMS: Record<SKILL_ITEM_SKINS, SkillItemDefinition> = {
     state: MAIN_SCENE_STATE.PLAYER_READY,
     type: SKILL_ITEM_TYPE.SELECT_BOX,
     maxPerLevel: 1,
-    itemCost: 50,
+    itemCost: 5,
     title: 'key',
     description: ['description'],
     skin: SKILL_ITEM_SKINS.KEY
@@ -26,7 +26,7 @@ const SKILL_ITEMS: Record<SKILL_ITEM_SKINS, SkillItemDefinition> = {
     state: MAIN_SCENE_STATE.PLAYER_READY,
     type: SKILL_ITEM_TYPE.SELECT_NONE,
     maxPerLevel: 1,
-    itemCost: 60,
+    itemCost: 5,
     title: 'star',
     description: ['description'],
     skin: SKILL_ITEM_SKINS.STAR
@@ -35,7 +35,7 @@ const SKILL_ITEMS: Record<SKILL_ITEM_SKINS, SkillItemDefinition> = {
     state: MAIN_SCENE_STATE.STARTED,
     type: SKILL_ITEM_TYPE.SELECT_BOX,
     maxPerLevel: 1,
-    itemCost: 20,
+    itemCost: 5,
     title: 'box',
     description: ['Close one box,', 'and no animal can hide there.'],
     skin: SKILL_ITEM_SKINS.BOX

@@ -1,10 +1,12 @@
 import HiddenChar from '../objects/hiddenChar'
 import {
+  ALL_SKILL_ITEMS_CURRENT_STATE_DONE,
   HIDDEN_CHARS_ENQUEUED,
   HIDDEN_CHAR_REACHED_FINAL_POS,
   HIDDEN_CHAR_REACHED_TARGET,
   PLAYER_REACHED_FINAL_POS,
   PLAYER_REACHED_INITIAL_POS,
+  removeKnownEvents,
 } from '../events/events'
 import { getAllSkins, getARandomSkinFrom } from '../utils/skinUtils'
 import { ANIMAL_SKINS, BUTTON, SOUNDS, SCENES, MAIN_SCENE_STATE } from '../utils/constants'
@@ -26,7 +28,8 @@ import { SkillItemList } from '../objects/skillItemList'
 import { StateController } from '../controllers/stateController'
 
 export default class MainScene extends Phaser.Scene {
-  targets: Phaser.Physics.Arcade.StaticGroup
+  targets: Array<TargetInterface>
+  targetGroup: Phaser.Physics.Arcade.StaticGroup
   player: PlayerInterface
   hiddenChars: Phaser.GameObjects.Group
   hiddenThumbChars: HiddenThumbChars
@@ -59,6 +62,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   init(config: MainSceneConfig) {
+    removeKnownEvents(this)
     this.gameover = false
     if (!config.gameWorld?.key) {
       this.currentWorld = getGameWorld()
@@ -98,12 +102,14 @@ export default class MainScene extends Phaser.Scene {
     this.gameMap = new GameMap(this, 0, 0, this.currentWorld)
     this.gameMap.overrideTiles(this.level)
 
-    this.targets = this.physics.add.staticGroup()
+    this.targetGroup = this.physics.add.staticGroup()
 
     this.createBackButton()
 
     this.hiddenChars = this.add.group()
     this.hiddenThumbChars = new HiddenThumbChars(this, width * 0.5, height * 0)
+
+    StateController.getInstance().skillItems = this.getSkillItems()
 
     this.frameLevel = new FrameLevel(
       this,
@@ -111,19 +117,63 @@ export default class MainScene extends Phaser.Scene {
       170,
       this.currentWorld.name,
       this.isInTutorialMode ? 'Tutorial' : `Level ${this.level.level}`,
-      this.getSkillItems(),
       this.handleLoseFocus
     )
     this.backgroundAudio = getOrAddAudio(this, SOUNDS.BACKGROUND, { volume: 0.4, loop: true })
     playSound(this, this.backgroundAudio)
+    this.door = this.createDoor()
+
+    this.targets = this.gameMap.createTargets(this.targetGroup)
 
     StateController.getInstance().changeState(MAIN_SCENE_STATE.STARTED)
+    this.updateSkillItemStatuses(this.afterStart)
+  }
 
+  // TODO: move to state controller
+  // It will need a big refactoring to make StateController
+  // as the owner of the state
+  private updateSkillItemStatuses = (callback: () => void) => {
+    const { currentState } = StateController.getInstance()
+
+    if (!StateController.getInstance().getSkillItemsOfCurrentState().length) {
+      callback()
+      return
+    }
+
+    if (currentState === MAIN_SCENE_STATE.STARTED) {
+      const skillItemFrameDialog = new FrameDialog(
+        this,
+        this.frameLevel.x,
+        this.frameLevel.y + this.frameLevel.displayHeight,
+        [
+          'Great news!',
+          'You have an item to be',
+          "used now!",
+          'You may use it or ',
+          'just close this dialog.'
+        ],
+        true,
+        {
+          width: this.frameLevel.displayWidth,
+          height: this.frameLevel.displayHeight,
+        },
+        () => {
+          skillItemFrameDialog.destroy(true)
+          callback()
+        }
+      )
+      this.events.once(ALL_SKILL_ITEMS_CURRENT_STATE_DONE, () => {
+        skillItemFrameDialog.destroy(true)
+        callback()
+      })
+    } else {
+      callback()
+    }
+  }
+
+  private afterStart = () => {
     this.createHiddenChars(this.level)
-
-    this.targetQueue = new TargetQueue(this, this.level, this.gameMap.createTargets(this.targets), [
-      ...this.currentHiddenSkins,
-    ])
+    this.targetQueue = new TargetQueue(this, this.level, this.targets, [...this.currentHiddenSkins])
     if (!this.events.eventNames().includes(HIDDEN_CHARS_ENQUEUED)) {
       this.events.on(HIDDEN_CHARS_ENQUEUED, this.goToNextHiddenChar, this)
     }
@@ -132,10 +182,8 @@ export default class MainScene extends Phaser.Scene {
     this.player.on(PLAYER_REACHED_INITIAL_POS, this.handlePlayerReachedInitialPosition)
     this.player.on(PLAYER_REACHED_FINAL_POS, this.handlePlayerReachedFinalPosition)
 
-    this.physics.add.collider(this.player, this.targets, undefined, undefined, this)
-    // this.physics.add.collider(this.hiddenChars, this.targets, undefined, undefined, this)
+    this.physics.add.collider(this.player, this.targetGroup, undefined, undefined, this)
 
-    this.door = this.createDoor()
     this.timer = new Timer(this, (seconds: number) => {
       this.frameLevel.timer = seconds
     })
@@ -146,7 +194,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   handleLoseFocus = () => {
-    // if (1 === 1) return
+    if (1 === 1) return
     // assuming a Paused scene that has a pause modal
     if (this.scene.isActive(SCENES.PAUSE_SCENE)) {
       return
@@ -188,7 +236,7 @@ export default class MainScene extends Phaser.Scene {
       this.scene.restart(<MainSceneConfig>{
         gameWorld,
         level,
-        skillItems: []
+        skillItems: [],
       })
     })
   }
@@ -267,12 +315,14 @@ export default class MainScene extends Phaser.Scene {
     this.time.delayedCall(300, () => {
       if (!this.gameover) {
         this.gameover = true
-        this.player.active = false
-        this.player.visible = false
+        if (this.player) {
+          this.player.active = false
+          this.player.visible = false
+        }
         this.clearHiddenChars()
         this.closeTargets()
         this.backgroundAudio.stop()
-        this.timer.stop()
+        this.timer?.stop()
       }
       cb()
     })
@@ -340,7 +390,7 @@ export default class MainScene extends Phaser.Scene {
         fingerPointer = new FingerPoint(this, x + this.currentWorld.tileConfig.height * 0.5, y)
         fingerPointer.setVisible(true)
       }
-      new FrameDialog(this, width * 0.5, height * 0.5, this.level.tutorial.text, () => {
+      new FrameDialog(this, width * 0.5, height * 0.5, this.level.tutorial.text, false, undefined, () => {
         fingerPointer?.destroy()
         this.startRound()
       })
@@ -366,8 +416,8 @@ export default class MainScene extends Phaser.Scene {
     this.door.open = true
     if (this.hiddenCharsAreReady() && !this.roundInProgress) {
       StateController.getInstance().changeState(MAIN_SCENE_STATE.STARTED)
-      this.roundInProgress = true
 
+      this.roundInProgress = true
       ++this.round
       if (this.round > this.level.rounds) {
         this.backgroundAudio.stop()
@@ -379,18 +429,22 @@ export default class MainScene extends Phaser.Scene {
         this.resetTargets()
         this.door.open = false
         this.frameLevel.timer = 0
-        this.createHiddenChars(this.level)
-        this.player.active = true
+        this.updateSkillItemStatuses(this.prepareCharsToNextRound)
       })
     }
   }
 
+  prepareCharsToNextRound = () => {
+    this.createHiddenChars(this.level)
+    this.player.active = true
+  }
+
   resetTargets() {
-    this.targets.getChildren().forEach((target: any) => (<TargetInterface>target).reset())
+    this.targetGroup.getChildren().forEach((target: any) => (<TargetInterface>target).reset())
   }
 
   closeTargets() {
-    this.targets.getChildren().forEach((target: any) => {
+    this.targetGroup.getChildren().forEach((target: any) => {
       ;(<TargetInterface>target).close()
     })
   }
@@ -484,23 +538,24 @@ export default class MainScene extends Phaser.Scene {
 
       this.addHiddenChar(hiddenChar)
 
-      const target = this.getFreeTarget()
+      const target = this.getRandomFreeTarget()
       const pathToGo = this.gameMap.getPathTo(initialPosition, target.objectPosition, false)
 
       hiddenChar.goTo(target, pathToGo)
     })
   }
 
-  getFreeTarget(): TargetInterface {
+  getRandomFreeTarget(): TargetInterface {
     const availTargets = this.getFreeTargets()
     const randomTargetPos = Math.floor(Math.random() * availTargets.length)
     return availTargets[this.isInTutorialMode ? 0 : randomTargetPos]
   }
 
   getFreeTargets(): TargetInterface[] {
-    return <TargetInterface[]>(
-      this.targets.getChildren().filter((target: any) => !(<TargetInterface>target.hiddenCharName))
-    )
+    return <TargetInterface[]>this.targetGroup.getChildren().filter((item: any) => {
+      const target = <TargetInterface>item
+      return !target.stuck && !target.hiddenCharName
+    })
   }
 
   getHiddenChar(skin: string): HiddenChar {
@@ -516,6 +571,7 @@ export default class MainScene extends Phaser.Scene {
   goToNextHiddenChar = () => {
     const target = this.targetQueue.dequeue()
     if (target) {
+      StateController.getInstance().changeState(MAIN_SCENE_STATE.TARGETS_ENQUEUED)
       this.timer.stop()
       this.player.active = true
       const pathToGo = this.gameMap.getPathTo(this.player.objectPosition, target.objectPosition, true)

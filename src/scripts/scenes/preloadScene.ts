@@ -127,6 +127,7 @@ export default class PreloadScene extends Phaser.Scene {
   private loadSkillItemsImages() {
     Object.keys(SKILL_ITEM_SKINS).forEach((key) => {
       this.load.image(SKILL_ITEM_SKINS[key], `assets/img/${SKILL_ITEM_SKINS[key]}.png`)
+      this.load.image(`${SKILL_ITEM_SKINS[key]}-inactive`, `assets/img/${SKILL_ITEM_SKINS[key]}-inactive.png`)
     })
   }
   private loadAssetsProgress = () => {

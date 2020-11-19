@@ -157,6 +157,7 @@ declare interface TargetConstructor {
 
 declare interface TargetInterface extends Phaser.Physics.Arcade.Sprite {
   opened: boolean
+  stuck: boolean
   hiddenCharName: import('../src/scripts/utils/constants').ANIMAL_SKINS | null
   objectPosition: ObjectPosition
   id: number

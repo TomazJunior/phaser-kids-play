@@ -29,6 +29,7 @@ export class Box extends Target {
   }
 
   public close() {
+    if (this.stuck) return
     if (!this.opened) return
 
     this.opened = false
@@ -40,6 +41,7 @@ export class Box extends Target {
   }
 
   public openTarget(withSound: boolean) {
+    if (this.stuck) return
     withSound && playSound(this.scene, this.clickOnRightBoxAudio)
     this.opened = true
     this.setTexture('box-opened')

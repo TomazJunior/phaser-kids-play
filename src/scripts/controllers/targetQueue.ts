@@ -12,7 +12,7 @@ export class TargetQueue {
     private targets: Array<TargetInterface>,
     private currentHiddenSkins: ANIMAL_SKINS[]
   ) {
-    targets.forEach((target) => target.on(PLAYER_TOUCHED_TARGET, this.handleTargetQueue))
+    this.scene.events.on(PLAYER_TOUCHED_TARGET, this.handleTargetQueue)
   }
 
   public set inTutorialMode(v: boolean) {
@@ -23,6 +23,7 @@ export class TargetQueue {
   }
 
   enqueue(target: TargetInterface) {
+    if (target.stuck) return
     if (this.queueLocked) return
     this.queue = [...this.queue, target.id]
     target.showQueuePosition(this.queue.length)
