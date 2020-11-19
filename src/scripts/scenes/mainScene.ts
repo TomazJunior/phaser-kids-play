@@ -152,6 +152,8 @@ export default class MainScene extends Phaser.Scene {
           height: this.frameLevel.displayHeight,
         },
         () => {
+          // Remove listener to avoid accumulate events
+          this.events.off(ALL_SKILL_ITEMS_CURRENT_STATE_DONE)
           callback()
         }
       )
