@@ -1,4 +1,5 @@
 import { ButtonCircle } from '../ui/buttonCircle'
+import { getQuantityOfSkillItems } from '../utils/fileStorage'
 
 import { SKILL_ITEM_SKINS } from '../utils/skillItems'
 import SkillItem from './skillItems/skillItem'
@@ -7,8 +8,9 @@ export default class SkillItemFrame extends Phaser.GameObjects.Image {
   private _quantity: number = 0
   private _selected: boolean = false
   private addButton: ButtonCircle
+  private minusButton: ButtonCircle
   private quantityButton: ButtonCircle
-  private selectButton: ButtonCircle
+
   public readonly skin: SKILL_ITEM_SKINS
 
   constructor(
@@ -25,24 +27,17 @@ export default class SkillItemFrame extends Phaser.GameObjects.Image {
     this.skin = skin
     const cardImage = scene.add.image(this.x, this.y, skin)
 
-    this.addButton = new ButtonCircle(scene, this.x + 25, this.y + 60, 'circle-blue', '+', this.handleAddClick)
-    this.selectButton = new ButtonCircle(
-      scene,
-      this.x + 25,
-      this.y + 60,
-      'circle-green-checkmark',
-      '',
-      this.handleSelectClick
-    ).setVisible(false)
+    this.addButton = new ButtonCircle(scene, this.x - 25, this.y + 60, 'circle-blue', '+', this.handleAddClick)
+    this.minusButton = new ButtonCircle(scene, this.x + 25, this.y + 60, 'circle-red', '-', this.handleMinusClick)
 
-    this.quantityButton = new ButtonCircle(scene, this.x - 35, this.y - 40, 'circle-red', '0')
+    this.quantityButton = new ButtonCircle(scene, this.x - 50, this.y - 50, 'circle-green', '0')
     this.quantity = 0
 
     this.setInteractive().on('pointerdown', () => {
-      if (this.addButton?.visible) {
-        this.handleAddClick()
-      } else {
+      if (this.quantity) {
         this.selected = !this.selected
+      } else {
+        this.handleAddClick(true)
       }
     })
   }
@@ -51,12 +46,13 @@ export default class SkillItemFrame extends Phaser.GameObjects.Image {
     if (v >= 0 && v <= this.skillItem.skillItemDefinition.maxPerLevel) {
       this._quantity = v
     }
-
+    this.updateAddButtonStyle()
     const isSkillItemFull = v >= this.skillItem.skillItemDefinition.maxPerLevel
-    this.addButton?.setVisible(!isSkillItemFull)
-    this.selectButton?.setVisible(isSkillItemFull)
     this.quantityButton.text = this._quantity.toString()
-    if (!this._quantity) {
+    
+    if (isSkillItemFull) {
+      this.selected = true
+    } else if (!this.quantity) {
       this.selected = false
     }
   }
@@ -72,19 +68,49 @@ export default class SkillItemFrame extends Phaser.GameObjects.Image {
   public set selected(v: boolean) {
     this._selected = v
     if (this._selected) {
-      this.selectButton.texture = 'circle-green-checkmark'
       this.setTexture('frame-skill-item-selected')
     } else {
-      this.selectButton.texture = 'circle-yellow-checkmark'
       this.setTexture('frame-skill-item')
     }
   }
 
-  handleAddClick = () => {
-    this.onAddClick(this.skillItem)
+  handleMinusClick = () => {
+    this.quantity--
+  }
+
+  handleAddClick = (selectIfHasItem: boolean = false) => {
+    if (this.addButton?.texture === 'circle-blue') {
+      this.quantity++
+      if (selectIfHasItem && this.quantity) {
+        this.selected = true
+      }
+    } else if (this.addButton?.texture === 'circle-blue-chart') {
+      this.onAddClick(this.skillItem)
+    }
   }
 
   handleSelectClick = () => {
     this.selected = !this._selected
+  }
+
+  updateAddButtonStyle = () => {
+    if (!this.addButton) return
+
+    const isSkillItemFull = this.quantity >= this.skillItem.skillItemDefinition.maxPerLevel
+
+    if (isSkillItemFull) {
+      this.addButton.texture = 'circle-grey'
+      this.addButton.text = '+'
+    } else {
+      const quantityOfSkillItems = getQuantityOfSkillItems(this.skin)
+      const hasMoreItems = quantityOfSkillItems > this._quantity
+      if (hasMoreItems) {
+        this.addButton.texture = 'circle-blue'
+        this.addButton.text = '+'
+      } else {
+        this.addButton.texture = 'circle-blue-chart'
+        this.addButton.text = ''
+      }
+    }
   }
 }

@@ -87,6 +87,7 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('circle-red', 'assets/img/circle-red.png')
     this.load.image('circle-green', 'assets/img/circle-green.png')
     this.load.image('circle-blue', 'assets/img/circle-blue.png')
+    this.load.image('circle-blue-chart', 'assets/img/circle-blue-chart.png')
     this.load.image('circle-grey', 'assets/img/circle-grey.png')
     this.load.image('circle-yellow', 'assets/img/circle-yellow.png')
     this.load.image('gem-score', 'assets/img/gem-score.png')

@@ -1,3 +1,5 @@
+import { SKILL_ITEM_SKINS } from "./skillItems"
+
 const FILE_STORAGE_KEY = 'fileStorage'
 const initialFileStorageConfig: FileStorageConfig = {
   tutorials: [],
@@ -135,6 +137,11 @@ export const buySkillItem = (item: SkillItemDefinition) => {
     skillItems: [...skillItems.filter((s) => !(s.skin === item.skin)), skillItem],
   })
   incPlayerGems(-item.itemCost)
+}
+
+export const getQuantityOfSkillItems = (skin: SKILL_ITEM_SKINS): number => {
+  const { skillItems } = getFileStorageConfig()
+  return skillItems.find((s) => s.skin === skin)?.quantity || 0
 }
 
 export const removeSkillItems = (items: Array<SkillItemFileStorageConfig>) => {
