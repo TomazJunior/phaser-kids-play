@@ -194,7 +194,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   handleLoseFocus = () => {
-    if (1 === 1) return
+    // if (1 === 1) return
     // assuming a Paused scene that has a pause modal
     if (this.scene.isActive(SCENES.PAUSE_SCENE)) {
       return
