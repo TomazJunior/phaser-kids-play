@@ -44,7 +44,8 @@ export enum OBJECT_DEPTHS {
   BACKGROUND = 15,
   FRAME_DIALOG = 20,
   PLAYER = 25,
-  FINGER_POINT = 40
+  FINGER_POINT = 40,
+  FIREWORKS = 60
 }
 
 export const GAME_NAME = 'Find them all'

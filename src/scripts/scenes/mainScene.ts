@@ -25,6 +25,7 @@ import FingerPoint from '../objects/fingerPoint'
 import { Timer } from '../controllers/timer'
 import { SkillItemList } from '../objects/skillItemList'
 import { StateController } from '../controllers/stateController'
+import { createAnimations } from '../utils/animations'
 
 export default class MainScene extends Phaser.Scene {
   targets: Array<TargetInterface>
@@ -84,6 +85,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   create() {
+    createAnimations(this)
     this.sound.pauseOnBlur = false
     this.game.events.on(Phaser.Core.Events.BLUR, () => {
       this.handleLoseFocus()
@@ -217,14 +219,14 @@ export default class MainScene extends Phaser.Scene {
       .map((skillItemConfig) => {
         return {
           clazz: SkillItemList.getSkillItemBySkill(skillItemConfig.skin)?.clazz,
-          quantity: skillItemConfig.quantity
+          quantity: skillItemConfig.quantity,
         }
       })
       .filter((skillItemConfig) => !!skillItemConfig?.clazz)
       .map((skillItemConfig) => {
         return {
           skillItem: new skillItemConfig!.clazz!(this),
-          quantity: skillItemConfig.quantity
+          quantity: skillItemConfig.quantity,
         }
       })
   }
@@ -329,9 +331,6 @@ export default class MainScene extends Phaser.Scene {
 
   addHiddenChar(hiddenChar: HiddenChar) {
     this.hiddenChars.add(hiddenChar)
-    if (this.hiddenCharsReachedTargets()) {
-      StateController.getInstance().changeState(MAIN_SCENE_STATE.HIDDEN_CHAR_IN_SCENE)
-    }
   }
 
   hiddenCharsReachedTargets(): boolean {
@@ -404,10 +403,10 @@ export default class MainScene extends Phaser.Scene {
     if (hiddenChar.followingPlayer) {
       if (this.hiddenCharsReachedTheDoor()) {
         StateController.getInstance().changeState(MAIN_SCENE_STATE.HIDDEN_CHAR_IN_THER_DOOR)
+        this.time.delayedCall(600, () => {
+          this.handlePlayerReachedFinalPosition()
+        })
       }
-      this.time.delayedCall(600, () => {
-        this.handlePlayerReachedFinalPosition()
-      })
     }
   }
 
@@ -468,8 +467,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   createHiddenChars(level: Level) {
-    //TODO: show dialog to choose skill items from STARTED scene if exists
-    // console.log('show dialog STARTED scene')
+    StateController.getInstance().changeState(MAIN_SCENE_STATE.HIDDEN_CHAR_IN_SCENE)
 
     const { hiddens, extraHiddens } = level
     const extraSkins: Array<ANIMAL_SKINS> = []

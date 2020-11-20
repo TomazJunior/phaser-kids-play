@@ -28,7 +28,7 @@ const SKILL_ITEMS: Record<SKILL_ITEM_SKINS, SkillItemDefinition> = {
     maxPerLevel: 3,
     itemCost: 5,
     title: 'star',
-    description: ['description'],
+    description: ['Throw a firework', 'all animals will show up'],
     skin: SKILL_ITEM_SKINS.STAR
   },
   [SKILL_ITEM_SKINS.BOX]: {
@@ -37,7 +37,7 @@ const SKILL_ITEMS: Record<SKILL_ITEM_SKINS, SkillItemDefinition> = {
     maxPerLevel: 3,
     itemCost: 5,
     title: 'box',
-    description: ['Close one box,', 'and no animal can hide there.'],
+    description: ['Close one box,', 'and no animal can hide there'],
     skin: SKILL_ITEM_SKINS.BOX
   },
 }

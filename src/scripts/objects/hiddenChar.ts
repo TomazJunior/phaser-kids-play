@@ -1,4 +1,5 @@
 import {
+  FIREWORK_HAS_BEEN_RELEASE,
   HIDDEN_CHAR_REACHED_FINAL_POS,
   HIDDEN_CHAR_REACHED_ROAD_POS,
   HIDDEN_CHAR_REACHED_TARGET,
@@ -18,7 +19,7 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
     roadPosition: boolean
   }
   reachedTarget = false
-  enteredTheDoor = false 
+  enteredTheDoor = false
   target: TargetInterface
   objectPosition: ObjectPosition
   pathToGo: Array<ObjectPosition>
@@ -43,9 +44,18 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
     this.setDepth(OBJECT_DEPTHS.HIDDEN_CHAR)
     this.enterOnTargetAudio = getOrAddAudio(scene, SOUNDS.ENTER_THE_BOX)
     this.enterOnDoorAudio = getOrAddAudio(scene, SOUNDS.ENTER_THE_DOOR)
+
+    this.scene.events.on(FIREWORK_HAS_BEEN_RELEASE, () => {
+      if (this.visible || !this.active) return
+      this.scene.time.delayedCall(Phaser.Math.Between(250, 500), () => {
+        this.getOutNearToTarget()
+      })
+    })
+
     scene.events.on('update', this.update, this)
   }
 
+  
   public setIsGoingTo(pathToGo: Array<ObjectPosition>, roadPosition: boolean) {
     this.isWalking = true
     this.pathToGo = [...pathToGo]
@@ -86,7 +96,6 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
         },
       })
     })
-
   }
 
   public getOut(position: ObjectPosition, onComplete: () => Promise<void>) {
@@ -116,7 +125,7 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
     })
   }
 
-  public getOutNearToTarget(onComplete: () => Promise<void>) {
+  public getOutNearToTarget = (onComplete?: () => Promise<void>) => {
     this.speed = 350
     this.isWalking = false
     this.visible = true
@@ -135,7 +144,11 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
       onComplete: async () => {
         const pathToGo = this.gameMap.getPathTo(lastPosition, this.target.objectPosition, false)
         this.goToPath(pathToGo[0], pathToGo)
-        await onComplete()
+        if (onComplete) {
+          await onComplete()
+        } else {
+          Promise.resolve()
+        }
       },
     })
   }
@@ -192,7 +205,7 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
         } else if (this.targetObjectPosition) {
           switch (this.targetObjectPosition.tile) {
             case TILES.FINAL_POSITION:
-              this.reachedTarget = true  
+              this.reachedTarget = true
               this.emit(HIDDEN_CHAR_REACHED_FINAL_POS, this)
               break
             default:

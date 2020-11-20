@@ -94,6 +94,11 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('skill-gem-cost', 'assets/img/skill-gem-cost.png')
     this.load.image('skill-item-spot-shadow', 'assets/img/skill-item-spot-shadow.png')
 
+    this.load.spritesheet('firework', 'assets/img/firework.png', {
+      frameWidth: 256,
+      frameHeight: 256
+    })
+
     //skill items
     this.loadSkillItemsImages()
 
@@ -149,13 +154,13 @@ export default class PreloadScene extends Phaser.Scene {
       //   level: GAME_WORLDS[0].levels[0],
       //   skillItems: [{
       //     skin: SKILL_ITEM_SKINS.BOX,
-      //     quantity: 2
+      //     quantity: 5
       //   },{
       //     skin: SKILL_ITEM_SKINS.KEY,
-      //     quantity: 1
+      //     quantity: 5
       //   },{
       //     skin: SKILL_ITEM_SKINS.STAR,
-      //     quantity: 1
+      //     quantity: 5
       //   }],
       // })
       // this.scene.start(SCENES.PAUSE_SCENE)

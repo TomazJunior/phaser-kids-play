@@ -1,6 +1,6 @@
 import { SKILL_ITEM_ACTION_DONE, SKILL_ITEM_SELECTED } from '../../events/events'
 import { ButtonCircle } from '../../ui/buttonCircle'
-import { getSkillItemDefinition, SKILL_ITEM_SKINS } from '../../utils/skillItems'
+import { getSkillItemDefinition, SKILL_ITEM_SKINS, SKILL_ITEM_TYPE } from '../../utils/skillItems'
 
 export default abstract class SkillItem {
   protected image?: Phaser.GameObjects.Image
@@ -35,6 +35,12 @@ export default abstract class SkillItem {
     this.shadow.setVisible(v)
 
     if (this.selected) this.scene.events.emit(SKILL_ITEM_SELECTED, this)
+
+    if (this.selected && this.skillItemDefinition.type === SKILL_ITEM_TYPE.SELECT_NONE) {
+      this.scene.time.delayedCall(100, async () => {
+        await this.process()
+      })
+    }
   }
 
   public get selected(): boolean {

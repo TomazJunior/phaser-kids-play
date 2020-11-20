@@ -12,6 +12,7 @@ export const PLAYER_TOUCHED_TARGET = 'PLAYER_TOUCHED_TARGET'
 
 export const SKILL_ITEM_SELECTED = 'SKILL_ITEM_SELECTED'
 export const SKILL_ITEM_ACTION_DONE = 'SKILL_ITEM_ACTION_DONE'
+export const FIREWORK_HAS_BEEN_RELEASE = 'FIREWORK_HAS_BEEN_RELEASE'
 
 export const removeKnownEvents = (scene: Phaser.Scene) => {
   ;[
@@ -27,5 +28,6 @@ export const removeKnownEvents = (scene: Phaser.Scene) => {
     PLAYER_TOUCHED_TARGET,
     SKILL_ITEM_SELECTED,
     SKILL_ITEM_ACTION_DONE,
+    FIREWORK_HAS_BEEN_RELEASE,
   ].forEach((event) => scene.events.removeListener(event))
 }
