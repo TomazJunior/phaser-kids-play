@@ -19,7 +19,7 @@ const SKILL_ITEMS: Record<SKILL_ITEM_SKINS, SkillItemDefinition> = {
     maxPerLevel: 3,
     itemCost: 5,
     title: 'key',
-    description: ['description'],
+    description: ['Open one box.', 'and release an animal if exist'],
     skin: SKILL_ITEM_SKINS.KEY
   },
   [SKILL_ITEM_SKINS.STAR]: {

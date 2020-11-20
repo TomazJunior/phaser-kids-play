@@ -12,15 +12,17 @@ export default abstract class SkillItem {
 
   public readonly skillItemDefinition: SkillItemDefinition
 
-  constructor(private scene: Phaser.Scene, skin: SKILL_ITEM_SKINS) {
+  constructor(protected scene: Phaser.Scene, skin: SKILL_ITEM_SKINS) {
     this.skillItemDefinition = getSkillItemDefinition(skin)
   }
 
   protected abstract doAction: () => Promise<void>
 
   public process = async () => {
-    this.enabled = false
+    this._enabled = false
     await this.doAction()
+    this._enabled = true
+    this.selected = false
     this.scene.events.emit(SKILL_ITEM_ACTION_DONE, this)
   }
 
@@ -31,7 +33,8 @@ export default abstract class SkillItem {
 
     this._selected = v
     this.shadow.setVisible(v)
-    this.scene.events.emit(SKILL_ITEM_SELECTED, this)
+
+    if (this.selected) this.scene.events.emit(SKILL_ITEM_SELECTED, this)
   }
 
   public get selected(): boolean {
@@ -72,7 +75,7 @@ export default abstract class SkillItem {
       })
     })
   }
-  
+
   public addThumbnail = (x: number, y: number, quantity: number) => {
     const { skin } = this.skillItemDefinition
     this._quantity = quantity

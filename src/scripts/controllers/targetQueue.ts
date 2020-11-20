@@ -1,5 +1,6 @@
 import { HIDDEN_CHARS_ENQUEUED, PLAYER_TOUCHED_TARGET } from '../events/events'
 import { ANIMAL_SKINS } from '../utils/constants'
+import { StateController } from './stateController'
 
 export class TargetQueue {
   private queue: Array<number> = []
@@ -80,6 +81,8 @@ export class TargetQueue {
   }
 
   private handleTargetQueue = (target: TargetInterface) => {
+    const { selectedSkillItem } = StateController.getInstance()
+    if (selectedSkillItem) return
     if (this.queueLocked) return
     if (!this.isValidIfIsTutorialMode(target)) return
 
@@ -96,12 +99,12 @@ export class TargetQueue {
   }
 
   private getTargetByHiddenChar(hiddenCharName: ANIMAL_SKINS): TargetInterface | undefined {
-    return this.targets.find((target) => target.hiddenCharName === hiddenCharName)
+    return this.targets.find((target) => target.hiddenChar?.skin === hiddenCharName)
   }
 
   private isValidIfIsTutorialMode(target: TargetInterface): boolean {
     if (!this._inTutorialMode) return true
-    return target.hiddenCharName === this.currentHiddenSkins[this.queue.length]
+    return target.hiddenChar?.skin === this.currentHiddenSkins[this.queue.length]
   }
 
   private toggleHelpNextTarget() {

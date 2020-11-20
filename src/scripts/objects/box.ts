@@ -37,7 +37,7 @@ export class Box extends Target {
   }
 
   public isRightTarget(skin: ANIMAL_SKINS | null): boolean {
-    return skin === this.hiddenCharName
+    return skin === this.hiddenChar?.skin
   }
 
   public openTarget(withSound: boolean) {

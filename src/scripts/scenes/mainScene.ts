@@ -23,7 +23,6 @@ import Door from '../objects/door'
 import { FrameDialog } from '../ui/frameDialog'
 import FingerPoint from '../objects/fingerPoint'
 import { Timer } from '../controllers/timer'
-import SkillItem from '../objects/skillItems/skillItem'
 import { SkillItemList } from '../objects/skillItemList'
 import { StateController } from '../controllers/stateController'
 
@@ -554,7 +553,7 @@ export default class MainScene extends Phaser.Scene {
   getFreeTargets(): TargetInterface[] {
     return <TargetInterface[]>this.targetGroup.getChildren().filter((item: any) => {
       const target = <TargetInterface>item
-      return !target.stuck && !target.hiddenCharName
+      return !target.stuck && !target.hiddenChar
     })
   }
 
@@ -631,7 +630,7 @@ export default class MainScene extends Phaser.Scene {
 
   openTarget = async (target: TargetInterface) => {
     this.player.active = false
-    if (!target.hiddenCharName || !target.isRightTarget(this.hiddenThumbChars.currentHiddenChar)) {
+    if (!target.hiddenChar || !target.isRightTarget(this.hiddenThumbChars.currentHiddenChar)) {
       target.wrongTarget()
       this.closeTarget(target)
       if (!this.isInTutorialMode) {
@@ -642,9 +641,9 @@ export default class MainScene extends Phaser.Scene {
     }
 
     target.openTarget(true)
-    this.hiddenThumbChars.moveToNext(target.hiddenCharName)
+    this.hiddenThumbChars.moveToNext(target.hiddenChar.skin)
 
-    const hiddenChar: HiddenChar = this.getHiddenChar(target.hiddenCharName)
+    const hiddenChar: HiddenChar = this.getHiddenChar(target.hiddenChar.skin)
     if (!hiddenChar) return
 
     this.player.pushHiddenChar(hiddenChar, this.targetQueue.getNext(), async () => {

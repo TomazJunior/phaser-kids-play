@@ -54,7 +54,7 @@ declare interface SkillItemFileStorageConfig {
 }
 
 declare interface SkillItemInScene {
-  skillItem: import('../src/scripts/objects/skillItems/skillItem').default,
+  skillItem: import('../src/scripts/objects/skillItems/skillItem').default
   quantity: number
 }
 declare interface LevelFileStorageConfig {
@@ -162,7 +162,7 @@ declare interface TargetConstructor {
 declare interface TargetInterface extends Phaser.Physics.Arcade.Sprite {
   opened: boolean
   stuck: boolean
-  hiddenCharName: import('../src/scripts/utils/constants').ANIMAL_SKINS | null
+  hiddenChar?: import('../src/scripts/objects/hiddenChar').default
   objectPosition: ObjectPosition
   id: number
 
@@ -171,7 +171,7 @@ declare interface TargetInterface extends Phaser.Physics.Arcade.Sprite {
   close: () => void
   reset: () => void
   openTarget: (withSound: boolean) => void
-  setHiddenCharName: (name: import('../src/scripts/utils/constants').ANIMAL_SKINS | null) => void
+  setHiddenChar: (hiddenChar: import('../src/scripts/objects/hiddenChar').default) => void
   isSelected: () => void
   toggleHelp: (enable: boolean) => void
   hideQueuePosition: () => void
@@ -186,7 +186,9 @@ declare interface Neighbors {
 }
 
 declare interface SkillItemConstructor {
-  new (scene: Phaser.Scene): import('../src/scripts/objects/skillItems/skillItem').default
+  new (
+    scene: Phaser.Scene
+  ): import('../src/scripts/objects/skillItems/skillItem').default
 }
 
 declare interface SkillItemListInterface {

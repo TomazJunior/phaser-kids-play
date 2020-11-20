@@ -101,10 +101,10 @@ export class FrameLevel extends Phaser.GameObjects.Sprite {
     if (skillItem.selected) {
       skillItemsInScene
         .map((s) => s.skillItem)
-        .filter(
-          (skillItem) => skillItem.selected && skillItem.skillItemDefinition.skin !== skillItem.skillItemDefinition.skin
-        )
-        .forEach((skillItem) => (skillItem.selected = false))
+        .filter((s) => {
+          return s.selected && s.skillItemDefinition.skin !== skillItem.skillItemDefinition.skin
+        })
+        .forEach((s) => (s.selected = false))
     }
   }
 

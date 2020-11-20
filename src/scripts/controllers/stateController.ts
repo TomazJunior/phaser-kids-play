@@ -38,7 +38,10 @@ export class StateController {
   }
 
   public get selectedSkillItem(): SkillItem | undefined {
-    return this.skillItemsInScene?.find((s) => s.skillItem.selected)?.skillItem
+    const skillItemInScene = this.skillItemsInScene.find((s) => {
+      return s.skillItem.selected
+    })
+    return skillItemInScene?.skillItem
   }
 
   public getSkillItemsOfCurrentState = (): Array<SkillItem> => {

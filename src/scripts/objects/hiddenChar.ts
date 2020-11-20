@@ -55,7 +55,7 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
   public goTo(target: TargetInterface, pathToGo: Array<ObjectPosition>) {
     this.target = target
     this.targetObjectPosition = undefined
-    target.setHiddenCharName(this.skin)
+    target.setHiddenChar(this)
     this.setIsGoingTo(pathToGo, false)
   }
 
@@ -112,6 +112,30 @@ export default class HiddenChar extends Phaser.Physics.Arcade.Sprite {
           this.removeListener(HIDDEN_CHAR_REACHED_ROAD_POS)
           await onComplete()
         })
+      },
+    })
+  }
+
+  public getOutNearToTarget(onComplete: () => Promise<void>) {
+    this.speed = 350
+    this.isWalking = false
+    this.visible = true
+    this.reachedTarget = false
+    this.followingPlayer = true
+    const pathToGo = this.gameMap.getPathTo(this.objectPosition, this.target.objectPosition)
+    const lastPosition = pathToGo.pop()
+    if (!lastPosition) throw new Error('lastPosition can not be null')
+
+    this.scene.tweens.add({
+      targets: this,
+      x: lastPosition.x,
+      y: lastPosition.y,
+      scale: 0.5,
+      duration: 500,
+      onComplete: async () => {
+        const pathToGo = this.gameMap.getPathTo(lastPosition, this.target.objectPosition, false)
+        this.goToPath(pathToGo[0], pathToGo)
+        await onComplete()
       },
     })
   }

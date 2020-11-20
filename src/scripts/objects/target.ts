@@ -2,9 +2,10 @@ import { PLAYER_TOUCHED_TARGET } from '../events/events'
 import { getOrAddAudio, playSound } from '../utils/audioUtil'
 import { ANIMAL_SKINS, FONTS, OBJECT_DEPTHS, SOUNDS, SPRITE_NAME } from '../utils/constants'
 import FingerPoint from './fingerPoint'
+import HiddenChar from './hiddenChar'
 
 export default abstract class Target extends Phaser.Physics.Arcade.Sprite implements TargetInterface {
-  hiddenCharName: ANIMAL_SKINS | null
+  hiddenChar?: HiddenChar
   opened = true
   border: Phaser.GameObjects.Image
   fingerPoint: FingerPoint
@@ -87,15 +88,15 @@ export default abstract class Target extends Phaser.Physics.Arcade.Sprite implem
     this.opened = false
   }
 
-  public setHiddenCharName(name: ANIMAL_SKINS | null) {
+  public setHiddenChar(hiddenChar?: HiddenChar) {
     this.openTarget(false)
-    this.hiddenCharName = name
+    this.hiddenChar = hiddenChar
   }
 
   public reset() {
     this.stuck = false
     this.shadow.setVisible(false)
-    this.hiddenCharName = null
+    this.hiddenChar = undefined
     this.openTarget(false)
     this.toggleHelp(false)
     this.hideQueuePosition()
