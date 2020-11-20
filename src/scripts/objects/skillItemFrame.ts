@@ -10,6 +10,7 @@ export default class SkillItemFrame extends Phaser.GameObjects.Image {
   private addButton: ButtonCircle
   private minusButton: ButtonCircle
   private quantityButton: ButtonCircle
+  private isAdding: boolean = false
 
   public readonly skin: SKILL_ITEM_SKINS
 
@@ -27,8 +28,22 @@ export default class SkillItemFrame extends Phaser.GameObjects.Image {
     this.skin = skin
     const cardImage = scene.add.image(this.x, this.y, skin)
 
-    this.addButton = new ButtonCircle(scene, this.x - 25, this.y + 60, 'circle-blue', '+', this.handleAddClick)
-    this.minusButton = new ButtonCircle(scene, this.x + 25, this.y + 60, 'circle-red', '-', this.handleMinusClick)
+    this.addButton = new ButtonCircle(
+      scene,
+      this.x - 30,
+      this.y + 60,
+      'circle-blue',
+      '+',
+      this.handleAddClick
+    ).setScale(1.2)
+    this.minusButton = new ButtonCircle(
+      scene,
+      this.x + 30,
+      this.y + 60,
+      'circle-red',
+      '-',
+      this.handleMinusClick
+    ).setScale(1.2)
 
     this.quantityButton = new ButtonCircle(scene, this.x - 50, this.y - 50, 'circle-green', '0')
     this.quantity = 0
@@ -52,7 +67,7 @@ export default class SkillItemFrame extends Phaser.GameObjects.Image {
     this.updateAddButtonStyle()
     const isSkillItemFull = v >= this.skillItem.skillItemDefinition.maxPerLevel
     this.quantityButton.text = this._quantity.toString()
-    
+
     if (isSkillItemFull) {
       this.selected = true
     } else if (!this.quantity) {
@@ -82,6 +97,8 @@ export default class SkillItemFrame extends Phaser.GameObjects.Image {
   }
 
   handleAddClick = (selectIfHasItem: boolean = false) => {
+    if (this.isAdding) return
+    this.isAdding = true
     if (this.addButton?.texture === 'circle-blue') {
       this.quantity++
       if (selectIfHasItem && this.quantity) {
@@ -90,6 +107,7 @@ export default class SkillItemFrame extends Phaser.GameObjects.Image {
     } else if (this.addButton?.texture === 'circle-blue-chart') {
       this.onAddClick(this.skillItem)
     }
+    this.isAdding = false
   }
 
   handleSelectClick = () => {
