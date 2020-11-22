@@ -32,6 +32,27 @@ export class InfoDialog extends Phaser.GameObjects.Sprite {
       .setOrigin(0.5, 0)
       .setStroke(COLORS.DARK_YELLOW, 10)
 
+    const creditsText = scene.add
+      .text(
+        this.x - 10,
+        this.y - this.displayHeight * 0.1,
+        [
+          'https://opengameart.org/users/jellyfizh',
+          'https://kenney.nl',
+          'https://www.gameart2d.com',
+          'https://www.dafont.com/a-alloy-ink.font',
+          '',
+          'Sound Effects',
+          'http://dig.ccmixter.org/people/JeffSpeed68',
+        ],
+        {
+          fontFamily: FONTS.KEN_VECTOR,
+          fontSize: '20px',
+        }
+      )
+      .setOrigin(0.5, 0)
+      .setStroke(COLORS.DARK_YELLOW, 10)
+
     const versionText = scene.add
       .text(this.x + this.displayWidth * 0.35, this.y + this.displayHeight * 0.35, 'v.0.5', {
         fontFamily: FONTS.ALLOY_INK,
@@ -40,6 +61,12 @@ export class InfoDialog extends Phaser.GameObjects.Sprite {
       .setOrigin(0.5, 0)
       .setStroke(COLORS.DARK_YELLOW, 10)
 
-    this.group.add(this).add(textTitle).addMultiple(closeButton.getChildren()).add(creditsTitle).add(versionText)
+    this.group
+      .add(this)
+      .add(textTitle)
+      .addMultiple(closeButton.getChildren())
+      .add(creditsTitle)
+      .add(creditsText)
+      .add(versionText)
   }
 }

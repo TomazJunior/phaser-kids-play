@@ -68,8 +68,6 @@ export default class ConfigScene extends Phaser.Scene {
         y: 0.7,
       },
       onClick: () => {
-        //TODO: that's temporary
-        clearTutorial()
         new InfoDialog(this, width * 0.5, height * 0.5)
       },
     }).setOrigin(0.5, 0.5)
