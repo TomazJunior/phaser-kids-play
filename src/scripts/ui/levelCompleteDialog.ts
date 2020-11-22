@@ -14,6 +14,7 @@ import { calculateGems, calculateStars, getStarImageName } from '../utils/scores
 import { getLevel, getNextLevel } from '../utils/worldUtil'
 import { ButtonSmall } from './buttonSmall'
 import { FrameLevelTimer } from './frameLevel'
+import { GemScore } from './gemScore'
 
 export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
   private nextLevelAudio: Phaser.Sound.BaseSound
@@ -23,8 +24,8 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
   private textGems: Phaser.GameObjects.Text
   private listOftweens: Array<Phaser.Tweens.Tween> = []
   private currentLevelStorage: LevelFileStorageConfig | undefined
+  private gemScore: GemScore
   private _forceCompleteTweens: boolean
-
   private readonly FIRST_COLUMN_X: number
   private readonly SECOND_COLUMN_X: number
   private readonly INITIAL_Y: number
@@ -47,6 +48,8 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
     scene.add.existing(this)
     this.setInteractive().on('pointerdown', () => (this.forceCompleteTweens = true))
 
+    this.gemScore = new GemScore(scene, 150)
+    this.gemScore.show()
     // set default positions
     this.FIRST_COLUMN_X = this.x - this.width * 0.5 + 80
     this.SECOND_COLUMN_X = this.FIRST_COLUMN_X + 180
@@ -123,6 +126,7 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
       .add(this.starsImage)
       .add(recordStarTitle)
       .add(recordStarText)
+      .addMultiple(this.gemScore.getChildren())
       .setDepth(OBJECT_DEPTHS.FRAME_DIALOG)
   }
 
@@ -294,8 +298,9 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
         onUpdate: (tween: Phaser.Tweens.Tween, { value }: any) => {
           this.textGems.text = Math.trunc(value).toFixed(0)
         },
-        onComplete: () => {
+        onComplete: async () => {
           this.textGems.text = this.gems.toString()
+          await this.gemScore.refreshValue()
           resolve()
         },
       })
