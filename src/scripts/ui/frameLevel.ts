@@ -5,12 +5,16 @@ import { BUTTON, COLORS, FONTS, MAX_TIMER_DURATION } from '../utils/constants'
 import { ButtonSmall } from './buttonSmall'
 import RoundIndicator from './roundIndicator'
 
+export interface FrameLevelTimer {
+  seconds: number
+  inTutorialMode: boolean
+}
 export class FrameLevel extends Phaser.GameObjects.Sprite {
   private worldText: Phaser.GameObjects.Text
   private levelText: Phaser.GameObjects.Text
   private rounds: Phaser.GameObjects.Group
   private _round: number = 0
-  private _timers: Array<number> = []
+  private _timers: Array<FrameLevelTimer> = []
 
   clockText: Phaser.GameObjects.Text
   constructor(scene: Phaser.Scene, x: number, y: number, title: string, level: string, onPause: () => void) {
@@ -84,15 +88,15 @@ export class FrameLevel extends Phaser.GameObjects.Sprite {
     }
   }
 
-  public addTimer(seconds: number) {
-    this._timers.push(seconds)
+  public addTimer(timer: FrameLevelTimer) {
+    this._timers.push(timer)
   }
 
   public clearTimer() {
     this._timers = []
   }
 
-  public get timers(): Array<number> {
+  public get timers(): Array<FrameLevelTimer> {
     return this._timers
   }
 

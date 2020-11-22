@@ -13,6 +13,7 @@ import { getLevelStorage, incPlayerGems, setLevelStorage } from '../utils/fileSt
 import { calculateGems, calculateStars, getStarImageName } from '../utils/scoresUtil'
 import { getLevel, getNextLevel } from '../utils/worldUtil'
 import { ButtonSmall } from './buttonSmall'
+import { FrameLevelTimer } from './frameLevel'
 
 export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
   private nextLevelAudio: Phaser.Sound.BaseSound
@@ -29,7 +30,6 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
   private readonly INITIAL_Y: number
   private readonly OFFSET_Y: number = 40
   private readonly DELAY: number = 250
-  private readonly TOTAL_DELAY: number
   private readonly BEST_TIME_IN_SECS: number
 
   constructor(
@@ -38,7 +38,7 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
     y: number,
     private gameworld: GameWorld,
     private level: Level,
-    private timers: Array<number | undefined>,
+    private timers: Array<FrameLevelTimer>,
     private finishedRounds: number,
     private onRestartScene: (gameworld: GameWorld, level: Level) => void,
     private onGoToLevelScene: () => void
@@ -51,7 +51,6 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
     this.FIRST_COLUMN_X = this.x - this.width * 0.5 + 80
     this.SECOND_COLUMN_X = this.FIRST_COLUMN_X + 180
     this.INITIAL_Y = this.y + 25
-    this.TOTAL_DELAY = this.DELAY + this.DELAY * this.level.rounds
     this.BEST_TIME_IN_SECS = this.level.hiddens * BEST_TIME_BY_BOX_IN_SEC
 
     this.group = this.scene.physics.add.staticGroup()
@@ -176,14 +175,14 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
   }
 
   addRoundText = async (): Promise<void> => {
-    const updateRoundText = async (index) => {
+    const updateRoundText = async (index, isTutorialMode) => {
       return new Promise((resolve) => {
         const delay = this.forceCompleteTweens ? 0 : this.DELAY
         this.scene.time.delayedCall(delay, () => {
           const x = this.FIRST_COLUMN_X
           const y = this.INITIAL_Y + index * this.OFFSET_Y
           const text = this.scene.add
-            .text(x, y, `Round ${index + 1}`, {
+            .text(x, y, isTutorialMode ? 'Tutorial' : `Round ${index + 1}`, {
               fontFamily: FONTS.ALLOY_INK,
               fontSize: '24px',
             })
@@ -200,7 +199,8 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
     }
 
     for (let index = 0; index < this.level.rounds; index++) {
-      await updateRoundText(index)
+      const isTutorialMode = index < this.timers.length ? this.timers[index].inTutorialMode : false
+      await updateRoundText(index, isTutorialMode)
     }
   }
 
@@ -208,7 +208,8 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
     const updateTimerText = async (index) => {
       return new Promise((resolve) => {
         const y = this.INITIAL_Y + index * this.OFFSET_Y
-        const timerInSeconds = index > this.timers.length || !this.isRoundPassed(index) ? undefined : this.timers[index]
+        const timer = index > this.timers.length || !this.isRoundPassed(index) ? undefined : this.timers[index]
+        const timerInSeconds = timer?.seconds
 
         const timerText = this.scene.add.text(this.SECOND_COLUMN_X, y, timerInSeconds ? '0 sec' : ' - ', {
           fontFamily: FONTS.ALLOY_INK,
@@ -216,13 +217,14 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
         })
         this.group.add(timerText).setDepth(OBJECT_DEPTHS.FRAME_DIALOG)
         if (timerInSeconds) {
+          const isTutorialMode = index < this.timers.length ? this.timers[index].inTutorialMode : false
           const tween = this.scene.tweens.addCounter({
             from: 0,
             to: timerInSeconds,
             duration: this.forceCompleteTweens ? 0 : 500,
             onUpdate: (tween: Phaser.Tweens.Tween, { value }: any) => {
               timerText.text = value.toFixed(2) + ' sec'
-              if (this.isBeatTheBestTime(value)) {
+              if (isTutorialMode || this.isBeatTheBestTime(value)) {
                 timerText.setStroke(COLORS.LIGHT_GREEN, 6)
               } else {
                 timerText.setStroke(COLORS.DARK_RED, 6)
@@ -230,7 +232,7 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
             },
             onComplete: () => {
               timerText.text = timerInSeconds.toFixed(2) + ' sec'
-              if (this.isBeatTheBestTime(timerInSeconds)) {
+              if (isTutorialMode || this.isBeatTheBestTime(timerInSeconds)) {
                 timerText.setStroke(COLORS.LIGHT_GREEN, 6)
               } else {
                 timerText.setStroke(COLORS.DARK_RED, 6)
@@ -343,8 +345,8 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
   private get stars(): number {
     let value = calculateStars(this.finishedRounds)
     const beatTheBestTime = this.timers.every(
-      (timerInSeconds: number | undefined, index: number) =>
-        this.isRoundPassed(index) && this.isBeatTheBestTime(timerInSeconds)
+      (timer: FrameLevelTimer, index: number) =>
+        timer.inTutorialMode || (this.isRoundPassed(index) && this.isBeatTheBestTime(timer.seconds))
     )
     if (value === 2 && beatTheBestTime) {
       value++

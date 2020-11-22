@@ -575,7 +575,7 @@ export default class MainScene extends Phaser.Scene {
       this.player.goTo(target, pathToGo)
     }
     if (this.targetQueue.isEmpty) {
-      this.frameLevel.addTimer(this.timer.seconds)
+      this.frameLevel.addTimer({ seconds: this.timer.seconds, inTutorialMode: this.isInTutorialMode })
     }
   }
 
