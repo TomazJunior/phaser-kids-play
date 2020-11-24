@@ -1,0 +1,9 @@
+environmentTag: local
+region: us-east-1
+dynamoDBEndpoint: http://localhost:8000
+usersTableName: memory-users-local
+devicesTableName: memory-devices-local
+dynamoDBaccessKey: "access"
+dynamoDBaccessSecret: "secret"
+LoggerLevel: debug
+LoggerStack: true

@@ -1,0 +1,35 @@
+service: memory-apigateway-service
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: us-east-1
+  stage: ${self:custom.currentStage}
+  logRetentionInDays: 30
+  timeout: 30
+
+custom:
+  defaultStage: dev
+  currentStage: ${opt:stage, self:custom.defaultStage}
+  apiGatewayName: memory-apigateway-${self:custom.currentStage}
+  
+resources:
+  Resources:
+    ApiGateway:
+      Type: "AWS::ApiGateway::RestApi"
+      Properties:
+        Description: "Memory Game Dashboard API Gateway"
+        Name: ${self:custom.apiGatewayName}
+  Outputs:
+    ApiGatewayId:
+      Value:
+        Ref: ApiGateway
+      Export:
+        Name: ApiGatewayIdExport-Memory-${self:custom.currentStage}
+    ApiGatewayRootResourceId:
+      Value:
+        Fn::GetAtt:
+          - ApiGateway
+          - RootResourceId
+      Export:
+        Name: ApiGatewayRootResourceExport-Memory-${self:custom.currentStage}
