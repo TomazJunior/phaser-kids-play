@@ -7,10 +7,12 @@
       content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
     />
 
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' gap:; style-src 'self' 'unsafe-inline'; media-src *" /> -->
+
     <meta
       http-equiv="Content-Security-Policy"
       content="
-    default-src 'self' data: gap: https://ssl.gstatic.com; 
+    default-src 'self' data: gap: https://ssl.gstatic.com localhost:5000 https://i26pozpz1g.execute-api.us-east-1.amazonaws.com; 
     style-src 'self' 'unsafe-hashes' 'sha256-ogy1NBAMK5QnZy2F1Ip/+RqzCTcOxeAoxyfC+NFB0IA=' 'sha256-jYA/D2sXO0YUP2glV8lgcd2/A/Hk0kSan6G97ms0iRA=' 'sha256-f66HkUJDgVOaRBLdZr8aM+Y7yyCm9/+tnZ9sOY2xdDQ=' 'sha256-/a7clCEx59FGW0gKAKvM65ccf9oIL9RHSr863m6h7I8=' 'sha256-y/KlAde9GfkGM8efhNpcDckBplXDdDt+sQA91wVyeAA='; 
     media-src *; 
     img-src 'self' data: content: blob:;
@@ -82,7 +84,6 @@
     <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
     <div style="font-family: AlloyInk; position: absolute; left: -1000px; visibility: hidden">.</div>
     <div style="font-family: kenvector; position: absolute; left: -1000px; visibility: hidden">.</div>
-
     <div id="phaser-game"></div>
   </body>
 </html>

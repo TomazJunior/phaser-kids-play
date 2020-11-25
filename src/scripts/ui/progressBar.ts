@@ -24,13 +24,13 @@ export default class ProgressBar extends Phaser.GameObjects.Container {
     this.add(this.graphics).add(this.newGraphics).add(this.loadingText)
   }
 
-  updateValue = (percentage: number) => {
+  updateValue = (percentage: number, text?: string) => {
     this.newGraphics.clear()
     this.newGraphics.fillStyle(0x3587e2, 1)
     this.newGraphics.fillRectShape(new Phaser.Geom.Rectangle(5, 5, percentage * 390, 40))
 
     percentage = percentage * 100
-    this.loadingText.setText('Loading: ' + percentage.toFixed(2) + '%')
+    this.loadingText.setText((text || 'Loading: ') + percentage.toFixed(2) + '%')
   }
 
   complete = () => {}

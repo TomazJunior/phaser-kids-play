@@ -69,7 +69,21 @@ functions:
               - User-Id
               - X-Amz-Date
               - X-Api-Key
-              - X-Amz-Security-Token              
+              - X-Amz-Security-Token    
+      - http:
+          path: /device
+          method: any
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+              - Content-Length
+              - X-Requested-With
+              - User-Id
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token                         
 resources:
   Resources:
     UsersTableName:

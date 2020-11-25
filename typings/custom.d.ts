@@ -40,6 +40,7 @@ declare interface ButtonConfig {
 }
 
 declare interface FileStorageConfig {
+  deviceId: string,
   sound: boolean
   backgroudSound: boolean
   tutorials: Array<TutorialFileStorageConfig>

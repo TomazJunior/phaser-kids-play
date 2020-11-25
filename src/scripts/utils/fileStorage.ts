@@ -1,7 +1,10 @@
-import { SKILL_ITEM_SKINS } from "./skillItems"
+import { SKILL_ITEM_SKINS } from './skillItems'
 
 const FILE_STORAGE_KEY = 'fileStorage'
+const DEVICE_FILE_STORAGE_KEY = 'deviceinfo'
+
 const initialFileStorageConfig: FileStorageConfig = {
+  deviceId: '',
   tutorials: [],
   sound: true,
   backgroudSound: true,
@@ -15,19 +18,6 @@ const initialFileStorageConfig: FileStorageConfig = {
     },
   ],
   skillItems: [],
-}
-
-export const getFileStorageConfig = (): FileStorageConfig => {
-  try {
-    const value: any = localStorage.getItem(FILE_STORAGE_KEY)
-    let parsed = {}
-    if (!!value) {
-      parsed = JSON.parse(value)
-    }
-    return { ...initialFileStorageConfig, ...parsed }
-  } catch (error) {
-    return { ...initialFileStorageConfig }
-  }
 }
 
 export const clearTutorial = (): void => {
@@ -146,6 +136,50 @@ export const getQuantityOfSkillItems = (skin: SKILL_ITEM_SKINS): number => {
 
 export const removeSkillItems = (items: Array<SkillItemFileStorageConfig>) => {
   items.forEach((item) => removeSkillItem(item))
+}
+
+export const setDeviceId = (deviceId: string) => {
+  setFileStorageConfig({
+    ...getFileStorageConfig(),
+    deviceId: deviceId,
+  })
+}
+
+export const getDeviceId = (): string => {
+  return getFileStorageConfig().deviceId
+}
+
+export const storeDeviceInformation = (data: any) => {
+  if (!data) {
+    data = {}
+  }
+  localStorage.setItem(DEVICE_FILE_STORAGE_KEY, JSON.stringify(data))
+}
+
+export const getDeviceInformation = (): any => {
+  try {
+    const value: any = localStorage.getItem(DEVICE_FILE_STORAGE_KEY)
+    let parsed = {}
+    if (!!value) {
+      parsed = JSON.parse(value)
+    }
+    return { ...parsed }
+  } catch (error) {
+    return {}
+  }
+}
+
+export const getFileStorageConfig = (): FileStorageConfig => {
+  try {
+    const value: any = localStorage.getItem(FILE_STORAGE_KEY)
+    let parsed = {}
+    if (!!value) {
+      parsed = JSON.parse(value)
+    }
+    return { ...initialFileStorageConfig, ...parsed }
+  } catch (error) {
+    return { ...initialFileStorageConfig }
+  }
 }
 
 const removeSkillItem = (item: SkillItemFileStorageConfig) => {

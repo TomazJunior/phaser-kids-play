@@ -1,3 +1,4 @@
+import { updateDeviceInfo } from '../controllers/deviceInfo'
 import ProgressBar from '../ui/progressBar'
 import { updateSoundState } from '../utils/audioUtil'
 import {
@@ -5,7 +6,6 @@ import {
   BUTTON_PREFIX,
   BUTTON_PREFIX_EXTRA,
   FONTS,
-  GAME_WORLDS,
   SCENES,
   SOUNDS,
   SPRITE_NAME,
@@ -96,7 +96,7 @@ export default class PreloadScene extends Phaser.Scene {
 
     this.load.spritesheet('firework', 'assets/img/firework.png', {
       frameWidth: 256,
-      frameHeight: 256
+      frameHeight: 256,
     })
 
     //skill items
@@ -137,33 +137,39 @@ export default class PreloadScene extends Phaser.Scene {
     })
   }
   private loadAssetsProgress = () => {
-    this.load.on('progress', this.progressBar.updateValue)
+    this.load.on('progress', (value) => this.progressBar.updateValue(value - 0.1))
     // this.load.on('fileprogress', (file) => {
     //   console.log(file.src)
     // })
-    this.load.on('complete', () => {
-      // this.scene.start(SCENES.LEVEL_SCENE)
-      this.scene.start(SCENES.MENU_SCENE)
-      // this.scene.start(SCENES.CONFIG_SCENE)
-      // this.scene.start(SCENES.SELECT_ITEMS_SCENE, <CurrentWorldAndLevelConfig>{
-      //   gameWorld: GAME_WORLDS[0],
-      //   level: GAME_WORLDS[0].levels[0],
-      // })
-      // this.scene.start(SCENES.MAIN_SCENE, <MainSceneConfig>{
-      //   gameWorld: GAME_WORLDS[0],
-      //   level: GAME_WORLDS[0].levels[0],
-      //   skillItems: [{
-      //     skin: SKILL_ITEM_SKINS.BOX,
-      //     quantity: 5
-      //   },{
-      //     skin: SKILL_ITEM_SKINS.KEY,
-      //     quantity: 5
-      //   },{
-      //     skin: SKILL_ITEM_SKINS.STAR,
-      //     quantity: 5
-      //   }],
-      // })
-      // this.scene.start(SCENES.PAUSE_SCENE)
+    this.load.on('complete', async () => {
+      this.progressBar.updateValue(0.95)
+      await updateDeviceInfo()
+      this.progressBar.updateValue(1)
+
+      this.time.delayedCall(Phaser.Math.Between(50, 200), () => {
+        // this.scene.start(SCENES.LEVEL_SCENE)
+        this.scene.start(SCENES.MENU_SCENE)
+        // this.scene.start(SCENES.CONFIG_SCENE)
+        // this.scene.start(SCENES.SELECT_ITEMS_SCENE, <CurrentWorldAndLevelConfig>{
+        //   gameWorld: GAME_WORLDS[0],
+        //   level: GAME_WORLDS[0].levels[0],
+        // })
+        // this.scene.start(SCENES.MAIN_SCENE, <MainSceneConfig>{
+        //   gameWorld: GAME_WORLDS[0],
+        //   level: GAME_WORLDS[0].levels[0],
+        //   skillItems: [{
+        //     skin: SKILL_ITEM_SKINS.BOX,
+        //     quantity: 5
+        //   },{
+        //     skin: SKILL_ITEM_SKINS.KEY,
+        //     quantity: 5
+        //   },{
+        //     skin: SKILL_ITEM_SKINS.STAR,
+        //     quantity: 5
+        //   }],
+        // })
+        // this.scene.start(SCENES.PAUSE_SCENE)
+      })
     })
   }
 

@@ -4,9 +4,11 @@ import { DynamoDBService } from './dynamodb.service'
 
 const DeviceSchema = {
   id: dynogels.types.uuid(),
+  userId: joi.string().allow(null),
   serial: joi.string().allow(null),
   uuid: joi.string().allow(null),
   version: joi.string().allow(null),
+  platform: joi.string().allow(null),
 }
 
 export const Device = dynogels.define(process.env.devicesTableName!, {
@@ -16,7 +18,6 @@ export const Device = dynogels.define(process.env.devicesTableName!, {
   tableName: process.env.devicesTableName,
 })
 Device.config({ dynamodb: DynamoDBService.getInstance().dynamoDB })
-
 
 const UserSchema = {
   id: dynogels.types.uuid(),
