@@ -1,5 +1,5 @@
 import { ButtonCircle } from '../ui/buttonCircle'
-import { getQuantityOfSkillItems } from '../utils/gameInfoData'
+import { getQuantityOfSkillItems } from '../utils/gameProgressData'
 
 import { SKILL_ITEM_SKINS } from '../utils/skillItems'
 import SkillItem from './skillItems/skillItem'

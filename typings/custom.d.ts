@@ -39,24 +39,26 @@ declare interface ButtonConfig {
   onClick: () => void
 }
 
-declare interface FileStorageConfig {
-  deviceId: string,
+declare interface GameConfigInfoData {
+  deviceId: string
   sound: boolean
   backgroudSound: boolean
-  tutorials: Array<TutorialFileStorageConfig>
+}
+
+declare interface GameProgressData {
   levels: Array<LevelFileStorageConfig>
   gems: number
   skillItems: Array<SkillItemFileStorageConfig>
+  tutorials: Array<TutorialFileStorageConfig>
 }
-
 declare interface DeviceStorageConfig extends DeviceInfoConfig {
   isOnline: boolean
 }
 
 declare interface DeviceInfoConfig {
-  serial?: string, 
-  uuid?: string,
-  version?: string, 
+  serial?: string
+  uuid?: string
+  version?: string
   platform?: string
 }
 
@@ -198,9 +200,7 @@ declare interface Neighbors {
 }
 
 declare interface SkillItemConstructor {
-  new (
-    scene: Phaser.Scene
-  ): import('../src/scripts/objects/skillItems/skillItem').default
+  new (scene: Phaser.Scene): import('../src/scripts/objects/skillItems/skillItem').default
 }
 
 declare interface SkillItemListInterface {

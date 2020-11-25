@@ -1,5 +1,5 @@
 import { GAME_WORLDS, TILES, TileGameWorldType } from './constants'
-import { getFileStorageConfig } from './gameInfoData'
+import { getGameProgressData } from './gameProgressData'
 
 export const isLevelExist = (gameWorld: GameWorld, level: number): boolean => {
   return !!gameWorld.levels.find((levelConfig) => level === levelConfig.level)
@@ -84,10 +84,10 @@ export const getPreviousWorld = (gameWorld: GameWorld): GameWorld | undefined =>
 }
 
 export const allLevelsCompleted = (gameWorld: GameWorld): boolean => {
-  const fileStorageData: FileStorageConfig = getFileStorageConfig()
+  const gameProgressData: GameProgressData = getGameProgressData()
 
   return gameWorld.levels.every(
     (level) =>
-      !!fileStorageData.levels.find((lvl) => lvl.key === gameWorld.key && lvl.level === level.level && lvl.stars >= 1)
+      !!gameProgressData.levels.find((lvl) => lvl.key === gameWorld.key && lvl.level === level.level && lvl.stars >= 1)
   )
 }

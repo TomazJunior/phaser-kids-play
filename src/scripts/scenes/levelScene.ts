@@ -1,7 +1,7 @@
 import BackgroundParallax from '../ui/backgroundParallax'
 import { ButtonSmall } from '../ui/buttonSmall'
 import { BUTTON, BUTTON_PREFIX, COLORS, FONTS, SCENES } from '../utils/constants'
-import { getFileStorageConfig } from '../utils/gameInfoData'
+import { getGameProgressData } from '../utils/gameProgressData'
 import { getStarImageName } from '../utils/scoresUtil'
 import { allLevelsCompleted, getGameWorld, getNextWorld, getPreviousWorld } from '../utils/worldUtil'
 
@@ -54,7 +54,7 @@ export default class LevelScene extends Phaser.Scene {
     let posX = initialX
     let posY = initialY
 
-    const fileStorageData: FileStorageConfig = getFileStorageConfig()
+    const gameProgressData: GameProgressData = getGameProgressData()
 
     let initialLevel = 1
     if (!!previousWorld) {
@@ -72,10 +72,10 @@ export default class LevelScene extends Phaser.Scene {
       }
 
       const levelFileData =
-        fileStorageData.levels &&
-        fileStorageData.levels.find((lvl) => lvl.level === level.level && lvl.key === this.gameWorld.key)
+        gameProgressData.levels &&
+        gameProgressData.levels.find((lvl) => lvl.level === level.level && lvl.key === this.gameWorld.key)
 
-      const maxLevel = fileStorageData.levels
+      const maxLevel = gameProgressData.levels
         .filter((level) => level.key === this.gameWorld.key)
         .reduce((maxLevel, level) => {
           if (level.stars) {

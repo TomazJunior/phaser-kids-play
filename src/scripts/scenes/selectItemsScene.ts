@@ -6,7 +6,7 @@ import { GemScore } from '../ui/gemScore'
 import SkillItem from '../objects/skillItems/skillItem'
 import { FrameBig } from '../ui/frameBIg'
 import { SkillItemBuyFrame } from '../objects/skillItemBuyFrame'
-import { buySkillItem, getFileStorageConfig, getGems, removeSkillItems } from '../utils/gameInfoData'
+import { buySkillItem, getGameProgressData, getGems, removeSkillItems } from '../utils/gameProgressData'
 import { ButtonSmall } from '../ui/buttonSmall'
 
 export default class SelectItemsScene extends Phaser.Scene {
@@ -148,7 +148,7 @@ export default class SelectItemsScene extends Phaser.Scene {
   }
 
   refreshCards = () => {
-    const { skillItems } = getFileStorageConfig()
+    const { skillItems } = getGameProgressData()
     if (!skillItems?.length) return
     if (!this.cards?.length) return
 
@@ -161,7 +161,7 @@ export default class SelectItemsScene extends Phaser.Scene {
   }
 
   refreshAndSelectCard = (skillItem: SkillItemDefinition) => {
-    const { skillItems } = getFileStorageConfig()
+    const { skillItems } = getGameProgressData()
 
     if (!skillItems?.length) return
     if (!this.cards?.length) return
