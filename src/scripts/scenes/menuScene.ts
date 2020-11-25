@@ -1,7 +1,7 @@
 import BackgroundParallax from '../ui/backgroundParallax'
 import { ButtonBig } from '../ui/buttonBig'
 import { FONTS, SCENES } from '../utils/constants'
-import { getDeviceId } from '../utils/fileStorage'
+import { getDeviceId } from '../utils/gameInfoData'
 export default class MenuScene extends Phaser.Scene {
   constructor() {
     super({ key: SCENES.MENU_SCENE })
@@ -27,9 +27,11 @@ export default class MenuScene extends Phaser.Scene {
       },
     }).setOrigin(0.5, 0.5)
 
-    this.add.text(width * 0.5, height - 30, getDeviceId(), {
-      fontFamily: FONTS.KEN_VECTOR,
-      fontSize: '24px',
-    }).setOrigin(0.5, 0.5)
+    this.add
+      .text(width * 0.5, height - 30, getDeviceId(), {
+        fontFamily: FONTS.KEN_VECTOR,
+        fontSize: '24px',
+      })
+      .setOrigin(0.5, 0.5)
   }
 }

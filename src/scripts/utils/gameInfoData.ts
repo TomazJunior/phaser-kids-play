@@ -1,7 +1,6 @@
 import { SKILL_ITEM_SKINS } from './skillItems'
 
 const FILE_STORAGE_KEY = 'fileStorage'
-const DEVICE_FILE_STORAGE_KEY = 'deviceinfo'
 
 const initialFileStorageConfig: FileStorageConfig = {
   deviceId: '',
@@ -19,6 +18,7 @@ const initialFileStorageConfig: FileStorageConfig = {
   ],
   skillItems: [],
 }
+
 
 export const clearTutorial = (): void => {
   setFileStorageConfig({
@@ -149,25 +149,6 @@ export const getDeviceId = (): string => {
   return getFileStorageConfig().deviceId
 }
 
-export const storeDeviceInformation = (data: any) => {
-  if (!data) {
-    data = {}
-  }
-  localStorage.setItem(DEVICE_FILE_STORAGE_KEY, JSON.stringify(data))
-}
-
-export const getDeviceInformation = (): any => {
-  try {
-    const value: any = localStorage.getItem(DEVICE_FILE_STORAGE_KEY)
-    let parsed = {}
-    if (!!value) {
-      parsed = JSON.parse(value)
-    }
-    return { ...parsed }
-  } catch (error) {
-    return {}
-  }
-}
 
 export const getFileStorageConfig = (): FileStorageConfig => {
   try {
@@ -194,6 +175,8 @@ const removeSkillItem = (item: SkillItemFileStorageConfig) => {
     skillItems: [...skillItems.filter((s) => !(s.skin === item.skin)), skillItemFound],
   })
 }
+
+
 
 const setFileStorageConfig = (fileStorage: FileStorageConfig) => {
   localStorage.setItem(FILE_STORAGE_KEY, JSON.stringify(fileStorage))

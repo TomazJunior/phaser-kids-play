@@ -49,6 +49,17 @@ declare interface FileStorageConfig {
   skillItems: Array<SkillItemFileStorageConfig>
 }
 
+declare interface DeviceStorageConfig extends DeviceInfoConfig {
+  isOnline: boolean
+}
+
+declare interface DeviceInfoConfig {
+  serial?: string, 
+  uuid?: string,
+  version?: string, 
+  platform?: string
+}
+
 declare interface SkillItemFileStorageConfig {
   quantity: number
   skin: import('../src/scripts/utils/skillItems').SKILL_ITEM_SKINS

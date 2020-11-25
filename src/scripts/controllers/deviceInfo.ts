@@ -1,5 +1,6 @@
 import { ServiceApi } from '../utils/api'
-import { getDeviceId, getDeviceInformation, setDeviceId } from '../utils/fileStorage'
+import { getDeviceInformation } from '../utils/deviceData'
+import { getDeviceId, setDeviceId } from '../utils/gameInfoData'
 
 export const updateDeviceInfo = async () => {
   const deviceId: string = getDeviceId()

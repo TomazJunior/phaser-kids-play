@@ -1,5 +1,5 @@
 import { COLORS, FONTS } from '../utils/constants'
-import { getGems, incPlayerGems } from '../utils/fileStorage'
+import { getGems, incPlayerGems } from '../utils/gameInfoData'
 import { ButtonCircle } from './buttonCircle'
 
 export class GemScore extends Phaser.GameObjects.Group {

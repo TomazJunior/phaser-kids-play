@@ -9,7 +9,7 @@ import {
   OBJECT_DEPTHS,
   SOUNDS,
 } from '../utils/constants'
-import { getLevelStorage, incPlayerGems, setLevelStorage } from '../utils/fileStorage'
+import { getLevelStorage, incPlayerGems, setLevelStorage } from '../utils/gameInfoData'
 import { calculateGems, calculateStars, getStarImageName } from '../utils/scoresUtil'
 import { getLevel, getNextLevel } from '../utils/worldUtil'
 import { ButtonSmall } from './buttonSmall'

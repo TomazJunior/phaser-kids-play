@@ -4,12 +4,11 @@ import { InfoDialog } from '../ui/creditsDialog'
 import { updateSoundState } from '../utils/audioUtil'
 import { BUTTON, BUTTON_PREFIX, BUTTON_PREFIX_EXTRA, COLORS, FONTS, SCENES } from '../utils/constants'
 import {
-  clearTutorial,
   isBackgroundSoundEnabled,
   isSoundEnabled,
   setBackgroundSoundEnabled,
   setSoundEnabled,
-} from '../utils/fileStorage'
+} from '../utils/gameInfoData'
 
 export default class ConfigScene extends Phaser.Scene {
   

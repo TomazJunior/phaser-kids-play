@@ -1,7 +1,7 @@
 import BackgroundParallax from '../ui/backgroundParallax'
 import { ButtonSmall } from '../ui/buttonSmall'
 import { BUTTON, BUTTON_PREFIX, COLORS, FONTS, SCENES } from '../utils/constants'
-import { getFileStorageConfig } from '../utils/fileStorage'
+import { getFileStorageConfig } from '../utils/gameInfoData'
 import { getStarImageName } from '../utils/scoresUtil'
 import { allLevelsCompleted, getGameWorld, getNextWorld, getPreviousWorld } from '../utils/worldUtil'
 

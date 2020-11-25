@@ -1,4 +1,4 @@
-import { getFileStorageConfig } from './fileStorage'
+import { getFileStorageConfig } from './gameInfoData'
 import { SOUNDS } from './constants'
 
 export const playSound = (scene: Phaser.Scene, audio: Phaser.Sound.BaseSound) => {

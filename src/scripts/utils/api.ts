@@ -1,7 +1,7 @@
 import { AxiosInstance } from 'axios'
 import urlJoin from 'url-join'
 import { AxiosHelper } from './axiosHelper'
-import { isLocalhost } from './device'
+import { isLocalhost } from './deviceUtils'
 
 export class ServiceApi {
   api: AxiosInstance

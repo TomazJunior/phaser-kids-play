@@ -1,5 +1,5 @@
 import { GAME_WORLDS, TILES, TileGameWorldType } from './constants'
-import { getFileStorageConfig } from './fileStorage'
+import { getFileStorageConfig } from './gameInfoData'
 
 export const isLevelExist = (gameWorld: GameWorld, level: number): boolean => {
   return !!gameWorld.levels.find((levelConfig) => level === levelConfig.level)

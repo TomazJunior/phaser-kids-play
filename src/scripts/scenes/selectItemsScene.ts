@@ -6,7 +6,7 @@ import { GemScore } from '../ui/gemScore'
 import SkillItem from '../objects/skillItems/skillItem'
 import { FrameBig } from '../ui/frameBIg'
 import { SkillItemBuyFrame } from '../objects/skillItemBuyFrame'
-import { buySkillItem, getFileStorageConfig, getGems, removeSkillItems } from '../utils/fileStorage'
+import { buySkillItem, getFileStorageConfig, getGems, removeSkillItems } from '../utils/gameInfoData'
 import { ButtonSmall } from '../ui/buttonSmall'
 
 export default class SelectItemsScene extends Phaser.Scene {

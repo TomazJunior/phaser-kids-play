@@ -4,12 +4,12 @@ import PreloadScene from './scenes/preloadScene'
 import resize from './utils/resize'
 import { GAME } from './utils/constants'
 import MenuScene from './scenes/menuScene'
-import { isAndroid, isLocalhost } from './utils/device'
+import { isAndroid, isLocalhost } from './utils/deviceUtils'
 import LevelScene from './scenes/levelScene'
 import PauseScene from './scenes/pauseScene'
 import ConfigScene from './scenes/configScene'
 import SelectItemsScene from './scenes/selectItemsScene'
-import { storeDeviceInformation } from './utils/fileStorage'
+import { setDeviceInfoConfig, setIsOnline } from './utils/deviceData'
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -39,8 +39,16 @@ const onResume = (game: Phaser.Game) => {
   // game.sound.resumeAll()
 }
 
+const onOffline = (game: Phaser.Game) => {
+  setIsOnline(false)
+}
+
+const onOnline = (game: Phaser.Game) => {
+  setIsOnline(true)
+}
+
 const onDeviceReady = () => {
-  storeDeviceInformation(window.device)
+  setDeviceInfoConfig(window.device)
 
   document.addEventListener(
     'pause',
@@ -58,8 +66,13 @@ const onDeviceReady = () => {
     false
   )
 
+  document.addEventListener('offline', () => onOffline(game), false)
+  document.addEventListener('online', () => onOnline(game), false)
+
   if (isAndroid()) {
     window.plugins.insomnia.keepAwake()
+  } else {
+    setIsOnline(false)
   }
 
   const game = new Phaser.Game(config)

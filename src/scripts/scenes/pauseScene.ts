@@ -8,7 +8,7 @@ import {
   isSoundEnabled,
   setBackgroundSoundEnabled,
   setSoundEnabled,
-} from '../utils/fileStorage'
+} from '../utils/gameInfoData'
 
 export default class PauseScene extends Phaser.Scene {
   private config: PauseSceneConfig
