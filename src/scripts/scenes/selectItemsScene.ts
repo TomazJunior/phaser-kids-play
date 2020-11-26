@@ -27,11 +27,12 @@ export default class SelectItemsScene extends Phaser.Scene {
 
   create() {
     this.background = new BackgroundParallax(this, false, false)
-    this.createSkillItemFrames()
-    this.gemScore = new GemScore(this, 150).setVisible(true)
+    this.createSkillItemFrames().then(() => {
+      this.gemScore = new GemScore(this, 150).setVisible(true)
 
-    this.createBackButton()
-    this.createGoToLevelButton()
+      this.createBackButton()
+      this.createGoToLevelButton()
+    })
   }
 
   init(config: CurrentWorldAndLevelConfig) {
@@ -44,9 +45,9 @@ export default class SelectItemsScene extends Phaser.Scene {
 
     new ButtonSmall(this, width * 0.5 + 270, height * 0.5 + 170, {
       name: BUTTON.RIGHT,
-      onClick: () => {
+      onClick: async () => {
         const selectedSkillItems = this.getSelectedItems()
-        removeSkillItems(selectedSkillItems)
+        await removeSkillItems(selectedSkillItems)
 
         this.scene.stop(SCENES.SELECT_ITEMS_SCENE)
         this.scene.start(SCENES.MAIN_SCENE, <MainSceneConfig>{
@@ -95,7 +96,7 @@ export default class SelectItemsScene extends Phaser.Scene {
       await buySkillItem(skillItem)
       await this.gemScore.refreshValue()
       this.time.delayedCall(250, async () => {
-        this.refreshAndSelectCard(skillItem)
+        await this.refreshAndSelectCard(skillItem)
         await this.handleHideBuySkillItemFrame()
         resolve()
       })
@@ -121,7 +122,7 @@ export default class SelectItemsScene extends Phaser.Scene {
     })
   }
 
-  createSkillItemFrames() {
+  createSkillItemFrames = async () => {
     const { width, height } = this.scale
     this.frame = new FrameBig<SkillItemFrame>(this, width * 0.5, height * 0.5, {
       visible: true,
@@ -141,7 +142,7 @@ export default class SelectItemsScene extends Phaser.Scene {
         )
       })
     })
-    this.refreshCards()
+    await this.refreshCards()
   }
 
   handleShowBuySkillItemFrame = (skillItem: SkillItem) => {
@@ -154,8 +155,8 @@ export default class SelectItemsScene extends Phaser.Scene {
     })
   }
 
-  refreshCards = () => {
-    const skillItems = getSkillItems()
+  refreshCards = async () => {
+    const skillItems = await getSkillItems()
     if (!skillItems?.length) return
     if (!this.cards?.length) return
 
@@ -167,8 +168,8 @@ export default class SelectItemsScene extends Phaser.Scene {
     })
   }
 
-  refreshAndSelectCard = (skillItem: SkillItemDefinition) => {
-    const skillItems = getSkillItems()
+  refreshAndSelectCard = async (skillItem: SkillItemDefinition) => {
+    const skillItems = await getSkillItems()
 
     if (!skillItems?.length) return
     if (!this.cards?.length) return

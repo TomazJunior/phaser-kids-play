@@ -5,7 +5,6 @@ import { SKILL_ITEM_SKINS } from './skillItems'
 const GAME_PROGRESS_STORAGE_KEY = 'gamePogressInfo'
 
 const INITIAL_GAME_PROGRESS_STORAGE: GameProgressData = {
-  tutorials: [],
   gems: 0,
   levels: [
     {
@@ -16,37 +15,6 @@ const INITIAL_GAME_PROGRESS_STORAGE: GameProgressData = {
     },
   ],
   skillItems: [],
-}
-
-export const getTutorialSeen = (gameWorld: GameWorld, level: number): boolean => {
-  const { tutorials } = getGameProgressData()
-  const tutorial = tutorials.find((tutorial) => tutorial.level === level && gameWorld.key == tutorial.key)
-  if (!tutorial) return false
-  return tutorial.seen
-}
-
-export const setTutorialSeen = (key: string, level: number, seen: boolean) => {
-  const { tutorials } = getGameProgressData()
-  let tutorial = tutorials.find((tutorial) => tutorial.level === level && tutorial.key === key)
-  if (!tutorial) {
-    tutorial = {
-      key,
-      level,
-      seen,
-    }
-  }
-  tutorial.seen = seen
-
-  setFileStorageConfig({
-    ...getGameProgressData(),
-    tutorials: [
-      ...tutorials.filter((item) => {
-        const found = item.level === tutorial?.level && item.key === tutorial?.key
-        return !found
-      }),
-      tutorial,
-    ],
-  })
 }
 
 export const incPlayerGems = async (value: number): Promise<void> => {
@@ -71,7 +39,7 @@ export const getGems = async (): Promise<number> => {
 
 export const getLevelStorage = async (level: number, key: string): Promise<LevelFileStorageConfig | undefined> => {
   const levels = await getLevels()
-  
+
   const levelFound = levels.find((item) => item.level === level && item.key === key)
   const levelFileStorage = levelFound ? { ...levelFound } : undefined
   return Promise.resolve(levelFileStorage)
@@ -82,7 +50,7 @@ export const setLevelStorage = async (data: LevelFileStorageConfig) => {
   const currentLevel = levels.find((item) => item.level === data.level && item.key === data.key)
   const maxStars = Math.max(data.stars, currentLevel?.stars || 0)
   const level: LevelFileStorageConfig = { ...data, attempts: (currentLevel?.attempts || 0) + 1, stars: maxStars }
-  
+
   const updatedLevels = [...levels.filter((item) => !(item.key === level.key && item.level === level.level)), level]
   if (window.cordova) {
     await setInSecureKey(STORE_KEYS.LEVELS, updatedLevels)
@@ -97,27 +65,35 @@ export const buySkillItem = async (item: SkillItemDefinition) => {
   const gems = await getGems()
   if (item.itemCost > gems) throw new Error(`Cost of the item is higher than the ${item.skin} item`)
 
-  const { skillItems } = getGameProgressData()
+  const skillItems = await getSkillItems()
   const skillItemFound = skillItems.find((s) => s.skin === item.skin)
   let skillItem: SkillItemFileStorageConfig = {
     skin: item.skin,
     quantity: skillItemFound ? skillItemFound.quantity + 1 : 1,
   }
 
+  const updatedSkillItems = [...skillItems.filter((s) => !(s.skin === item.skin)), skillItem]
+  if (window.cordova) {
+    await setInSecureKey(STORE_KEYS.SKILL_ITEMS, updatedSkillItems)
+  }
+
   setFileStorageConfig({
     ...getGameProgressData(),
-    skillItems: [...skillItems.filter((s) => !(s.skin === item.skin)), skillItem],
+    skillItems: updatedSkillItems,
   })
+
   await incPlayerGems(-item.itemCost)
 }
 
-export const getQuantityOfSkillItems = (skin: SKILL_ITEM_SKINS): number => {
-  const { skillItems } = getGameProgressData()
+export const getQuantityOfSkillItems = async (skin: SKILL_ITEM_SKINS): Promise<number> => {
+  const skillItems = await getSkillItems()
   return skillItems.find((s) => s.skin === skin)?.quantity || 0
 }
 
-export const removeSkillItems = (items: Array<SkillItemFileStorageConfig>) => {
-  items.forEach((item) => removeSkillItem(item))
+export const removeSkillItems = async (items: Array<SkillItemFileStorageConfig>) => {
+  for (const item of items) {
+    await removeSkillItem(item)
+  }
 }
 
 export const getLevels = async (): Promise<Array<LevelFileStorageConfig>> => {
@@ -128,8 +104,11 @@ export const getLevels = async (): Promise<Array<LevelFileStorageConfig>> => {
   return levels
 }
 
-export const getSkillItems = (): Array<SkillItemFileStorageConfig> => {
-  const { skillItems } = getGameProgressData()
+export const getSkillItems = async (): Promise<Array<SkillItemFileStorageConfig>> => {
+  let { skillItems } = getGameProgressData()
+  if (window.cordova) {
+    skillItems = await getFromSecureKey(STORE_KEYS.SKILL_ITEMS, [])
+  }
   return skillItems
 }
 
@@ -146,16 +125,20 @@ export const getGameProgressData = (): GameProgressData => {
   }
 }
 
-const removeSkillItem = (item: SkillItemFileStorageConfig) => {
-  const { skillItems } = getGameProgressData()
+const removeSkillItem = async (item: SkillItemFileStorageConfig) => {
+  const skillItems = await getSkillItems()
   let skillItemFound = skillItems.find((s) => s.skin === item.skin)
   if (!skillItemFound) {
     throw new Error(`Skill ${item.skin} item not found in the list ${skillItems}`)
   }
   skillItemFound.quantity -= item.quantity
+  const updatedSkillItems = [...skillItems.filter((s) => !(s.skin === item.skin)), skillItemFound]
+  if (window.cordova) {
+    await setInSecureKey(STORE_KEYS.SKILL_ITEMS, updatedSkillItems)
+  }
   setFileStorageConfig({
     ...getGameProgressData(),
-    skillItems: [...skillItems.filter((s) => !(s.skin === item.skin)), skillItemFound],
+    skillItems: updatedSkillItems,
   })
 }
 

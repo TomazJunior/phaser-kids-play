@@ -43,13 +43,13 @@ declare interface GameConfigInfoData {
   deviceId: string
   sound: boolean
   backgroudSound: boolean
+  tutorials: Array<TutorialFileStorageConfig>
 }
 
 declare interface GameProgressData {
   levels: Array<LevelFileStorageConfig>
   gems: number
   skillItems: Array<SkillItemFileStorageConfig>
-  tutorials: Array<TutorialFileStorageConfig>
 }
 declare interface DeviceStorageConfig extends DeviceInfoConfig {
   isOnline: boolean

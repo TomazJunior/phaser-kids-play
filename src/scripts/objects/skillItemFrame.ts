@@ -64,15 +64,16 @@ export default class SkillItemFrame extends Phaser.GameObjects.Image {
     } else {
       this._quantity = v
     }
-    this.updateAddButtonStyle()
-    const isSkillItemFull = v >= this.skillItem.skillItemDefinition.maxPerLevel
-    this.quantityButton.text = this._quantity.toString()
+    this.updateAddButtonStyle().then(() => {
+      const isSkillItemFull = v >= this.skillItem.skillItemDefinition.maxPerLevel
+      this.quantityButton.text = this._quantity.toString()
 
-    if (isSkillItemFull) {
-      this.selected = true
-    } else if (!this.quantity) {
-      this.selected = false
-    }
+      if (isSkillItemFull) {
+        this.selected = true
+      } else if (!this.quantity) {
+        this.selected = false
+      }
+    })
   }
 
   public get quantity(): number {
@@ -114,7 +115,7 @@ export default class SkillItemFrame extends Phaser.GameObjects.Image {
     this.selected = !this._selected
   }
 
-  updateAddButtonStyle = () => {
+  updateAddButtonStyle = async () => {
     if (!this.addButton) return
 
     const isSkillItemFull = this.quantity >= this.skillItem.skillItemDefinition.maxPerLevel
@@ -123,7 +124,7 @@ export default class SkillItemFrame extends Phaser.GameObjects.Image {
       this.addButton.texture = 'circle-grey'
       this.addButton.text = '+'
     } else {
-      const quantityOfSkillItems = getQuantityOfSkillItems(this.skin)
+      const quantityOfSkillItems = await getQuantityOfSkillItems(this.skin)
       const hasMoreItems = quantityOfSkillItems > this._quantity
       if (hasMoreItems) {
         this.addButton.texture = 'circle-blue'

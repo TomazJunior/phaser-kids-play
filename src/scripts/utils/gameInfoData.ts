@@ -1,6 +1,7 @@
 const GAME_INFO_STORAGE_KEY = 'gameConfigInfo'
 
 const initialFileStorageConfig: GameConfigInfoData = {
+  tutorials: [],
   deviceId: '',
   sound: true,
   backgroudSound: true,
@@ -39,6 +40,36 @@ export const getDeviceId = (): string => {
   return getFileStorageConfig().deviceId
 }
 
+export const getTutorialSeen = (gameWorld: GameWorld, level: number): boolean => {
+  const { tutorials } = getFileStorageConfig()
+  const tutorial = tutorials.find((tutorial) => tutorial.level === level && gameWorld.key == tutorial.key)
+  if (!tutorial) return false
+  return tutorial.seen
+}
+
+export const setTutorialSeen = (key: string, level: number, seen: boolean) => {
+  const { tutorials } = getFileStorageConfig()
+  let tutorial = tutorials.find((tutorial) => tutorial.level === level && tutorial.key === key)
+  if (!tutorial) {
+    tutorial = {
+      key,
+      level,
+      seen,
+    }
+  }
+  tutorial.seen = seen
+
+  setFileStorageConfig({
+    ...getFileStorageConfig(),
+    tutorials: [
+      ...tutorials.filter((item) => {
+        const found = item.level === tutorial?.level && item.key === tutorial?.key
+        return !found
+      }),
+      tutorial,
+    ],
+  })
+}
 
 export const getFileStorageConfig = (): GameConfigInfoData => {
   try {
