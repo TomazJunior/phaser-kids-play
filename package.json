@@ -41,6 +41,7 @@
     "cordova-plugin-device": "^2.0.3",
     "cordova-plugin-insomnia": "^4.3.0",
     "cordova-plugin-network-information": "^2.0.2",
+    "cordova-plugin-secure-key-store": "^1.5.5",
     "cordova-plugin-webpack": "^1.0.5",
     "gh-pages": "^2.0.1",
     "html-webpack-plugin": "^3.2.0",
@@ -75,7 +76,8 @@
       "cordova-plugin-insomnia": {},
       "cordova-plugin-webpack": {},
       "cordova-plugin-device": {},
-      "cordova-plugin-network-information": {}
+      "cordova-plugin-network-information": {},
+      "cordova-plugin-secure-key-store": {}
     }
   }
 }

@@ -22,6 +22,7 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
   targetObjectPosition: ObjectPosition | undefined
   foundChars: Array<HiddenChar>
   gameMap: GameMap
+  reachedEndOfWorld: boolean
 
   constructor(
     scene: Phaser.Scene,
@@ -45,6 +46,8 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
 
     // player will be visible only after all chars being hidden
     this.setVisible(false)
+
+    this.reachedEndOfWorld = false
 
     this.foundChars = []
     this.walkingAudio = getOrAddAudio(scene, SOUNDS.WALKING, { volume: 0.4, loop: true })
@@ -199,9 +202,20 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
       distanceY = 0
     }
 
+    if (
+      Math.abs(Math.trunc(this.scene.scale.width - this.x)) < 15 &&
+      this.animation !== PLAYER.ANIMATIONS.DOWN_IDLE &&
+      !this.reachedEndOfWorld
+    ) {
+      distanceX = 0
+      this.pathToGo = []
+      this.reachedEndOfWorld = true
+    }
+
     if (distanceX === 0 && distanceY === 0) {
       if (this.pathToGo.length) {
         this.goToNextPosition(initialPos)
+        this.reachedEndOfWorld = false
       } else {
         this.isWalking = false
         this.setVelocity(0, 0)

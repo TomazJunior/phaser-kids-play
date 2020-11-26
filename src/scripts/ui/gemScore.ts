@@ -15,26 +15,28 @@ export class GemScore extends Phaser.GameObjects.Group {
 
     this.y = -100
     this.frame = scene.add.sprite(x, this.y, 'gem-score')
-    this._value = getGems()
+    getGems().then((value: number) => {
+      this._value = value
 
-    this.valueText = scene.add
-      .text(this.x - 20, this.y, this._value.toString(), {
-        fontFamily: FONTS.ALLOY_INK,
-        fontSize: '46px',
-      })
-      .setStroke(COLORS.DARK_YELLOW, 10)
-      .setOrigin(0.5, 0.5)
+      this.valueText = scene.add
+        .text(this.x - 20, this.y, this._value.toString(), {
+          fontFamily: FONTS.ALLOY_INK,
+          fontSize: '46px',
+        })
+        .setStroke(COLORS.DARK_YELLOW, 10)
+        .setOrigin(0.5, 0.5)
 
-    this.addButton = new ButtonCircle(
-      scene,
-      this.x + 120,
-      this.y + 30,
-      'circle-blue',
-      '+',
-      this.handleAddClick
-    ).setVisible(false)
+      this.addButton = new ButtonCircle(
+        scene,
+        this.x + 120,
+        this.y + 30,
+        'circle-blue',
+        '+',
+        this.handleAddClick
+      ).setVisible(false)
 
-    this.add(this.frame).add(this.valueText).addMultiple(this.addButton.getChildren())
+      this.add(this.frame).add(this.valueText).addMultiple(this.addButton.getChildren())
+    })
   }
 
   private get value(): number {
@@ -47,7 +49,7 @@ export class GemScore extends Phaser.GameObjects.Group {
   }
 
   async show() {
-    this.value = getGems()
+    this.value = await getGems()
     return new Promise((resolve) => {
       this.setVisible(true)
       this.scene.tweens.add({
@@ -76,9 +78,9 @@ export class GemScore extends Phaser.GameObjects.Group {
   }
 
   refreshValue = (): Promise<void> => {
-    return new Promise((resolve) => {
+    return new Promise(async (resolve) => {
       const currentValue = this._value
-      const updatedValue = getGems()
+      const updatedValue = await getGems()
 
       this.scene.tweens.addCounter({
         from: currentValue,
@@ -95,9 +97,9 @@ export class GemScore extends Phaser.GameObjects.Group {
     })
   }
 
-  incValue = (value: number) => {
-    incPlayerGems(value)
-    this.value = getGems()
+  incValue = async (value: number) => {
+    await incPlayerGems(value)
+    this.value = await getGems()
   }
 
   handleAddClick = () => {

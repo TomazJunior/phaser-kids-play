@@ -6,7 +6,7 @@ import { GemScore } from '../ui/gemScore'
 import SkillItem from '../objects/skillItems/skillItem'
 import { FrameBig } from '../ui/frameBIg'
 import { SkillItemBuyFrame } from '../objects/skillItemBuyFrame'
-import { buySkillItem, getGameProgressData, getGems, removeSkillItems } from '../utils/gameProgressData'
+import { buySkillItem, getSkillItems, getGems, removeSkillItems } from '../utils/gameProgressData'
 import { ButtonSmall } from '../ui/buttonSmall'
 
 export default class SelectItemsScene extends Phaser.Scene {
@@ -67,14 +67,14 @@ export default class SelectItemsScene extends Phaser.Scene {
     }).setOrigin(0.5, 0.5)
   }
 
-  createBuySkillItemFrame(skillItem: SkillItem): Promise<void> {
+  private createBuySkillItemFrame = async (skillItem: SkillItem): Promise<void> => {
     const { width } = this.scale
     const { skillItemDefinition } = skillItem
     // start position is outside of the screen
     this.frameSkillItem = new SkillItemBuyFrame(this, width * 0.5, -this.HIDDEN_FRAME_START_POSITION, skillItem, {
       title: skillItemDefinition.title,
       visible: false,
-      gems: getGems(),
+      gems: await getGems(),
       onCloseButton: this.handleHideBuySkillItemFrame,
       onConfirmButton: this.handleConfirmBuyingSkillItem,
     })
@@ -92,7 +92,7 @@ export default class SelectItemsScene extends Phaser.Scene {
 
   handleConfirmBuyingSkillItem = (skillItem: SkillItemDefinition): Promise<void> => {
     return new Promise(async (resolve) => {
-      buySkillItem(skillItem)
+      await buySkillItem(skillItem)
       await this.gemScore.refreshValue()
       this.time.delayedCall(250, async () => {
         this.refreshAndSelectCard(skillItem)
@@ -131,7 +131,14 @@ export default class SelectItemsScene extends Phaser.Scene {
 
     this.cards = SkillItemList.skills.map((skillItem, index) => {
       return this.frame.addItem((x, y) => {
-        return new SkillItemFrame(this, x, y, skillItem.skin, new skillItem.clazz(this), this.handleShowBuySkillItemFrame)
+        return new SkillItemFrame(
+          this,
+          x,
+          y,
+          skillItem.skin,
+          new skillItem.clazz(this),
+          this.handleShowBuySkillItemFrame
+        )
       })
     })
     this.refreshCards()
@@ -148,7 +155,7 @@ export default class SelectItemsScene extends Phaser.Scene {
   }
 
   refreshCards = () => {
-    const { skillItems } = getGameProgressData()
+    const skillItems = getSkillItems()
     if (!skillItems?.length) return
     if (!this.cards?.length) return
 
@@ -161,13 +168,13 @@ export default class SelectItemsScene extends Phaser.Scene {
   }
 
   refreshAndSelectCard = (skillItem: SkillItemDefinition) => {
-    const { skillItems } = getGameProgressData()
+    const skillItems = getSkillItems()
 
     if (!skillItems?.length) return
     if (!this.cards?.length) return
 
-    const card = this.cards.find(card => card.skin === skillItem.skin)
-    
+    const card = this.cards.find((card) => card.skin === skillItem.skin)
+
     if (card) {
       const foundSkillItem = skillItems.find((s) => s.skin === card.skin)
       if (foundSkillItem) {

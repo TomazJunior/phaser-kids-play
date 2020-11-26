@@ -22,6 +22,10 @@ export const SCORE_BY_STAR = {
   3: 15,
 }
 
+export enum STORE_KEYS {
+  GEMS = 'gems'
+}
+
 export enum MAIN_SCENE_STATE {
   INIT = 'INIT',
   STARTED = 'STARTED',

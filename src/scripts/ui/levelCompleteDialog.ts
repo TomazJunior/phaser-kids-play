@@ -93,41 +93,41 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
     this.currentLevelStorage = getLevelStorage(this.level.level, this.gameworld.key)
 
     setLevelStorage({ level: this.level.level, stars: this.stars, key: this.gameworld.key })
-    incPlayerGems(this.gems)
+    incPlayerGems(this.gems).then(() => {
+      this.addRoundText().then(async () => {
+        await this.addStarsBasedOnRounds()
+        await this.addTimerByRound()
+        await this.addStarsBasedOnTimer()
+        await this.showGems()
+        this.isRoundPassed(this.level.rounds) && playSound(this.scene, this.nextLevelAudio)
+        if (this.currentLevelStorage?.stars !== 3 && this.stars !== 3) this.showTryAgainMessage()
+      })
 
-    this.addRoundText().then(async () => {
-      await this.addStarsBasedOnRounds()
-      await this.addTimerByRound()
-      await this.addStarsBasedOnTimer()
-      await this.showGems()
-      this.isRoundPassed(this.level.rounds) && playSound(this.scene, this.nextLevelAudio)
-      if (this.currentLevelStorage?.stars !== 3 && this.stars !== 3) this.showTryAgainMessage()
+      const recordStarTitle = this.scene.add
+        .text(gemsTitle.x, this.y - 5, 'record', {
+          fontFamily: FONTS.ALLOY_INK,
+          fontSize: '32px',
+        })
+        .setStroke(COLORS.DARK_YELLOW, 10)
+
+      const recordStarText = this.scene.add
+        .text(this.textGems.x - 15, recordStarTitle.y + 45, `${this.currentLevelStorage?.stars || 0} / 3`, {
+          fontFamily: FONTS.ALLOY_INK,
+          fontSize: '48px',
+        })
+        .setStroke(COLORS.DARK_YELLOW, 10)
+
+      this.group
+        .add(this)
+        .add(textTitle)
+        .add(gemsTitle)
+        .add(this.textGems)
+        .add(this.starsImage)
+        .add(recordStarTitle)
+        .add(recordStarText)
+        .addMultiple(this.gemScore.getChildren())
+        .setDepth(OBJECT_DEPTHS.FRAME_DIALOG)
     })
-
-    const recordStarTitle = this.scene.add
-      .text(gemsTitle.x, this.y - 5, 'record', {
-        fontFamily: FONTS.ALLOY_INK,
-        fontSize: '32px',
-      })
-      .setStroke(COLORS.DARK_YELLOW, 10)
-
-    const recordStarText = this.scene.add
-      .text(this.textGems.x - 15, recordStarTitle.y + 45, `${this.currentLevelStorage?.stars || 0} / 3`, {
-        fontFamily: FONTS.ALLOY_INK,
-        fontSize: '48px',
-      })
-      .setStroke(COLORS.DARK_YELLOW, 10)
-
-    this.group
-      .add(this)
-      .add(textTitle)
-      .add(gemsTitle)
-      .add(this.textGems)
-      .add(this.starsImage)
-      .add(recordStarTitle)
-      .add(recordStarText)
-      .addMultiple(this.gemScore.getChildren())
-      .setDepth(OBJECT_DEPTHS.FRAME_DIALOG)
   }
 
   addButtons = (): void => {

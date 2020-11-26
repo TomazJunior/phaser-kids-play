@@ -1,8 +1,10 @@
+import { STORE_KEYS } from './constants'
+import { getFromSecureKey, setInSecureKey } from './secureKeyStore'
 import { SKILL_ITEM_SKINS } from './skillItems'
 
 const GAME_PROGRESS_STORAGE_KEY = 'gamePogressInfo'
 
-const initialFileStorageConfig: GameProgressData = {
+const INITIAL_GAME_PROGRESS_STORAGE: GameProgressData = {
   tutorials: [],
   gems: 0,
   levels: [
@@ -14,13 +16,6 @@ const initialFileStorageConfig: GameProgressData = {
     },
   ],
   skillItems: [],
-}
-
-export const clearTutorial = (): void => {
-  setFileStorageConfig({
-    ...getGameProgressData(),
-    tutorials: [],
-  })
 }
 
 export const getTutorialSeen = (gameWorld: GameWorld, level: number): boolean => {
@@ -54,17 +49,24 @@ export const setTutorialSeen = (key: string, level: number, seen: boolean) => {
   })
 }
 
-export const incPlayerGems = (value: number): void => {
-  const newValue = getGems() + value
+export const incPlayerGems = async (value: number): Promise<void> => {
+  const newValue = (await getGems()) + value
   if (newValue < 0) throw new Error('Gems became negative, something wrong happened')
+  if (window.cordova) {
+    await setInSecureKey(STORE_KEYS.GEMS, newValue)
+  }
   setFileStorageConfig({
     ...getGameProgressData(),
     gems: newValue,
   })
 }
 
-export const getGems = (): number => {
-  return getGameProgressData().gems
+export const getGems = async (): Promise<number> => {
+  if (window.cordova) {
+    return await getFromSecureKey(STORE_KEYS.GEMS, 0)
+  } else {
+    return Promise.resolve(getGameProgressData().gems)
+  }
 }
 
 export const getLevelStorage = (level: number, key: string): LevelFileStorageConfig | undefined => {
@@ -85,8 +87,8 @@ export const setLevelStorage = (data: LevelFileStorageConfig) => {
   })
 }
 
-export const buySkillItem = (item: SkillItemDefinition) => {
-  const gems = getGems()
+export const buySkillItem = async (item: SkillItemDefinition) => {
+  const gems = await getGems()
   if (item.itemCost > gems) throw new Error(`Cost of the item is higher than the ${item.skin} item`)
 
   const { skillItems } = getGameProgressData()
@@ -100,7 +102,7 @@ export const buySkillItem = (item: SkillItemDefinition) => {
     ...getGameProgressData(),
     skillItems: [...skillItems.filter((s) => !(s.skin === item.skin)), skillItem],
   })
-  incPlayerGems(-item.itemCost)
+  await incPlayerGems(-item.itemCost)
 }
 
 export const getQuantityOfSkillItems = (skin: SKILL_ITEM_SKINS): number => {
@@ -112,6 +114,16 @@ export const removeSkillItems = (items: Array<SkillItemFileStorageConfig>) => {
   items.forEach((item) => removeSkillItem(item))
 }
 
+export const getLevels = (): Array<LevelFileStorageConfig> => {
+  const { levels } = getGameProgressData()
+  return levels
+}
+
+export const getSkillItems = (): Array<SkillItemFileStorageConfig> => {
+  const { skillItems } = getGameProgressData()
+  return skillItems
+}
+
 export const getGameProgressData = (): GameProgressData => {
   try {
     const value: any = localStorage.getItem(GAME_PROGRESS_STORAGE_KEY)
@@ -119,9 +131,9 @@ export const getGameProgressData = (): GameProgressData => {
     if (!!value) {
       parsed = JSON.parse(value)
     }
-    return { ...initialFileStorageConfig, ...parsed }
+    return { ...INITIAL_GAME_PROGRESS_STORAGE, ...parsed }
   } catch (error) {
-    return { ...initialFileStorageConfig }
+    return { ...INITIAL_GAME_PROGRESS_STORAGE }
   }
 }
 
