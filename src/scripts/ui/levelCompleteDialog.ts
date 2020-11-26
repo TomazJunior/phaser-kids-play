@@ -90,10 +90,11 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
 
     this.addButtons()
 
-    this.currentLevelStorage = getLevelStorage(this.level.level, this.gameworld.key)
+    getLevelStorage(this.level.level, this.gameworld.key).then(async (currentLevelStorage) => {
+      this.currentLevelStorage = currentLevelStorage
+      await setLevelStorage({ level: this.level.level, stars: this.stars, key: this.gameworld.key })
 
-    setLevelStorage({ level: this.level.level, stars: this.stars, key: this.gameworld.key })
-    incPlayerGems(this.gems).then(() => {
+      await incPlayerGems(this.gems)
       this.addRoundText().then(async () => {
         await this.addStarsBasedOnRounds()
         await this.addTimerByRound()

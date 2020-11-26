@@ -23,7 +23,8 @@ export const SCORE_BY_STAR = {
 }
 
 export enum STORE_KEYS {
-  GEMS = 'gems'
+  GEMS = 'gems',
+  LEVELS = 'levels'
 }
 
 export enum MAIN_SCENE_STATE {

@@ -69,21 +69,27 @@ export const getGems = async (): Promise<number> => {
   }
 }
 
-export const getLevelStorage = (level: number, key: string): LevelFileStorageConfig | undefined => {
-  const { levels } = getGameProgressData()
+export const getLevelStorage = async (level: number, key: string): Promise<LevelFileStorageConfig | undefined> => {
+  const levels = await getLevels()
+  
   const levelFound = levels.find((item) => item.level === level && item.key === key)
-  return levelFound ? { ...levelFound } : undefined
+  const levelFileStorage = levelFound ? { ...levelFound } : undefined
+  return Promise.resolve(levelFileStorage)
 }
 
-export const setLevelStorage = (data: LevelFileStorageConfig) => {
-  const { levels } = getGameProgressData()
+export const setLevelStorage = async (data: LevelFileStorageConfig) => {
+  const levels = await getLevels()
   const currentLevel = levels.find((item) => item.level === data.level && item.key === data.key)
   const maxStars = Math.max(data.stars, currentLevel?.stars || 0)
   const level: LevelFileStorageConfig = { ...data, attempts: (currentLevel?.attempts || 0) + 1, stars: maxStars }
-
+  
+  const updatedLevels = [...levels.filter((item) => !(item.key === level.key && item.level === level.level)), level]
+  if (window.cordova) {
+    await setInSecureKey(STORE_KEYS.LEVELS, updatedLevels)
+  }
   setFileStorageConfig({
     ...getGameProgressData(),
-    levels: [...levels.filter((item) => !(item.key === level.key && item.level === level.level)), level],
+    levels: updatedLevels,
   })
 }
 
@@ -114,8 +120,11 @@ export const removeSkillItems = (items: Array<SkillItemFileStorageConfig>) => {
   items.forEach((item) => removeSkillItem(item))
 }
 
-export const getLevels = (): Array<LevelFileStorageConfig> => {
-  const { levels } = getGameProgressData()
+export const getLevels = async (): Promise<Array<LevelFileStorageConfig>> => {
+  let { levels } = getGameProgressData()
+  if (window.cordova) {
+    levels = await getFromSecureKey(STORE_KEYS.LEVELS, [])
+  }
   return levels
 }
 

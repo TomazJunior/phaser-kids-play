@@ -14,8 +14,7 @@ export default class LevelScene extends Phaser.Scene {
   }
   create() {
     this.background = new BackgroundParallax(this, false)
-    this.createSelectLevelFrame()
-    this.createBackButton()
+    this.createSelectLevelFrame().then(this.createBackButton)
   }
 
   init(gameWorld: GameWorld) {
@@ -26,7 +25,7 @@ export default class LevelScene extends Phaser.Scene {
     }
   }
 
-  createBackButton() {
+  createBackButton = () => {
     new ButtonSmall(this, 50, 50, {
       name: BUTTON.LEFT,
       onClick: () => {
@@ -35,7 +34,7 @@ export default class LevelScene extends Phaser.Scene {
     }).setOrigin(0.5, 0.5)
   }
 
-  createSelectLevelFrame() {
+  createSelectLevelFrame = async (): Promise<void> => {
     const { width, height } = this.scale
     const frame = this.add.image(width * 0.5, height * 0.55, 'big-frame-window')
     const textTitle = this.add
@@ -56,8 +55,10 @@ export default class LevelScene extends Phaser.Scene {
 
     let initialLevel = 1
     if (!!previousWorld) {
-      initialLevel = allLevelsCompleted(previousWorld) ? 1 : 0
+      initialLevel = (await allLevelsCompleted(previousWorld)) ? 1 : 0
     }
+
+    const levels = await getLevels()
 
     this.gameWorld.levels.forEach((level, index) => {
       if (index) {
@@ -69,7 +70,6 @@ export default class LevelScene extends Phaser.Scene {
         posY += 125
       }
 
-      const levels = getLevels()
       const levelFileData = levels.find((lvl) => lvl.level === level.level && lvl.key === this.gameWorld.key)
       const maxLevel = levels
         .filter((level) => level.key === this.gameWorld.key)
@@ -112,11 +112,13 @@ export default class LevelScene extends Phaser.Scene {
       },
     })
 
+    const worldCompleted = !!nextWorld && await allLevelsCompleted(this.gameWorld)
+
     new ButtonSmall(this, initialX + 150 * 5 - 50, initialY + 125, {
       name: BUTTON.RIGHT,
-      prefix: !!nextWorld ? BUTTON_PREFIX.NORMAL : BUTTON_PREFIX.BLOCKED,
+      prefix: !!worldCompleted ? BUTTON_PREFIX.NORMAL : BUTTON_PREFIX.BLOCKED,
       onClick: () => {
-        if (nextWorld) {
+        if (worldCompleted) {
           this.scene.restart(nextWorld)
         }
       },

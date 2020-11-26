@@ -83,11 +83,8 @@ export const getPreviousWorld = (gameWorld: GameWorld): GameWorld | undefined =>
   return GAME_WORLDS[index - 1]
 }
 
-export const allLevelsCompleted = (gameWorld: GameWorld): boolean => {
-  const levels = getLevels()
-
-  return levels.every(
-    (level) =>
-      !!levels.find((lvl) => lvl.key === gameWorld.key && lvl.level === level.level && lvl.stars >= 1)
-  )
+export const allLevelsCompleted = async (gameWorld: GameWorld): Promise<boolean> => {
+  const levelsData = (await getLevels()).filter(lvl => lvl.key === gameWorld.key && lvl.stars > 0)
+  
+  return levelsData.length === gameWorld.levels.length
 }

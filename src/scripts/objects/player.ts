@@ -22,7 +22,7 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
   targetObjectPosition: ObjectPosition | undefined
   foundChars: Array<HiddenChar>
   gameMap: GameMap
-  reachedEndOfWorld: boolean
+  isInTheFarRightSide: boolean
 
   constructor(
     scene: Phaser.Scene,
@@ -47,7 +47,7 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
     // player will be visible only after all chars being hidden
     this.setVisible(false)
 
-    this.reachedEndOfWorld = false
+    this.isInTheFarRightSide = false
 
     this.foundChars = []
     this.walkingAudio = getOrAddAudio(scene, SOUNDS.WALKING, { volume: 0.4, loop: true })
@@ -188,6 +188,8 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
     const speed = 350
     // offset to garantee player won't collide up/down with the boxes
     const offset = 10
+    // offset to garantee player won't collide up/down with the boxes
+    const offsetRightSide = 15
 
     if (!this.isWalking) return
 
@@ -202,20 +204,21 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
       distanceY = 0
     }
 
-    if (
-      Math.abs(Math.trunc(this.scene.scale.width - this.x)) < 15 &&
+    const reachedTheRightSide =
+      Math.abs(Math.trunc(this.scene.scale.width - this.x)) < offsetRightSide &&
       this.animation !== PLAYER.ANIMATIONS.DOWN_IDLE &&
-      !this.reachedEndOfWorld
-    ) {
+      !this.isInTheFarRightSide
+      
+    if (reachedTheRightSide) {
       distanceX = 0
       this.pathToGo = []
-      this.reachedEndOfWorld = true
+      this.isInTheFarRightSide = true
     }
 
     if (distanceX === 0 && distanceY === 0) {
       if (this.pathToGo.length) {
         this.goToNextPosition(initialPos)
-        this.reachedEndOfWorld = false
+        this.isInTheFarRightSide = false
       } else {
         this.isWalking = false
         this.setVelocity(0, 0)
