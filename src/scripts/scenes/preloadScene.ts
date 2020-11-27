@@ -1,4 +1,4 @@
-import { updateDeviceInfo } from '../controllers/deviceInfo'
+import { updateUserInfo } from '../controllers/deviceInfo'
 import ProgressBar from '../ui/progressBar'
 import { updateSoundState } from '../utils/audioUtil'
 import {
@@ -143,7 +143,7 @@ export default class PreloadScene extends Phaser.Scene {
     // })
     this.load.on('complete', async () => {
       this.progressBar.updateValue(0.95)
-      await updateDeviceInfo()
+      await updateUserInfo()
       this.progressBar.updateValue(1)
 
       this.time.delayedCall(Phaser.Math.Between(50, 200), () => {

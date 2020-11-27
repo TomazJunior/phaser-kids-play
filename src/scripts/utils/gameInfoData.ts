@@ -2,6 +2,7 @@ const GAME_INFO_STORAGE_KEY = 'gameConfigInfo'
 
 const initialFileStorageConfig: GameConfigInfoData = {
   tutorials: [],
+  userId: '',
   deviceId: '',
   sound: true,
   backgroudSound: true,
@@ -32,12 +33,23 @@ export const isBackgroundSoundEnabled = (): boolean => {
 export const setDeviceId = (deviceId: string) => {
   setFileStorageConfig({
     ...getFileStorageConfig(),
-    deviceId: deviceId,
+    deviceId,
+  })
+}
+
+export const setUserId = (userId: string) => {
+  setFileStorageConfig({
+    ...getFileStorageConfig(),
+    userId,
   })
 }
 
 export const getDeviceId = (): string => {
   return getFileStorageConfig().deviceId
+}
+
+export const getUserId = (): string => {
+  return getFileStorageConfig().userId
 }
 
 export const getTutorialSeen = (gameWorld: GameWorld, level: number): boolean => {

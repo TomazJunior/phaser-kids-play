@@ -10,23 +10,11 @@ export class DeviceHandler {
     this.deviceService = new DeviceService(logger)
   }
 
-  create = async (req, res) => {
-    req.log.debug('DeviceHandler.create', 'Process started')
-    const device = await this.deviceService.add(new Device({ ...req.body }))
-    res.json(new Response(device))
-    req.log.debug('DeviceHandler.create', 'Process completed')
-  }
-
   updateLastTimeAccessed = async (req, res) => {
     req.log.debug('DeviceHandler.updateLastTimeAccessed', 'Process started')
-    const { id } = req.params
-    await this.deviceService.update(id, {})
-
-    res.json(
-      new Response({
-        status: 'ok',
-      })
-    )
+    const { userId, deviceId } = req.params
+    const updatedData = await this.deviceService.update(userId, deviceId, {})
+    res.json(new Response(updatedData))
     req.log.debug('DeviceHandler.updateLastTimeAccessed', 'Process completed')
   }
 }

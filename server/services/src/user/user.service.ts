@@ -7,7 +7,7 @@ export default class UserService {
     this.logger = logger
   }
 
-  async add(user: Item): Promise<Item> {
+  async add(user: Item): Promise<any> {
     this.logger.debug('UserService.add', 'process started')
     return new Promise((resolve, reject) => {
       return user.save((err: Error, data: Item) => {

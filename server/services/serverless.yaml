@@ -20,7 +20,7 @@ provider:
   environment:
     region: ${file(./config/serverless.config.${self:custom.currentStage}.yml):region}
     usersTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):usersTableName}
-    devicesTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):devicesTableName}    
+    devicesTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):devicesTableName}
     dynamoDBEndpoint: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBEndpoint}
     dynamoDBaccessKey: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBaccessKey}
     dynamoDBaccessSecret: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBaccessSecret}
@@ -57,6 +57,20 @@ functions:
               - X-Api-Key
               - X-Amz-Security-Token
       - http:
+          path: /user
+          method: any
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+              - Content-Length
+              - X-Requested-With
+              - User-Id
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
+      - http:
           path: /device/{proxy+}
           method: any
           cors:
@@ -69,21 +83,7 @@ functions:
               - User-Id
               - X-Amz-Date
               - X-Api-Key
-              - X-Amz-Security-Token    
-      - http:
-          path: /device
-          method: any
-          cors:
-            origin: '*'
-            headers:
-              - Content-Type
-              - Authorization
-              - Content-Length
-              - X-Requested-With
-              - User-Id
-              - X-Amz-Date
-              - X-Api-Key
-              - X-Amz-Security-Token                         
+              - X-Amz-Security-Token
 resources:
   Resources:
     UsersTableName:
@@ -102,12 +102,23 @@ resources:
       Properties:
         TableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):devicesTableName}
         AttributeDefinitions:
+          - AttributeName: 'userId'
+            AttributeType: 'S'
           - AttributeName: 'id'
             AttributeType: 'S'
         KeySchema:
-          - AttributeName: 'id'
+          - AttributeName: 'userId'
             KeyType: 'HASH'
-        BillingMode: PAY_PER_REQUEST        
+          - AttributeName: 'id'
+            KeyType: 'RANGE'
+        GlobalSecondaryIndexes:
+          - IndexName: DeviceIdIndex
+            KeySchema:
+              - AttributeName: id
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
 plugins:
   - serverless-plugin-typescript
   - serverless-offline

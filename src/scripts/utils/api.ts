@@ -12,10 +12,10 @@ export class ServiceApi {
     this.api = new AxiosHelper({ baseURL }).api
   }
 
-  createDevice = async (data: any) =>
-    await this.api.post(urlJoin(this.api.defaults.baseURL, `/device`), {
+  createUser = async (data: any) =>
+    await this.api.post(urlJoin(this.api.defaults.baseURL, `/user`), {
       ...data,
     })
-  deviceStarted = async (deviceId: string) =>
-    await this.api.put(urlJoin(this.api.defaults.baseURL, `/device/${deviceId}/started`))
+  deviceStarted = async (userId:string, deviceId: string) =>
+    await this.api.put(urlJoin(this.api.defaults.baseURL, `/user/${userId}/device/${deviceId}/started`))
 }

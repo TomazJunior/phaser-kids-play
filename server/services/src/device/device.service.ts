@@ -8,7 +8,7 @@ export default class DeviceService {
     this.logger = logger
   }
 
-  async add(device: Item): Promise<Item> {
+  async add(device: Item): Promise<any> {
     this.logger.debug('DeviceService.add', 'process started')
     return new Promise((resolve, reject) => {
       return device.save((err: Error, data: Item) => {
@@ -22,15 +22,15 @@ export default class DeviceService {
     })
   }
 
-  async update(id: number, properties: any) {
+  async update(userId: string, id: string, properties: any) {
     this.logger.debug('DeviceService.update', 'process started')
     return new Promise((resolve, reject) => {
-      return Device.update({ ...properties, id }, (err, data) => {
+      return Device.update({ ...properties, userId, id }, (err, data) => {
         if (err) {
           this.logger.debug('DeviceService.update', 'process failed')
           return reject(err)
         }
-        resolve(data)
+        resolve(data.toJSON())
         this.logger.debug('DeviceService.update', 'process completed')
       })
     })

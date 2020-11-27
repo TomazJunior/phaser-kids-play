@@ -41,6 +41,7 @@ declare interface ButtonConfig {
 
 declare interface GameConfigInfoData {
   deviceId: string
+  userId: string
   sound: boolean
   backgroudSound: boolean
   tutorials: Array<TutorialFileStorageConfig>
