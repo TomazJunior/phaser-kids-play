@@ -15,6 +15,31 @@ const INITIAL_GAME_PROGRESS_STORAGE: GameProgressData = {
     },
   ],
   skillItems: [],
+  rounds: [],
+}
+
+export const addRoundCompleted = async (roundCompleted: RoundCompleted): Promise<void> => {
+  // store only when gems are gained
+  if (!roundCompleted.gems) return Promise.resolve()
+  
+  const rounds = await getRoundsCompleted()
+  const newRounds = [...rounds, roundCompleted]
+  if (window.cordova) {
+    await setInSecureKey(STORE_KEYS.ROUNDS_COMPLETED, newRounds)
+  } else {
+    setFileStorageConfig({
+      ...getGameProgressData(),
+      rounds: newRounds,
+    })
+  }
+}
+
+export const getRoundsCompleted = async (): Promise<Array<RoundCompleted>> => {
+  if (window.cordova) {
+    return await getFromSecureKey(STORE_KEYS.ROUNDS_COMPLETED, [])
+  } else {
+    return Promise.resolve(getGameProgressData().rounds)
+  }
 }
 
 export const incPlayerGems = async (value: number): Promise<void> => {

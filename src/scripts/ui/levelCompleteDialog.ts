@@ -9,11 +9,10 @@ import {
   OBJECT_DEPTHS,
   SOUNDS,
 } from '../utils/constants'
-import { getLevelStorage, incPlayerGems, setLevelStorage } from '../utils/gameProgressData'
+import { addRoundCompleted, getLevelStorage, incPlayerGems, setLevelStorage } from '../utils/gameProgressData'
 import { calculateGems, calculateStars, getStarImageName } from '../utils/scoresUtil'
 import { getLevel, getNextLevel } from '../utils/worldUtil'
 import { ButtonSmall } from './buttonSmall'
-import { FrameLevelTimer } from './frameLevel'
 import { GemScore } from './gemScore'
 
 export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
@@ -93,8 +92,16 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
     getLevelStorage(this.level.level, this.gameworld.key).then(async (currentLevelStorage) => {
       this.currentLevelStorage = currentLevelStorage
       await setLevelStorage({ level: this.level.level, stars: this.stars, key: this.gameworld.key })
-
       await incPlayerGems(this.gems)
+      await addRoundCompleted({
+        key: this.gameworld.key,
+        level: this.level.level,
+        rounds: this.timers,
+        gems: this.gems,
+        stars: this.stars,
+        time: new Date().toISOString(),
+        sync: false,
+      })
       this.addRoundText().then(async () => {
         await this.addStarsBasedOnRounds()
         await this.addTimerByRound()

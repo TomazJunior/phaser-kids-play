@@ -5,10 +5,6 @@ import { BUTTON, COLORS, FONTS, MAX_TIMER_DURATION } from '../utils/constants'
 import { ButtonSmall } from './buttonSmall'
 import RoundIndicator from './roundIndicator'
 
-export interface FrameLevelTimer {
-  seconds: number
-  inTutorialMode: boolean
-}
 export class FrameLevel extends Phaser.GameObjects.Sprite {
   private worldText: Phaser.GameObjects.Text
   private levelText: Phaser.GameObjects.Text

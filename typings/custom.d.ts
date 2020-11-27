@@ -51,6 +51,7 @@ declare interface GameProgressData {
   levels: Array<LevelFileStorageConfig>
   gems: number
   skillItems: Array<SkillItemFileStorageConfig>
+  rounds: Array<RoundCompleted>
 }
 declare interface DeviceStorageConfig extends DeviceInfoConfig {
   isOnline: boolean
@@ -229,4 +230,19 @@ declare interface FrameBigInterface {
 declare interface SkillItemBuyFrameInterface extends FrameBigInterface {
   gems: number
   onConfirmButton: (skillItem: SkillItemDefinition) => Promise<void>
+}
+
+declare interface FrameLevelTimer {
+  seconds: number
+  inTutorialMode: boolean
+}
+
+declare interface RoundCompleted {
+  key: string,
+  level: number
+  rounds: Array<FrameLevelTimer>
+  gems: number
+  stars: number
+  time: string
+  sync: boolean
 }

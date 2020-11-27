@@ -29,6 +29,7 @@ export class Timer {
 
     const elapsed = this.timerEvent.getElapsed()
     this._seconds = elapsed / 1000
+    this._seconds = Math.round(this._seconds * 100) / 100
     this.onUpdate(this._seconds)
 
     if (this._seconds >= MAX_TIMER_DURATION) {

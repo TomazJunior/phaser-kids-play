@@ -25,7 +25,8 @@ export const SCORE_BY_STAR = {
 export enum STORE_KEYS {
   GEMS = 'gems',
   LEVELS = 'levels',
-  SKILL_ITEMS = 'skillItems'
+  SKILL_ITEMS = 'skillItems',
+  ROUNDS_COMPLETED = 'roundsCompleted'
 }
 
 export enum MAIN_SCENE_STATE {
