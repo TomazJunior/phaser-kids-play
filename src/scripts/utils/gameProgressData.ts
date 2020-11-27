@@ -22,11 +22,12 @@ export const incPlayerGems = async (value: number): Promise<void> => {
   if (newValue < 0) throw new Error('Gems became negative, something wrong happened')
   if (window.cordova) {
     await setInSecureKey(STORE_KEYS.GEMS, newValue)
+  } else {
+    setFileStorageConfig({
+      ...getGameProgressData(),
+      gems: newValue,
+    })
   }
-  setFileStorageConfig({
-    ...getGameProgressData(),
-    gems: newValue,
-  })
 }
 
 export const getGems = async (): Promise<number> => {
@@ -54,11 +55,12 @@ export const setLevelStorage = async (data: LevelFileStorageConfig) => {
   const updatedLevels = [...levels.filter((item) => !(item.key === level.key && item.level === level.level)), level]
   if (window.cordova) {
     await setInSecureKey(STORE_KEYS.LEVELS, updatedLevels)
+  } else {
+    setFileStorageConfig({
+      ...getGameProgressData(),
+      levels: updatedLevels,
+    })
   }
-  setFileStorageConfig({
-    ...getGameProgressData(),
-    levels: updatedLevels,
-  })
 }
 
 export const buySkillItem = async (item: SkillItemDefinition) => {
@@ -75,12 +77,12 @@ export const buySkillItem = async (item: SkillItemDefinition) => {
   const updatedSkillItems = [...skillItems.filter((s) => !(s.skin === item.skin)), skillItem]
   if (window.cordova) {
     await setInSecureKey(STORE_KEYS.SKILL_ITEMS, updatedSkillItems)
+  } else {
+    setFileStorageConfig({
+      ...getGameProgressData(),
+      skillItems: updatedSkillItems,
+    })
   }
-
-  setFileStorageConfig({
-    ...getGameProgressData(),
-    skillItems: updatedSkillItems,
-  })
 
   await incPlayerGems(-item.itemCost)
 }
@@ -97,19 +99,19 @@ export const removeSkillItems = async (items: Array<SkillItemFileStorageConfig>)
 }
 
 export const getLevels = async (): Promise<Array<LevelFileStorageConfig>> => {
-  let { levels } = getGameProgressData()
   if (window.cordova) {
-    levels = await getFromSecureKey(STORE_KEYS.LEVELS, [])
+    return await getFromSecureKey(STORE_KEYS.LEVELS, [])
+  } else {
+    return Promise.resolve(getGameProgressData().levels)
   }
-  return levels
 }
 
 export const getSkillItems = async (): Promise<Array<SkillItemFileStorageConfig>> => {
-  let { skillItems } = getGameProgressData()
   if (window.cordova) {
-    skillItems = await getFromSecureKey(STORE_KEYS.SKILL_ITEMS, [])
+    return await getFromSecureKey(STORE_KEYS.SKILL_ITEMS, [])
+  } else {
+    return Promise.resolve(getGameProgressData().skillItems)
   }
-  return skillItems
 }
 
 export const getGameProgressData = (): GameProgressData => {
@@ -135,11 +137,12 @@ const removeSkillItem = async (item: SkillItemFileStorageConfig) => {
   const updatedSkillItems = [...skillItems.filter((s) => !(s.skin === item.skin)), skillItemFound]
   if (window.cordova) {
     await setInSecureKey(STORE_KEYS.SKILL_ITEMS, updatedSkillItems)
+  } else {
+    setFileStorageConfig({
+      ...getGameProgressData(),
+      skillItems: updatedSkillItems,
+    })
   }
-  setFileStorageConfig({
-    ...getGameProgressData(),
-    skillItems: updatedSkillItems,
-  })
 }
 
 const setFileStorageConfig = (fileStorage: GameProgressData) => {
