@@ -19,7 +19,7 @@ export class UserHandler {
       active: true
     })
     const userDB = await this.userService.add(user)
-    const device = new Device({ ...req.body?.device, userId: userDB.id })
+    const device = new Device({ ...req.body, userId: userDB.id })
     const deviceDB = await this.deviceService.add(device)
     res.json(new Response({ userId: userDB.id, deviceId: deviceDB.id }))
     req.log.debug('UserHandler.create', 'Process completed')
