@@ -20,6 +20,31 @@ export const Device = dynogels.define(process.env.devicesTableName!, {
 })
 Device.config({ dynamodb: DynamoDBService.getInstance().dynamoDB })
 
+const RoundSchema = {
+  seconds: joi.number().required(),
+  inTutorialMode: joi.bool().required(),
+}
+
+const LevelSchema = {
+  id: dynogels.types.uuid(),
+  userId: joi.string().required(),
+  worldId: joi.string().required(),
+  level: joi.number().required(),
+  gems: joi.number().required(),
+  stars: joi.number().required(),
+  time: joi.date().required(),
+  rounds: joi.array().items(RoundSchema)
+}
+
+export const Level = dynogels.define(process.env.levelsTableName!, {
+  hashKey: 'userId',
+  rangeKey: 'id',
+  timestamps: true,
+  schema: LevelSchema,
+  tableName: process.env.levelsTableName,
+})
+Level.config({ dynamodb: DynamoDBService.getInstance().dynamoDB })
+
 const UserSchema = {
   id: dynogels.types.uuid(),
   active: joi.bool().default(true),

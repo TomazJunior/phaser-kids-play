@@ -21,6 +21,7 @@ provider:
     region: ${file(./config/serverless.config.${self:custom.currentStage}.yml):region}
     usersTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):usersTableName}
     devicesTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):devicesTableName}
+    levelsTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):levelsTableName}
     dynamoDBEndpoint: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBEndpoint}
     dynamoDBaccessKey: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBaccessKey}
     dynamoDBaccessSecret: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBaccessSecret}
@@ -119,6 +120,21 @@ resources:
             Projection:
               ProjectionType: ALL
         BillingMode: PAY_PER_REQUEST
+    LevelsTableName:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        TableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):levelsTableName}
+        AttributeDefinitions:
+          - AttributeName: 'userId'
+            AttributeType: 'S'
+          - AttributeName: 'id'
+            AttributeType: 'S'
+        KeySchema:
+          - AttributeName: 'userId'
+            KeyType: 'HASH'
+          - AttributeName: 'id'
+            KeyType: 'RANGE'
+        BillingMode: PAY_PER_REQUEST        
 plugins:
   - serverless-plugin-typescript
   - serverless-offline

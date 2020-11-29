@@ -16,6 +16,17 @@ export class ServiceApi {
     await this.api.post(urlJoin(this.api.defaults.baseURL, `/user`), {
       ...data,
     })
-  deviceStarted = async (userId:string, deviceId: string) =>
+  deviceStarted = async (userId: string, deviceId: string) =>
     await this.api.put(urlJoin(this.api.defaults.baseURL, `/user/${userId}/device/${deviceId}/started`))
+
+  levelCompleted = async (userId: string, level: LevelCompleted) =>
+    await this.api.post(urlJoin(this.api.defaults.baseURL, `/user/${userId}/level`), {
+      userId,
+      worldId: level.key,
+      level: level.level,
+      rounds: level.rounds,
+      gems: level.gems,
+      stars: level.stars,
+      time: level.time,
+    })
 }

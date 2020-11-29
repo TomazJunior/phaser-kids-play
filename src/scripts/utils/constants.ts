@@ -26,7 +26,7 @@ export enum STORE_KEYS {
   GEMS = 'gems',
   LEVELS = 'levels',
   SKILL_ITEMS = 'skillItems',
-  ROUNDS_COMPLETED = 'roundsCompleted'
+  LEVELS_COMPLETED = 'levelsCompleted'
 }
 
 export enum MAIN_SCENE_STATE {

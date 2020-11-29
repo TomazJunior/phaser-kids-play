@@ -1,3 +1,4 @@
+import { ServiceApi } from '../utils/api'
 import { getOrAddAudio, playSound } from '../utils/audioUtil'
 import {
   BEST_TIME_BY_BOX_IN_SEC,
@@ -9,7 +10,8 @@ import {
   OBJECT_DEPTHS,
   SOUNDS,
 } from '../utils/constants'
-import { addRoundCompleted, getLevelStorage, incPlayerGems, setLevelStorage } from '../utils/gameProgressData'
+import { getUserId } from '../utils/gameInfoData'
+import { addLevelCompleted, getLevelStorage, incPlayerGems, setLevelStorage } from '../utils/gameProgressData'
 import { calculateGems, calculateStars, getStarImageName } from '../utils/scoresUtil'
 import { getLevel, getNextLevel } from '../utils/worldUtil'
 import { ButtonSmall } from './buttonSmall'
@@ -91,25 +93,16 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
 
     getLevelStorage(this.level.level, this.gameworld.key).then(async (currentLevelStorage) => {
       this.currentLevelStorage = currentLevelStorage
-      await setLevelStorage({ level: this.level.level, stars: this.stars, key: this.gameworld.key })
-      await incPlayerGems(this.gems)
-      await addRoundCompleted({
+      const levelCompleted: LevelCompleted = {
         key: this.gameworld.key,
         level: this.level.level,
         rounds: this.timers,
         gems: this.gems,
         stars: this.stars,
         time: new Date().toISOString(),
-        sync: false,
-      })
-      this.addRoundText().then(async () => {
-        await this.addStarsBasedOnRounds()
-        await this.addTimerByRound()
-        await this.addStarsBasedOnTimer()
-        await this.showGems()
-        this.isRoundPassed(this.level.rounds) && playSound(this.scene, this.nextLevelAudio)
-        if (this.currentLevelStorage?.stars !== 3 && this.stars !== 3) this.showTryAgainMessage()
-      })
+      }
+      await setLevelStorage({ level: this.level.level, stars: this.stars, key: this.gameworld.key })
+      await incPlayerGems(this.gems)
 
       const recordStarTitle = this.scene.add
         .text(gemsTitle.x, this.y - 5, 'record', {
@@ -117,7 +110,6 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
           fontSize: '32px',
         })
         .setStroke(COLORS.DARK_YELLOW, 10)
-
       const recordStarText = this.scene.add
         .text(this.textGems.x - 15, recordStarTitle.y + 45, `${this.currentLevelStorage?.stars || 0} / 3`, {
           fontFamily: FONTS.ALLOY_INK,
@@ -135,7 +127,28 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
         .add(recordStarText)
         .addMultiple(this.gemScore.getChildren())
         .setDepth(OBJECT_DEPTHS.FRAME_DIALOG)
+
+      Promise.allSettled([
+        this.storeLevelCompleteInfo(levelCompleted),
+        this.addRoundText().then(async () => {
+          await this.addStarsBasedOnRounds()
+          await this.addTimerByRound()
+          await this.addStarsBasedOnTimer()
+          await this.showGems()
+          this.isRoundPassed(this.level.rounds) && playSound(this.scene, this.nextLevelAudio)
+          if (this.currentLevelStorage?.stars !== 3 && this.stars !== 3) this.showTryAgainMessage()
+        }),
+      ])
     })
+  }
+
+  storeLevelCompleteInfo = async (levelCompleted: LevelCompleted) => {
+    // store only when gems are gained
+    if (!levelCompleted.gems) return Promise.resolve()
+
+    const serviceApi = new ServiceApi()
+    await serviceApi.levelCompleted(getUserId(), levelCompleted)
+    await addLevelCompleted(levelCompleted)
   }
 
   addButtons = (): void => {
@@ -357,10 +370,12 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
 
   private get stars(): number {
     let value = calculateStars(this.finishedRounds)
-    const beatTheBestTime = this.timers.every(
-      (timer: FrameLevelTimer, index: number) =>
-        timer.inTutorialMode || (this.isRoundPassed(index) && this.isBeatTheBestTime(timer.seconds))
-    )
+    const beatTheBestTime =
+      this.timers.length === this.level.rounds &&
+      this.timers.every(
+        (timer: FrameLevelTimer, index: number) =>
+          timer.inTutorialMode || (this.isRoundPassed(index) && this.isBeatTheBestTime(timer.seconds))
+      )
     if (value === 2 && beatTheBestTime) {
       value++
     }

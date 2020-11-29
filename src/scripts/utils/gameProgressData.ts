@@ -15,30 +15,27 @@ const INITIAL_GAME_PROGRESS_STORAGE: GameProgressData = {
     },
   ],
   skillItems: [],
-  rounds: [],
+  levelsCompleted: [],
 }
 
-export const addRoundCompleted = async (roundCompleted: RoundCompleted): Promise<void> => {
-  // store only when gems are gained
-  if (!roundCompleted.gems) return Promise.resolve()
-  
-  const rounds = await getRoundsCompleted()
-  const newRounds = [...rounds, roundCompleted]
+export const addLevelCompleted = async (levelCompleted: LevelCompleted): Promise<void> => {
+  const levelsCompleted = await getLevelsCompleted()
+  const newlevelsCompleted = [...levelsCompleted, levelCompleted]
   if (window.cordova) {
-    await setInSecureKey(STORE_KEYS.ROUNDS_COMPLETED, newRounds)
+    await setInSecureKey(STORE_KEYS.LEVELS_COMPLETED, newlevelsCompleted)
   } else {
     setFileStorageConfig({
       ...getGameProgressData(),
-      rounds: newRounds,
+      levelsCompleted: newlevelsCompleted,
     })
   }
 }
 
-export const getRoundsCompleted = async (): Promise<Array<RoundCompleted>> => {
+export const getLevelsCompleted = async (): Promise<Array<LevelCompleted>> => {
   if (window.cordova) {
-    return await getFromSecureKey(STORE_KEYS.ROUNDS_COMPLETED, [])
+    return await getFromSecureKey(STORE_KEYS.LEVELS_COMPLETED, [])
   } else {
-    return Promise.resolve(getGameProgressData().rounds)
+    return Promise.resolve(getGameProgressData().levelsCompleted)
   }
 }
 

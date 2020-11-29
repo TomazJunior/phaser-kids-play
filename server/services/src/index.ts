@@ -2,6 +2,7 @@
 import { DynamoDBService } from './shared/dynamodb.service'
 import { initialize as initializeUser } from './user/user.router'
 import { initialize as initializeDevice } from './device/device.router'
+import { initialize as initializeLevel } from './level/level.router'
 
 export async function handler(event: any, context: any) {
   const router = require('lambda-api')({
@@ -33,6 +34,7 @@ export async function handler(event: any, context: any) {
 
   await initializeUser(router)
   await initializeDevice(router)
+  await initializeLevel(router)
 
   return router.run(event, context)
 }

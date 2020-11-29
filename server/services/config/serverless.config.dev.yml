@@ -3,6 +3,7 @@ region: us-east-1
 dynamoDBEndpoint: https://dynamodb.us-east-1.amazonaws.com/
 usersTableName: memory-users-dev
 devicesTableName: memory-devices-dev
+levelsTableName: memory-levels-dev
 dynamoDBaccessKey: ""
 dynamoDBaccessSecret: ""
 LoggerLevel: debug

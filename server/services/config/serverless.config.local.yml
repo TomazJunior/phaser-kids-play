@@ -3,6 +3,7 @@ region: us-east-1
 dynamoDBEndpoint: http://localhost:8000
 usersTableName: memory-users-local
 devicesTableName: memory-devices-local
+levelsTableName: memory-levels-local
 dynamoDBaccessKey: "access"
 dynamoDBaccessSecret: "secret"
 LoggerLevel: debug

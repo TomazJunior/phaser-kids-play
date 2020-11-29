@@ -51,7 +51,7 @@ declare interface GameProgressData {
   levels: Array<LevelFileStorageConfig>
   gems: number
   skillItems: Array<SkillItemFileStorageConfig>
-  rounds: Array<RoundCompleted>
+  levelsCompleted: Array<LevelCompleted>
 }
 declare interface DeviceStorageConfig extends DeviceInfoConfig {
   isOnline: boolean
@@ -237,12 +237,11 @@ declare interface FrameLevelTimer {
   inTutorialMode: boolean
 }
 
-declare interface RoundCompleted {
+declare interface LevelCompleted {
   key: string,
   level: number
   rounds: Array<FrameLevelTimer>
   gems: number
   stars: number
   time: string
-  sync: boolean
 }
