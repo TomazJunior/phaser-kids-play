@@ -43,7 +43,7 @@ export class InfoDialog extends Phaser.GameObjects.Sprite {
           'https://www.dafont.com/a-alloy-ink.font',
           '',
           'Sound Effects',
-          'http://dig.ccmixter.org/people/JeffSpeed68',
+          'https://freemusicarchive.org/music/Rolemusic',
         ],
         {
           fontFamily: FONTS.KEN_VECTOR,

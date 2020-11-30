@@ -109,7 +109,7 @@ export default class PreloadScene extends Phaser.Scene {
     http://dig.ccmixter.org/files/JeffSpeed68/57454 
     Ft: Admiral Bob (admiralbob77)
     */
-    this.load.audio(SOUNDS.BACKGROUND, 'assets/audio/two-pianos.mp3')
+    this.load.audio(SOUNDS.BACKGROUND, 'assets/audio/background-01.mp3')
 
     this.loadAssetsProgress()
   }
