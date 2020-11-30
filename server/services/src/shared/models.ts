@@ -53,7 +53,7 @@ GemAudit.config({ dynamodb: DynamoDBService.getInstance().dynamoDB })
 const SkillItemAuditSchema = {
   id: dynogels.types.uuid(),
   userId: joi.string().required(),
-  skillItem: joi.string().valid(...Object.values(SKILL_ITEM_SKINS)),
+  skin: joi.string().valid(...Object.values(SKILL_ITEM_SKINS)),
   quantity: joi.number().required(),
   gems: joi.number().required(),
   time: joi.date().required(),
@@ -93,8 +93,15 @@ export const Level = dynogels.define(process.env.levelsTableName!, {
 })
 Level.config({ dynamodb: DynamoDBService.getInstance().dynamoDB })
 
-const UserSchema = {
+export const UserSkillItemSchema = {
+  skin: joi.string().valid(...Object.values(SKILL_ITEM_SKINS)),
+  quantity: joi.number().required(),
+}
+
+export const UserSchema = {
   id: dynogels.types.uuid(),
+  gems: joi.number().default(0),
+  skillItems: joi.array().items(UserSkillItemSchema).default([]),
   active: joi.bool().default(true),
 }
 

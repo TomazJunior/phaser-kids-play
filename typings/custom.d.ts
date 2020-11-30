@@ -225,7 +225,7 @@ declare interface SkillItemPurchased extends SkillItemUsed {
 }
 
 declare interface SkillItemUsed {
-  skillItem: string
+  skin: string
   time: string
   quantity: number
 }

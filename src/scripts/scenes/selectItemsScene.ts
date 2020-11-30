@@ -116,7 +116,7 @@ export default class SelectItemsScene extends Phaser.Scene {
     const dialog = this.showLoadingDialog('Storing booster')
     const serviceApi = new ServiceApi()
     await serviceApi.skillItemPurchased(getUserId(), {
-      skillItem: skillItem.skin,
+      skin: skillItem.skin,
       gems: skillItem.itemCost,
       time: new Date().toISOString(),
       quantity: 1,

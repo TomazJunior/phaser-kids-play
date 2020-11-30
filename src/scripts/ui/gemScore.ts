@@ -19,12 +19,12 @@ export class GemScore extends Phaser.GameObjects.Group {
       this._value = value
 
       this.valueText = scene.add
-        .text(this.x - 20, this.y, this._value.toString(), {
+        .text(this.frame.x - this.frame.displayWidth * 0.5 + 90, this.y, this._value.toString(), {
           fontFamily: FONTS.ALLOY_INK,
           fontSize: '46px',
         })
         .setStroke(COLORS.DARK_YELLOW, 10)
-        .setOrigin(0.5, 0.5)
+        .setOrigin(0, 0.5)
 
       this.addButton = new ButtonCircle(
         scene,
