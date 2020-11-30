@@ -1,4 +1,4 @@
-import { BUTTON, BUTTON_PREFIX, OBJECT_DEPTHS } from '../utils/constants'
+import { BUTTON, OBJECT_DEPTHS } from '../utils/constants'
 import { ButtonSmall } from './buttonSmall'
 
 export class FrameDialog extends Phaser.GameObjects.Group {

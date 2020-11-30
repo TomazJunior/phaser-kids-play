@@ -29,4 +29,16 @@ export class ServiceApi {
       stars: level.stars,
       time: level.time,
     })
+
+  skillItemPurchased = async (userId: string, skillItemPurchased: SkillItemPurchased) =>
+    await this.api.post(urlJoin(this.api.defaults.baseURL, `/user/${userId}/skill-item/purchase`), {
+      userId,
+      ...skillItemPurchased,
+    })
+
+  skillItemUsed = async (userId: string, skillItems: Array<SkillItemFileStorageConfig>, time: string) =>
+    await this.api.post(urlJoin(this.api.defaults.baseURL, `/user/${userId}/skill-item/use`), {
+      skillItems,
+      time,
+    })
 }

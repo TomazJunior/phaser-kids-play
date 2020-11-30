@@ -2,6 +2,19 @@ import * as dynogels from 'dynogels'
 import * as joi from 'joi'
 import { DynamoDBService } from './dynamodb.service'
 
+//TODO: move to a shared place
+export enum GEM_AUDIT_TYPE {
+  LEVEL_COMPLETED = 'level_completed',
+  ITEM_PURCHASED = 'item_purchased',
+  ITEM_USED = 'item_used',
+}
+
+export enum SKILL_ITEM_SKINS {
+  KEY = 'skill-item-key',
+  STAR = 'skill-item-star',
+  BOX = 'skill-item-box',
+}
+
 const DeviceSchema = {
   id: dynogels.types.uuid(),
   userId: joi.string().required(),
@@ -20,6 +33,41 @@ export const Device = dynogels.define(process.env.devicesTableName!, {
 })
 Device.config({ dynamodb: DynamoDBService.getInstance().dynamoDB })
 
+const GemAuditSchema = {
+  id: dynogels.types.uuid(),
+  userId: joi.string().required(),
+  recordType: joi.string().valid(...Object.values(GEM_AUDIT_TYPE)),
+  gems: joi.number().required(),
+  originId: joi.string().allow(null),
+}
+
+export const GemAudit = dynogels.define(process.env.gemAuditTableName!, {
+  hashKey: 'userId',
+  rangeKey: 'id',
+  timestamps: true,
+  schema: GemAuditSchema,
+  tableName: process.env.gemAuditTableName,
+})
+GemAudit.config({ dynamodb: DynamoDBService.getInstance().dynamoDB })
+
+const SkillItemAuditSchema = {
+  id: dynogels.types.uuid(),
+  userId: joi.string().required(),
+  skillItem: joi.string().valid(...Object.values(SKILL_ITEM_SKINS)),
+  quantity: joi.number().required(),
+  gems: joi.number().required(),
+  time: joi.date().required(),
+}
+
+export const SkillItemAudit = dynogels.define(process.env.skillItemAuditTableName!, {
+  hashKey: 'userId',
+  rangeKey: 'id',
+  timestamps: true,
+  schema: SkillItemAuditSchema,
+  tableName: process.env.skillItemAuditTableName,
+})
+SkillItemAudit.config({ dynamodb: DynamoDBService.getInstance().dynamoDB })
+
 const RoundSchema = {
   seconds: joi.number().required(),
   inTutorialMode: joi.bool().required(),
@@ -33,7 +81,7 @@ const LevelSchema = {
   gems: joi.number().required(),
   stars: joi.number().required(),
   time: joi.date().required(),
-  rounds: joi.array().items(RoundSchema)
+  rounds: joi.array().items(RoundSchema),
 }
 
 export const Level = dynogels.define(process.env.levelsTableName!, {

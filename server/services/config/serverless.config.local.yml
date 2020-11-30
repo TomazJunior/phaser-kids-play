@@ -4,6 +4,8 @@ dynamoDBEndpoint: http://localhost:8000
 usersTableName: memory-users-local
 devicesTableName: memory-devices-local
 levelsTableName: memory-levels-local
+gemAuditTableName: memory-gem-audit-local
+skillItemAuditTableName: memory-skill-item-audit-local
 dynamoDBaccessKey: "access"
 dynamoDBaccessSecret: "secret"
 LoggerLevel: debug

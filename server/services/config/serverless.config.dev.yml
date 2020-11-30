@@ -4,6 +4,8 @@ dynamoDBEndpoint: https://dynamodb.us-east-1.amazonaws.com/
 usersTableName: memory-users-dev
 devicesTableName: memory-devices-dev
 levelsTableName: memory-levels-dev
+gemAuditTableName: memory-gem-audit-dev
+skillItemAuditTableName: memory-skill-item-audit-dev
 dynamoDBaccessKey: ""
 dynamoDBaccessSecret: ""
 LoggerLevel: debug

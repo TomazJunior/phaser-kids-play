@@ -8,6 +8,9 @@ import { FrameBig } from '../ui/frameBIg'
 import { SkillItemBuyFrame } from '../objects/skillItemBuyFrame'
 import { buySkillItem, getSkillItems, getGems, removeSkillItems } from '../utils/gameProgressData'
 import { ButtonSmall } from '../ui/buttonSmall'
+import { ServiceApi } from '../utils/api'
+import { getUserId } from '../utils/gameInfoData'
+import { LoadingDialog } from '../ui/loadingDialog'
 
 export default class SelectItemsScene extends Phaser.Scene {
   private background: BackgroundParallax
@@ -29,7 +32,6 @@ export default class SelectItemsScene extends Phaser.Scene {
     this.background = new BackgroundParallax(this, false, false)
     this.createSkillItemFrames().then(() => {
       this.gemScore = new GemScore(this, 150).setVisible(true)
-
       this.createBackButton()
       this.createGoToLevelButton()
     })
@@ -40,6 +42,11 @@ export default class SelectItemsScene extends Phaser.Scene {
     this.level = config.level
   }
 
+  showLoadingDialog = (content: string): LoadingDialog => {
+    const { width, height } = this.scale
+    return new LoadingDialog(this, width * 0.5, height * 0.5, content, true)
+  }
+
   createGoToLevelButton = () => {
     const { width, height } = this.scale
 
@@ -48,6 +55,7 @@ export default class SelectItemsScene extends Phaser.Scene {
       onClick: async () => {
         const selectedSkillItems = this.getSelectedItems()
         await removeSkillItems(selectedSkillItems)
+        await this.storeSkillItemUsedInfo(selectedSkillItems)
 
         this.scene.stop(SCENES.SELECT_ITEMS_SCENE)
         this.scene.start(SCENES.MAIN_SCENE, <MainSceneConfig>{
@@ -94,6 +102,7 @@ export default class SelectItemsScene extends Phaser.Scene {
   handleConfirmBuyingSkillItem = (skillItem: SkillItemDefinition): Promise<void> => {
     return new Promise(async (resolve) => {
       await buySkillItem(skillItem)
+      await this.storeSkillItemInfo(skillItem)
       await this.gemScore.refreshValue()
       this.time.delayedCall(250, async () => {
         await this.refreshAndSelectCard(skillItem)
@@ -101,6 +110,27 @@ export default class SelectItemsScene extends Phaser.Scene {
         resolve()
       })
     })
+  }
+
+  storeSkillItemInfo = async (skillItem: SkillItemDefinition) => {
+    const dialog = this.showLoadingDialog('Storing booster')
+    const serviceApi = new ServiceApi()
+    await serviceApi.skillItemPurchased(getUserId(), {
+      skillItem: skillItem.skin,
+      gems: skillItem.itemCost,
+      time: new Date().toISOString(),
+      quantity: 1,
+    })
+    dialog.close()
+  }
+
+  storeSkillItemUsedInfo = async (skillItems: Array<SkillItemFileStorageConfig>) => {
+    if (!skillItems || !skillItems.length) return Promise.resolve()
+
+    const dialog = this.showLoadingDialog('Loading level')
+    const serviceApi = new ServiceApi()
+    await serviceApi.skillItemUsed(getUserId(), skillItems, new Date().toISOString())
+    dialog.close()
   }
 
   handleHideBuySkillItemFrame = (): Promise<any> => {

@@ -220,6 +220,16 @@ declare interface SkillItemDefinition {
   description: Array<string>
 }
 
+declare interface SkillItemPurchased extends SkillItemUsed {
+  gems: number
+}
+
+declare interface SkillItemUsed {
+  skillItem: string
+  time: string
+  quantity: number
+}
+
 declare interface FrameBigInterface {
   title: string
   visible: boolean
@@ -238,7 +248,7 @@ declare interface FrameLevelTimer {
 }
 
 declare interface LevelCompleted {
-  key: string,
+  key: string
   level: number
   rounds: Array<FrameLevelTimer>
   gems: number

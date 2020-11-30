@@ -79,4 +79,8 @@ export class FrameBig<T extends Phaser.GameObjects.GameObject> extends Phaser.Ga
   public get displayHeight(): number {
     return this.frame.displayHeight
   }
+
+  public get displayWidth(): number {
+    return this.frame.displayWidth
+  }
 }
