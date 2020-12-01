@@ -144,10 +144,10 @@ export class LevelCompleteDialog extends Phaser.GameObjects.Sprite {
 
   storeLevelCompleteInfo = async (levelCompleted: LevelCompleted) => {
     // store only when gems are gained
-    if (!levelCompleted.gems) return Promise.resolve()
-
     const serviceApi = new ServiceApi()
     await serviceApi.levelCompleted(getUserId(), levelCompleted)
+    
+    if (!levelCompleted.gems) return Promise.resolve()
     await addLevelCompleted(levelCompleted)
   }
 

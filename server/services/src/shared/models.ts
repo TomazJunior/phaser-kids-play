@@ -98,10 +98,18 @@ export const UserSkillItemSchema = {
   quantity: joi.number().required(),
 }
 
+export const UserLevelSchema = {
+  worldId: joi.string().required(),
+  level: joi.number().required(),
+  attempts: joi.number().default(0),
+  stars: joi.number().default(0),
+}
+
 export const UserSchema = {
   id: dynogels.types.uuid(),
   gems: joi.number().default(0),
   skillItems: joi.array().items(UserSkillItemSchema).default([]),
+  levels: joi.array().items(UserLevelSchema).default([]),
   active: joi.bool().default(true),
 }
 
