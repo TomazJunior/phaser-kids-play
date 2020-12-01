@@ -6,7 +6,14 @@ import { GemScore } from '../ui/gemScore'
 import SkillItem from '../objects/skillItems/skillItem'
 import { FrameBig } from '../ui/frameBIg'
 import { SkillItemBuyFrame } from '../objects/skillItemBuyFrame'
-import { buySkillItem, getSkillItems, getGems, removeSkillItems } from '../utils/gameProgressData'
+import {
+  buySkillItem,
+  getSkillItems,
+  getGems,
+  removeSkillItems,
+  addSkillItemPurchased,
+  addSkillItemsUsed,
+} from '../utils/gameProgressData'
 import { ButtonSmall } from '../ui/buttonSmall'
 import { ServiceApi } from '../utils/api'
 import { getUserId } from '../utils/gameInfoData'
@@ -101,8 +108,8 @@ export default class SelectItemsScene extends Phaser.Scene {
 
   handleConfirmBuyingSkillItem = (skillItem: SkillItemDefinition): Promise<void> => {
     return new Promise(async (resolve) => {
-      await buySkillItem(skillItem)
       await this.storeSkillItemInfo(skillItem)
+      await buySkillItem(skillItem)
       await this.gemScore.refreshValue()
       this.time.delayedCall(250, async () => {
         await this.refreshAndSelectCard(skillItem)
@@ -114,14 +121,23 @@ export default class SelectItemsScene extends Phaser.Scene {
 
   storeSkillItemInfo = async (skillItem: SkillItemDefinition) => {
     const dialog = this.showLoadingDialog('Storing booster')
-    const serviceApi = new ServiceApi()
-    await serviceApi.skillItemPurchased(getUserId(), {
+
+    const skillItemPurchased: SkillItemPurchased = {
       skin: skillItem.skin,
       gems: skillItem.itemCost,
       time: new Date().toISOString(),
       quantity: 1,
-    })
-    dialog.close()
+    }
+
+    const serviceApi = new ServiceApi()
+    try {
+      await serviceApi.skillItemPurchased(getUserId(), skillItemPurchased)
+    } catch (error) {
+      // mute error
+      await addSkillItemPurchased({ ...skillItemPurchased, sync: false })
+    } finally {
+      dialog.close()
+    }
   }
 
   storeSkillItemUsedInfo = async (skillItems: Array<SkillItemFileStorageConfig>) => {
@@ -129,8 +145,14 @@ export default class SelectItemsScene extends Phaser.Scene {
 
     const dialog = this.showLoadingDialog('Loading level')
     const serviceApi = new ServiceApi()
-    await serviceApi.skillItemUsed(getUserId(), skillItems, new Date().toISOString())
-    dialog.close()
+
+    try {
+      await serviceApi.skillItemUsed(getUserId(), skillItems, new Date().toISOString())
+    } catch (error) {
+      await addSkillItemsUsed(skillItems)
+    } finally {
+      dialog.close()
+    }
   }
 
   handleHideBuySkillItemFrame = (): Promise<any> => {

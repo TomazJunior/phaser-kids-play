@@ -16,6 +16,8 @@ const INITIAL_GAME_PROGRESS_STORAGE: GameProgressData = {
   ],
   skillItems: [],
   levelsCompleted: [],
+  skillItemsPurchased: [],
+  skillItemsUsed: []
 }
 
 export const addLevelCompleted = async (levelCompleted: LevelCompleted): Promise<void> => {
@@ -107,6 +109,54 @@ export const buySkillItem = async (item: SkillItemDefinition) => {
   }
 
   await incPlayerGems(-item.itemCost)
+}
+
+export const addSkillItemPurchased = async (skillItemPurchased: SkillItemPurchased): Promise<void> => {
+  const skillItemsPurchased = await getSkillItemPurchased()
+  const newSkillItemPurchased = [...skillItemsPurchased, skillItemPurchased]
+  if (window.cordova) {
+    await setInSecureKey(STORE_KEYS.SKILL_ITEMS_PURCHASED, newSkillItemPurchased)
+  } else {
+    setFileStorageConfig({
+      ...getGameProgressData(),
+      skillItemsPurchased: newSkillItemPurchased,
+    })
+  }
+}
+
+export const getSkillItemPurchased = async (): Promise<Array<SkillItemPurchased>> => {
+  if (window.cordova) {
+    return await getFromSecureKey(STORE_KEYS.SKILL_ITEMS_PURCHASED, [])
+  } else {
+    return Promise.resolve(getGameProgressData().skillItemsPurchased)
+  }
+}
+
+export const addSkillItemsUsed = async (skillItems: Array<SkillItemFileStorageConfig>): Promise<void> => {
+  const skillItemsUsed = await getSkillItemsUsed()
+  const newSkillItemsUsed = [
+    ...skillItemsUsed,
+    ...skillItems.map((skillItem) => {
+      return <SkillItemUsedWithSync>{ ...skillItem, sync: false }
+    }),
+  ]
+
+  if (window.cordova) {
+    await setInSecureKey(STORE_KEYS.SKILL_ITEMS_USED, newSkillItemsUsed)
+  } else {
+    setFileStorageConfig({
+      ...getGameProgressData(),
+      skillItemsUsed: newSkillItemsUsed,
+    })
+  }
+}
+
+export const getSkillItemsUsed = async (): Promise<Array<SkillItemUsedWithSync>> => {
+  if (window.cordova) {
+    return await getFromSecureKey(STORE_KEYS.SKILL_ITEMS_USED, [])
+  } else {
+    return Promise.resolve(getGameProgressData().skillItemsUsed)
+  }
 }
 
 export const getQuantityOfSkillItems = async (skin: SKILL_ITEM_SKINS): Promise<number> => {

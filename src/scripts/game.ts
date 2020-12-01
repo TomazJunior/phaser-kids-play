@@ -72,7 +72,8 @@ const onDeviceReady = () => {
   if (isAndroid()) {
     window.plugins.insomnia.keepAwake()
   } else {
-    setIsOnline(false)
+    // set online if it is in browser
+    setIsOnline(true)
   }
 
   const game = new Phaser.Game(config)

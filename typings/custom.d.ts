@@ -52,6 +52,8 @@ declare interface GameProgressData {
   gems: number
   skillItems: Array<SkillItemFileStorageConfig>
   levelsCompleted: Array<LevelCompleted>
+  skillItemsPurchased: Array<SkillItemPurchased>
+  skillItemsUsed: Array<SkillItemUsedWithSync>
 }
 declare interface DeviceStorageConfig extends DeviceInfoConfig {
   isOnline: boolean
@@ -220,8 +222,12 @@ declare interface SkillItemDefinition {
   description: Array<string>
 }
 
-declare interface SkillItemPurchased extends SkillItemUsed {
+declare interface SkillItemPurchased extends SkillItemUsedWithSync {
   gems: number
+}
+
+declare interface SkillItemUsedWithSync extends SkillItemUsed{
+  sync?: boolean
 }
 
 declare interface SkillItemUsed {
@@ -254,4 +260,5 @@ declare interface LevelCompleted {
   gems: number
   stars: number
   time: string
+  sync?: boolean
 }

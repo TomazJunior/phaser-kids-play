@@ -46,7 +46,7 @@ export default class SkillItemFrame extends Phaser.GameObjects.Image {
     ).setScale(1.2)
 
     this.quantityButton = new ButtonCircle(scene, this.x - 50, this.y - 50, 'circle-green', '0')
-    this.quantity = 0
+    this._quantity = 0
 
     this.setInteractive().on('pointerdown', () => {
       if (this.quantity) {
@@ -115,7 +115,7 @@ export default class SkillItemFrame extends Phaser.GameObjects.Image {
     this.selected = !this._selected
   }
 
-  updateAddButtonStyle = async () => {
+  updateAddButtonStyle = async (): Promise<void> => {
     if (!this.addButton) return
 
     const isSkillItemFull = this.quantity >= this.skillItem.skillItemDefinition.maxPerLevel
@@ -134,5 +134,6 @@ export default class SkillItemFrame extends Phaser.GameObjects.Image {
         this.addButton.text = ''
       }
     }
+    return Promise.resolve()
   }
 }

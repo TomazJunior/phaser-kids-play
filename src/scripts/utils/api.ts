@@ -1,7 +1,10 @@
 import { AxiosInstance } from 'axios'
 import urlJoin from 'url-join'
+import NotConnectedError from '../errors/notConnectError'
 import { AxiosHelper } from './axiosHelper'
+import { isOnline } from './deviceData'
 import { isLocalhost } from './deviceUtils'
+import { setDeviceId, setUserId } from './gameInfoData'
 
 export class ServiceApi {
   api: AxiosInstance
@@ -12,15 +15,24 @@ export class ServiceApi {
     this.api = new AxiosHelper({ baseURL }).api
   }
 
-  createUser = async (data: any) =>
-    await this.api.post(urlJoin(this.api.defaults.baseURL, `/user`), {
-      ...data,
+  createUser = async (deviceInfo: any) => {
+    if (!isOnline()) return Promise.resolve()
+    const { data }: any = await this.api.post(urlJoin(this.api.defaults.baseURL, `/user`), {
+      ...deviceInfo,
     })
-  deviceStarted = async (userId: string, deviceId: string) =>
-    await this.api.put(urlJoin(this.api.defaults.baseURL, `/user/${userId}/device/${deviceId}/started`))
 
-  levelCompleted = async (userId: string, level: LevelCompleted) =>
-    await this.api.post(urlJoin(this.api.defaults.baseURL, `/user/${userId}/level`), {
+    setUserId(data.userId)
+    setDeviceId(data.deviceId)
+  }
+
+  deviceStarted = async (userId: string, deviceId: string) => {
+    if (!isOnline()) return Promise.resolve()
+    return await this.api.put(urlJoin(this.api.defaults.baseURL, `/user/${userId}/device/${deviceId}/started`))
+  }
+
+  levelCompleted = async (userId: string, level: LevelCompleted) => {
+    if (!isOnline()) return Promise.reject(new NotConnectedError())
+    return await this.api.post(urlJoin(this.api.defaults.baseURL, `/user/${userId}/level`), {
       userId,
       worldId: level.key,
       level: level.level,
@@ -29,16 +41,21 @@ export class ServiceApi {
       stars: level.stars,
       time: level.time,
     })
+  }
 
-  skillItemPurchased = async (userId: string, skillItemPurchased: SkillItemPurchased) =>
-    await this.api.post(urlJoin(this.api.defaults.baseURL, `/user/${userId}/skill-item/purchase`), {
+  skillItemPurchased = async (userId: string, skillItemPurchased: SkillItemPurchased) => {
+    if (!isOnline()) return Promise.reject(new NotConnectedError())
+    return await this.api.post(urlJoin(this.api.defaults.baseURL, `/user/${userId}/skill-item/purchase`), {
       userId,
       ...skillItemPurchased,
     })
+  }
 
-  skillItemUsed = async (userId: string, skillItems: Array<SkillItemFileStorageConfig>, time: string) =>
-    await this.api.post(urlJoin(this.api.defaults.baseURL, `/user/${userId}/skill-item/use`), {
+  skillItemUsed = async (userId: string, skillItems: Array<SkillItemFileStorageConfig>, time: string) => {
+    if (!isOnline()) return Promise.reject(new NotConnectedError())
+    return await this.api.post(urlJoin(this.api.defaults.baseURL, `/user/${userId}/skill-item/use`), {
       skillItems,
       time,
     })
+  }
 }

@@ -9,6 +9,7 @@ export class LoadingDialog extends Phaser.GameObjects.Group {
   wordDelay = 25
   lineDelay = 75
   closeButton: ButtonSmall | undefined
+  isClosing: boolean = false
 
   constructor(
     scene: Phaser.Scene,
@@ -69,6 +70,7 @@ export class LoadingDialog extends Phaser.GameObjects.Group {
       repeat: -1,
       yoyo: true,
       onYoyo: () => {
+        if (this.isClosing) return
         if (threeDotsText.text.length === 3) {
           threeDotsText.text = ''
         } else {
@@ -80,6 +82,7 @@ export class LoadingDialog extends Phaser.GameObjects.Group {
   }
 
   close = () => {
+    this.isClosing = true
     this.tweens.filter((tween) => tween.isPlaying()).forEach((tween) => tween.complete())
     this.destroy(true)
   }
