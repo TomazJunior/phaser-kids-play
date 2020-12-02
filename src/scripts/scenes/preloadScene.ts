@@ -1,11 +1,14 @@
 import { updateUserInfo } from '../controllers/deviceInfo'
+import BackgroundParallax from '../ui/backgroundParallax'
 import ProgressBar from '../ui/progressBar'
+import { createAnimations } from '../utils/animations'
 import { updateSoundState } from '../utils/audioUtil'
 import {
   BUTTON,
   BUTTON_PREFIX,
   BUTTON_PREFIX_EXTRA,
   FONTS,
+  GAME,
   GAME_WORLDS,
   SCENES,
   SOUNDS,
@@ -15,24 +18,23 @@ import { SKILL_ITEM_SKINS } from '../utils/skillItems'
 
 export default class PreloadScene extends Phaser.Scene {
   progressBar: ProgressBar
+  background: BackgroundParallax
   constructor() {
     super({ key: SCENES.PRELOAD_SCENE })
   }
 
   preload() {
+    createAnimations(this)
+
     const { width, height } = this.scale
+
+    this.background = new BackgroundParallax(this, true, true)
+
     this.progressBar = new ProgressBar(this, width * 0.4, height * 0.5)
-
-    this.load.image('background', 'assets/img/background.png')
-    this.load.spritesheet(SPRITE_NAME.SOKOBAN, 'assets/img/sokoban_tilesheet.png', {
-      frameWidth: 64,
-    })
-
-    this.load.atlasXML(
-      SPRITE_NAME.ROUND_ANIMALS,
-      'assets/img/round_nodetailsOutline.png',
-      'assets/img/round_nodetailsOutline.xml'
-    )
+    const playerSprite = this.add
+      .sprite(width * 0.5, height - 100, SPRITE_NAME.SOKOBAN)
+      .setScale(1.5)
+    playerSprite.play('right-walk', true)
 
     this.load.image('box-opened', 'assets/img/box-opened.png')
     this.load.image('box-closed', 'assets/img/box-closed.png')
@@ -62,7 +64,7 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('small-frame-level', 'assets/img/small-frame-level.png')
     this.load.image('frame-char-dialog', 'assets/img/frame-char-dialog.png')
     this.load.image('frame-loading-dialog', 'assets/img/frame-loading-dialog.png')
-    
+
     this.load.bitmapFont(FONTS.PIXEL_FONT, 'assets/fonts/pixelFont.png', 'assets/fonts/pixelFont.xml')
 
     this.load.audio(SOUNDS.CLICK, 'assets/audio/click5.mp3')
@@ -95,11 +97,6 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('gem-score', 'assets/img/gem-score.png')
     this.load.image('skill-gem-cost', 'assets/img/skill-gem-cost.png')
     this.load.image('skill-item-spot-shadow', 'assets/img/skill-item-spot-shadow.png')
-
-    this.load.spritesheet('firework', 'assets/img/firework.png', {
-      frameWidth: 256,
-      frameHeight: 256,
-    })
 
     //skill items
     this.loadSkillItemsImages()

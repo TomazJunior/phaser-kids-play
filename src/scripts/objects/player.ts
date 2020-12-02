@@ -39,7 +39,6 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
     this.setDepth(OBJECT_DEPTHS.PLAYER)
     this.setCollideWorldBounds(true)
     this.active = false
-    this.createAnimations()
     this.animation = PLAYER.ANIMATIONS.DOWN_IDLE
     this.play(this.animation, true)
     this.pathToGo = []
@@ -54,7 +53,6 @@ export default abstract class Player extends Phaser.Physics.Arcade.Sprite implem
     scene.events.on('update', this.update, this)
   }
 
-  protected abstract createAnimations()
 
   public get isReady(): boolean {
     return this._isReady && this.active

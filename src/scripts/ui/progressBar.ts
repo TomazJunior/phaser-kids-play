@@ -1,4 +1,3 @@
-
 export default class ProgressBar extends Phaser.GameObjects.Container {
   graphics: Phaser.GameObjects.Graphics
   newGraphics: Phaser.GameObjects.Graphics
@@ -13,13 +12,13 @@ export default class ProgressBar extends Phaser.GameObjects.Container {
     var progressBar = new Phaser.Geom.Rectangle(0, 0, 400, 50)
     var progressBarFill = new Phaser.Geom.Rectangle(5, 5, 290, 40)
 
-    this.graphics.fillStyle(0xffffff, 1)
+    this.graphics.fillStyle(0x000000, 1)
     this.graphics.fillRectShape(progressBar)
 
     this.newGraphics.fillStyle(0x3587e2, 1)
     this.newGraphics.fillRectShape(progressBarFill)
 
-    this.loadingText = scene.add.text(50, 60, 'Loading: ', { fontSize: '32px', fill: '#FFF' })
+    this.loadingText = scene.add.text(50, 60, 'Loading: ', { fontSize: '32px', fill: '#FFF' }).setStroke('black', 10)
 
     this.add(this.graphics).add(this.newGraphics).add(this.loadingText)
   }

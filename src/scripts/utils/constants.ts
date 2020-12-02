@@ -10,6 +10,7 @@ export enum SCENES {
   MENU_SCENE = 'MenuScene',
   PAUSE_SCENE = 'PauseScene',
   PRELOAD_SCENE = 'PreloadScene',
+  BOOT_SCENE = 'BootScene',
 }
 export const MAX_TIMER_DURATION = 60
 export const SCORE_PER_HIDDEN_CHAR = 10

@@ -10,6 +10,7 @@ import PauseScene from './scenes/pauseScene'
 import ConfigScene from './scenes/configScene'
 import SelectItemsScene from './scenes/selectItemsScene'
 import { setDeviceInfoConfig, setIsOnline } from './utils/deviceData'
+import BootScene from './scenes/bootScene'
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -19,7 +20,7 @@ const config: Phaser.Types.Core.GameConfig = {
     width: GAME.WIDTH,
     height: GAME.HEIGHT,
   },
-  scene: [PreloadScene, PauseScene, ConfigScene, MenuScene, LevelScene, SelectItemsScene, MainScene],
+  scene: [BootScene, PreloadScene, PauseScene, ConfigScene, MenuScene, LevelScene, SelectItemsScene, MainScene],
   physics: {
     default: 'arcade',
     arcade: {
