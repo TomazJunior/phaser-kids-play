@@ -21,7 +21,7 @@ export class LoadingDialog extends Phaser.GameObjects.Group {
   ) {
     super(scene)
     this.scene = scene
-    this.frame = scene.add.image(x, y, 'frame-char-dialog')
+    this.frame = scene.add.image(x, y, 'frame-loading-dialog')
 
     scene.add.existing(this)
     this.add(this.frame)
@@ -44,7 +44,7 @@ export class LoadingDialog extends Phaser.GameObjects.Group {
     }
 
     this.text = scene.add
-      .text(this.frame.x, this.frame.y, content, {
+      .text(this.frame.x, this.frame.y - 50, content, {
         font: '26px Arial',
       })
       .setStroke('#bb956d', 10)
@@ -54,7 +54,7 @@ export class LoadingDialog extends Phaser.GameObjects.Group {
     this.add(this.text)
 
     const threeDotsText = scene.add
-      .text(this.text.x + this.text.displayWidth * 0.5 + 10, this.frame.y, '...', {
+      .text(this.text.x + this.text.displayWidth * 0.5 + 10, this.frame.y - 50, '...', {
         font: '26px Arial',
       })
       .setStroke('#bb956d', 10)

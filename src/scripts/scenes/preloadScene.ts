@@ -61,7 +61,8 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('small-frame', 'assets/img/small-frame.png')
     this.load.image('small-frame-level', 'assets/img/small-frame-level.png')
     this.load.image('frame-char-dialog', 'assets/img/frame-char-dialog.png')
-
+    this.load.image('frame-loading-dialog', 'assets/img/frame-loading-dialog.png')
+    
     this.load.bitmapFont(FONTS.PIXEL_FONT, 'assets/fonts/pixelFont.png', 'assets/fonts/pixelFont.xml')
 
     this.load.audio(SOUNDS.CLICK, 'assets/audio/click5.mp3')
