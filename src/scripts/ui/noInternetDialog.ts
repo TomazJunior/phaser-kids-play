@@ -4,7 +4,7 @@ import { ButtonSmall } from './buttonSmall'
 export class NoInternetDialog extends Phaser.GameObjects.Sprite {
   private group: Phaser.GameObjects.Group
 
-  constructor(scene: Phaser.Scene, x: number, y: number) {
+  constructor(scene: Phaser.Scene, x: number, y: number, onClose: () => void) {
     super(scene, x, y, 'big-frame-window')
     scene.add.existing(this)
     this.group = scene.add.group()
@@ -20,6 +20,7 @@ export class NoInternetDialog extends Phaser.GameObjects.Sprite {
     const closeButton = new ButtonSmall(scene, this.x + this.displayWidth * 0.48, this.y - this.displayHeight * 0.35, {
       name: BUTTON.CLOSE,
       onClick: () => {
+        onClose()
         this.group.destroy(true)
       },
     })

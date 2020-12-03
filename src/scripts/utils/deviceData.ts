@@ -7,7 +7,7 @@ const initialDeviceStorageConfig: DeviceStorageConfig = {
 export const isOnline = (): boolean => {
   const { isOnline } = getDeviceInformation()
   if (!isOnline) {
-    console.log('device is not connected')
+    console.warn('device is not connected')
   }
   return isOnline
 }

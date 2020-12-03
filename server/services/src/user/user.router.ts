@@ -1,6 +1,10 @@
 import { UserHandler } from './user.handler'
 
 export const initialize = (router) => {
+  router.get('user/:userId', async (req, res) => {
+    const userHandler = new UserHandler(req.log)
+    return userHandler.getOne(req, res)
+  })
   router.post('user/', async (req, res) => {
     const userHandler = new UserHandler(req.log)
     return userHandler.create(req, res)

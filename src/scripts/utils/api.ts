@@ -15,6 +15,13 @@ export class ServiceApi {
     this.api = new AxiosHelper({ baseURL }).api
   }
 
+  getUser = async (userId: string): Promise<{id: string, gems: number}> => {
+    if (!userId) return Promise.reject('user id is required')
+    if (!isOnline()) return Promise.reject(new NotConnectedError())
+    const { data }: any = await this.api.get(urlJoin(this.api.defaults.baseURL, `/user/${userId}`))
+    return Promise.resolve(data)
+  }
+
   createUser = async (deviceInfo: any) => {
     if (!isOnline()) return Promise.resolve()
     const { data }: any = await this.api.post(urlJoin(this.api.defaults.baseURL, `/user`), {

@@ -32,8 +32,8 @@ export default class SkillItemFrame extends Phaser.GameObjects.Image {
       scene,
       this.x - 30,
       this.y + 60,
-      'circle-blue',
-      '+',
+      'circle-blue-chart',
+      '',
       this.handleAddClick
     ).setScale(1.2)
     this.minusButton = new ButtonCircle(

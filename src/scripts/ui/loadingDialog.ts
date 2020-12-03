@@ -3,26 +3,27 @@ import { ButtonSmall } from './buttonSmall'
 
 export class LoadingDialog extends Phaser.GameObjects.Group {
   private frame: Phaser.GameObjects.Image
-  private text: Phaser.GameObjects.Text
+  private contentText: Phaser.GameObjects.Text
   private tweens: Array<Phaser.Tweens.Tween> = []
 
   wordDelay = 25
   lineDelay = 75
   closeButton: ButtonSmall | undefined
   isClosing: boolean = false
+  private _content: Array<string>
 
   constructor(
     scene: Phaser.Scene,
     x: number,
     y: number,
-    content: string,
+    content: Array<string>,
     hideBackground: boolean = false,
     size?: { width: number; height: number }
   ) {
     super(scene)
     this.scene = scene
     this.frame = scene.add.image(x, y, 'frame-loading-dialog')
-
+    this.content = content
     scene.add.existing(this)
     this.add(this.frame)
 
@@ -43,42 +44,41 @@ export class LoadingDialog extends Phaser.GameObjects.Group {
       this.add(background)
     }
 
-    this.text = scene.add
-      .text(this.frame.x, this.frame.y - 50, content, {
+    this.contentText = scene.add
+      .text(this.frame.x - this.frame.displayWidth * 0.5 + 65, this.frame.y - 70, content, {
         font: '26px Arial',
       })
       .setStroke('#bb956d', 10)
       .setDepth(OBJECT_DEPTHS.FRAME_DIALOG)
-      .setOrigin(0.5, 0.5)
+      .setOrigin(0, 0)
 
-    this.add(this.text)
+    this.add(this.contentText)
 
-    const threeDotsText = scene.add
-      .text(this.text.x + this.text.displayWidth * 0.5 + 10, this.frame.y - 50, '...', {
-        font: '26px Arial',
-      })
-      .setStroke('#bb956d', 10)
-      .setDepth(OBJECT_DEPTHS.FRAME_DIALOG)
-      .setOrigin(0, 0.5)
-
-    this.add(threeDotsText)
-
+    let threeDotsText = '...'
     const threeDotsTween = this.scene.tweens.add({
-      targets: threeDotsText,
+      targets: this.contentText,
       alpha: 1,
       duration: 100,
       repeat: -1,
       yoyo: true,
       onYoyo: () => {
         if (this.isClosing) return
-        if (threeDotsText.text.length === 3) {
-          threeDotsText.text = ''
+        if (threeDotsText.length === 3) {
+          threeDotsText = ''
         } else {
-          threeDotsText.text = threeDotsText.text + '.'
+          threeDotsText += '.'
         }
+        const lines = [...this._content]
+        lines[lines.length - 1] = `${lines[lines.length - 1]} ${threeDotsText}`
+        this.contentText.setText(lines)
       },
     })
     this.tweens.push(threeDotsTween)
+  }
+
+  public set content(v: Array<string>) {
+    if (this.isClosing) return
+    this._content = v
   }
 
   close = () => {

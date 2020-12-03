@@ -14,6 +14,18 @@ export const deepCopy = (arr: any[]) => {
   return copy
 }
 
+export const sortArray = <T>(arr: any[], fieldName: string): Array<T> => {
+  return arr.sort((obj1, obj2) => {
+    if (obj1[fieldName] > obj2[fieldName]) {
+      return 1
+    }
+    if (obj1[fieldName] < obj2[fieldName]) {
+      return -1
+    }
+    return 0
+  })
+}
+
 // Helper function to deal with Objects
 const deepCopyObject = (obj) => {
   let tempObj = {}
@@ -30,3 +42,5 @@ const deepCopyObject = (obj) => {
   }
   return tempObj
 }
+
+

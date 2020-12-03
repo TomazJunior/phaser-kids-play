@@ -49,7 +49,7 @@ export default class SelectItemsScene extends Phaser.Scene {
     this.level = config.level
   }
 
-  showLoadingDialog = (content: string): LoadingDialog => {
+  showLoadingDialog = (content: Array<string>): LoadingDialog => {
     const { width, height } = this.scale
     return new LoadingDialog(this, width * 0.5, height * 0.5, content, true)
   }
@@ -120,7 +120,7 @@ export default class SelectItemsScene extends Phaser.Scene {
   }
 
   storeSkillItemInfo = async (skillItem: SkillItemDefinition) => {
-    const dialog = this.showLoadingDialog('Storing booster')
+    const dialog = this.showLoadingDialog(['Storing booster'])
 
     const skillItemPurchased: SkillItemPurchased = {
       skin: skillItem.skin,
@@ -143,7 +143,7 @@ export default class SelectItemsScene extends Phaser.Scene {
   storeSkillItemUsedInfo = async (skillItems: Array<SkillItemFileStorageConfig>) => {
     if (!skillItems || !skillItems.length) return Promise.resolve()
 
-    const dialog = this.showLoadingDialog('Loading level')
+    const dialog = this.showLoadingDialog(['Loading level'])
     const serviceApi = new ServiceApi()
 
     try {

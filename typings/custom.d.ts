@@ -52,7 +52,7 @@ declare interface GameProgressData {
   gems: number
   skillItems: Array<SkillItemFileStorageConfig>
   levelsCompleted: Array<LevelCompleted>
-  skillItemsPurchased: Array<SkillItemPurchased>
+  skillItemsPurchased: Array<SkillItemPurchasedWithSync>
   skillItemsUsed: Array<SkillItemUsedWithSync>
 }
 declare interface DeviceStorageConfig extends DeviceInfoConfig {
@@ -222,16 +222,20 @@ declare interface SkillItemDefinition {
   description: Array<string>
 }
 
-declare interface SkillItemPurchased extends SkillItemUsedWithSync {
+declare interface SkillItemPurchasedWithSync extends SkillItemPurchased {
+  sync?: boolean
+}
+
+declare interface SkillItemPurchased extends SkillItemUsed {
   gems: number
 }
 
-declare interface SkillItemUsedWithSync extends SkillItemUsed{
+declare interface SkillItemUsedWithSync extends SkillItemUsed {
   sync?: boolean
 }
 
 declare interface SkillItemUsed {
-  skin: string
+  skin: import('../src/scripts/utils/skillItems').SKILL_ITEM_SKINS
   time: string
   quantity: number
 }

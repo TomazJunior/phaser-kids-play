@@ -46,7 +46,7 @@ export const GemAudit = dynogels.define(process.env.gemAuditTableName!, {
   rangeKey: 'id',
   timestamps: true,
   schema: GemAuditSchema,
-  tableName: process.env.gemAuditTableName,
+  tableName: process.env.gemAuditTableName
 })
 GemAudit.config({ dynamodb: DynamoDBService.getInstance().dynamoDB })
 

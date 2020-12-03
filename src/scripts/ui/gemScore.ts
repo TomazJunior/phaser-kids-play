@@ -1,6 +1,10 @@
 import { COLORS, FONTS } from '../utils/constants'
-import { getGems, incPlayerGems } from '../utils/gameProgressData'
+import { isOnline, setIsOnline } from '../utils/deviceData'
+import { getGems, incPlayerGems, SetPlayerGems } from '../utils/gameProgressData'
+import SyncData, { SyncDataOnProgress } from '../utils/syncData'
 import { ButtonCircle } from './buttonCircle'
+import { LoadingDialog } from './loadingDialog'
+import { NoInternetDialog } from './noInternetDialog'
 
 export class GemScore extends Phaser.GameObjects.Group {
   private _value: number
@@ -8,11 +12,13 @@ export class GemScore extends Phaser.GameObjects.Group {
   private addButton: ButtonCircle
   private valueText: Phaser.GameObjects.Text
   y: number
+  isBuyingGem: boolean = false
+  syncData: SyncData
 
   constructor(scene: Phaser.Scene, private x: number) {
     super(scene)
     scene.add.existing(this)
-
+    this.syncData = new SyncData()
     this.y = -100
     this.frame = scene.add.sprite(x, this.y, 'gem-score')
     getGems().then((value: number) => {
@@ -102,9 +108,34 @@ export class GemScore extends Phaser.GameObjects.Group {
     this.value = await getGems()
   }
 
-  handleAddClick = () => {
-    //TODO: implement buy gem
-    // needs to integrate with server side + android
+  setGemValue = async (value: number) => {
+    await SetPlayerGems(value)
+    this.value = await getGems()
+  }
+
+  handleAddClick = async (): Promise<void> => {
+    if (this.isBuyingGem) return Promise.resolve()
+    this.isBuyingGem = true
+    const { width, height } = this.scene.scale
+    if (!isOnline()) {
+      new NoInternetDialog(this.scene, width * 0.5, height * 0.5, () => {
+        this.isBuyingGem = false
+      })
+    } else {
+      const loadingData = new LoadingDialog(this.scene, width * 0.5, height * 0.5, ['Syncing your', 'progress'], true)
+      await this.syncData.sync(
+        async (syncDataProgress: SyncDataOnProgress): Promise<void> => {
+          loadingData.content = syncDataProgress.stepText
+          if (syncDataProgress.gems) {
+            await this.setGemValue(syncDataProgress.gems)
+          }
+          if (syncDataProgress.done) loadingData.close()
+          return Promise.resolve()
+        }
+      )
+      this.isBuyingGem = false
+    }
+    return Promise.resolve()
   }
 
   showAddButton = (visible: boolean) => {

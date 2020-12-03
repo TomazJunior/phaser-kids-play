@@ -13,6 +13,15 @@ export class UserHandler {
     this.deviceService = new DeviceService(logger)
   }
 
+  getOne = async (req, res) => {
+    req.log.debug('UserHandler.getOne', 'Process started')
+    const { userId } = req.params
+    const user = await this.userService.getOne(userId)
+    const { id, gems } = user
+    res.json(new Response({ userId: id, gems }))
+    req.log.debug('UserHandler.getOne', 'Process completed')
+  }
+
   create = async (req, res) => {
     req.log.debug('UserHandler.create', 'Process started')
     const user = new User({
