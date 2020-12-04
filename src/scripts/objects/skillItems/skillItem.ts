@@ -3,11 +3,11 @@ import { ButtonCircle } from '../../ui/buttonCircle'
 import { getSkillItemDefinition, SKILL_ITEM_SKINS, SKILL_ITEM_TYPE } from '../../utils/skillItems'
 
 export default abstract class SkillItem {
-  protected image?: Phaser.GameObjects.Image
+  protected image?: Phaser.Physics.Arcade.Sprite
   private _enabled: boolean = false
   private _selected: boolean = false
   private _quantity: number = 0
-  private shadow: Phaser.GameObjects.Sprite
+  private shadow: Phaser.GameObjects.Image
   private badge?: ButtonCircle
 
   public readonly skillItemDefinition: SkillItemDefinition
@@ -86,11 +86,11 @@ export default abstract class SkillItem {
     const { skin } = this.skillItemDefinition
     this._quantity = quantity
 
-    this.shadow = this.scene.add.sprite(x, y, 'skill-item-spot-shadow').setVisible(false)
-
-    this.image = this.scene.add
-      .image(x, y, skin)
+    this.shadow = this.scene.add.image(x, y, 'skill-item-spot-shadow').setVisible(false)
+    this.image = this.scene.physics.add
+      .sprite(x, y, skin)
       .setScale(0.9)
+      .setBodySize(100, 80)
       .setInteractive()
       .on('pointerdown', () => {
         this.selected = !this.selected
