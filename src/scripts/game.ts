@@ -2,7 +2,7 @@ import 'phaser'
 import MainScene from './scenes/mainScene'
 import PreloadScene from './scenes/preloadScene'
 import resize from './utils/resize'
-import { GAME } from './utils/constants'
+import { GAME, IN_APP_PURCHASED } from './utils/constants'
 import MenuScene from './scenes/menuScene'
 import { isAndroid, isLocalhost } from './utils/deviceUtils'
 import LevelScene from './scenes/levelScene'
@@ -48,6 +48,26 @@ const onOnline = (game: Phaser.Game) => {
   setIsOnline(true)
 }
 
+const initStore = (game: Phaser.Game) => {
+  if (!window.store) {
+    console.log('Store not available')
+    return
+  }
+
+  window.store.register({
+    id: IN_APP_PURCHASED.GEMS_1000,
+    alias: '1000 gems',
+    type: window.store.CONSUMABLE,
+  })
+
+  window.store.error(function (error) {
+    console.error('ERROR ' + error.code + ': ' + error.message)
+    alert('ERROR ' + error.code + ': ' + error.message)
+  })
+
+  window.store.refresh()
+}
+
 const onDeviceReady = () => {
   setDeviceInfoConfig(window.device)
 
@@ -82,6 +102,7 @@ const onDeviceReady = () => {
     resize(game)
   })
   resize(game)
+  initStore(game)
 }
 
 window.addEventListener('load', () => {

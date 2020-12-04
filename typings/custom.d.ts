@@ -94,6 +94,7 @@ declare interface Window {
   StatusBar: any
   cordova: any
   plugins: any
+  store: IapStore.IStore
 }
 
 declare interface GameWorld {

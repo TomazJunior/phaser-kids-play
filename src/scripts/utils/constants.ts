@@ -41,7 +41,7 @@ export enum MAIN_SCENE_STATE {
   TARGETS_ENQUEUED = 'TARGETS_ENQUEUED',
   IN_TUTORIAL = 'IN_TUTORIAL',
   HIDDEN_CHAR_IN_THER_DOOR = 'HIDDEN_CHAR_IN_THER_DOOR',
-  GAME_OVER = 'GAME_OVER'
+  GAME_OVER = 'GAME_OVER',
 }
 
 export enum OBJECT_DEPTHS {
@@ -55,7 +55,7 @@ export enum OBJECT_DEPTHS {
   FRAME_DIALOG = 20,
   PLAYER = 25,
   FINGER_POINT = 40,
-  FIREWORKS = 60
+  FIREWORKS = 60,
 }
 
 export const GAME_NAME = 'Hidden Friends'
@@ -102,7 +102,10 @@ export enum TileGameWorldType {
   TILE,
 }
 
-//Oh no! Now it’s more than one! Could you please help me to find them in the correct order?
+export enum IN_APP_PURCHASED {
+  GEMS_1000 = '1000_gems_release_001',
+}
+
 export const GAME_WORLDS: Array<GameWorld> = [
   {
     key: '1',
@@ -134,7 +137,7 @@ export const GAME_WORLDS: Array<GameWorld> = [
           text: [
             'Oh... look! They’re trying',
             'to trick us, adding more boxes!',
-            'I\'m sure it won\'t be',
+            "I'm sure it won't be",
             'a problem for you...',
           ],
           showPointer: { col: 7, row: 1 },
@@ -713,7 +716,6 @@ export const FONTS = {
   PIXEL_FONT: 'pixelFont',
   ALLOY_INK: 'AlloyInk',
   KEN_VECTOR: 'kenvector',
-  
 }
 
 export enum SOUNDS {

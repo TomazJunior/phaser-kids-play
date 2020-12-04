@@ -6,7 +6,8 @@
   "main": "index.html",
   "scripts": {
     "start": "webpack-dev-server --config webpack/webpack.dev.js --port 3000",
-    "start:android": "cordova run android -- --webpack.config webpack/webpack.cordova.js",
+    "start:android": "cordova prepare && cordova run android -- --webpack.config webpack/webpack.cordova.js",
+    "start:android:release": "cordova prepare && cordova run android --release --buildConfig=build.json -- --webpack.config webpack/webpack.cordova.js",
     "build": "webpack --config webpack/webpack.prod.js",
     "webpack:cordova": "webpack --config webpack/webpack.cordova.js",
     "build:cordova": "cordova prepare && cordova build android -- --webpack.config webpack/webpack.cordova.js",

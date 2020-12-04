@@ -1,5 +1,5 @@
-import { COLORS, FONTS } from '../utils/constants'
-import { isOnline, setIsOnline } from '../utils/deviceData'
+import { COLORS, FONTS, IN_APP_PURCHASED } from '../utils/constants'
+import { isOnline } from '../utils/deviceData'
 import { getGems, incPlayerGems, SetPlayerGems } from '../utils/gameProgressData'
 import SyncData, { SyncDataOnProgress } from '../utils/syncData'
 import { ButtonCircle } from './buttonCircle'
@@ -133,12 +133,36 @@ export class GemScore extends Phaser.GameObjects.Group {
           return Promise.resolve()
         }
       )
-      this.isBuyingGem = false
+      // this.renderInAppPurchase()
     }
     return Promise.resolve()
   }
 
   showAddButton = (visible: boolean) => {
     this.addButton.setVisible(visible)
+  }
+
+  //TODO: finish the store mechanism
+  renderInAppPurchase = () => {
+    if (!window.store) {
+      alert('Store not available')
+      console.log('Store not available')
+      this.isBuyingGem = false
+      return
+    }
+
+    const render = () => {
+      // Get the product from the pool.
+      var product = window.store.get(IN_APP_PURCHASED.GEMS_1000)
+      alert('product =>' + JSON.stringify(product))
+    }
+
+    render()
+    window.store.when(IN_APP_PURCHASED.GEMS_1000).updated(render)
+    window.store.off(() => {
+      alert('store.off called')
+      console.log('store.off called')
+      this.isBuyingGem = false
+    })
   }
 }
