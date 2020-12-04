@@ -41,6 +41,7 @@
     "cordova-plugin-device": "^2.0.3",
     "cordova-plugin-insomnia": "^4.3.0",
     "cordova-plugin-network-information": "^2.0.2",
+    "cordova-plugin-purchase": "^10.5.0",
     "cordova-plugin-secure-key-store": "^1.5.5",
     "cordova-plugin-webpack": "^1.0.5",
     "gh-pages": "^2.0.1",
@@ -77,7 +78,10 @@
       "cordova-plugin-webpack": {},
       "cordova-plugin-device": {},
       "cordova-plugin-network-information": {},
-      "cordova-plugin-secure-key-store": {}
+      "cordova-plugin-secure-key-store": {},
+      "cordova-plugin-purchase": {
+        "BILLING_KEY": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsCW3nFN/VBFeoilgDCKJOerJ/twyBg2mEbW4spzFoCR5ddWwe+uCvVHZxUc9AMZmDBB6ElV3HArndvJrdF31LyWyLIwLvqjMVXldIaJuKYQPcyGx4Nw5h/nygjtWFMxvuS6abcWthhX/sjMsW6CNy0iM/NyUX8DRrXoOjq1tMRyg9IghrL2Nbh6iWkdRtlFn0rBodRkTYdsRb2AnawPHgDhjVAAJEcIoI4KLNCxhQchQDl3xZ++yHUKFo5B/OI1PRUXsNFUW885SSKjSS7rhBHjLzsHjDP1zFa4h+/9p7eVnvF14c4BfFQ8ly35SNmChFWaJcMuBkxUHu5heeeWVqwIDAQAB"
+      }
     }
   }
 }

@@ -58,7 +58,7 @@ export enum OBJECT_DEPTHS {
   FIREWORKS = 60
 }
 
-export const GAME_NAME = 'Find them all'
+export const GAME_NAME = 'Hidden Friends'
 export enum TILES {
   GROUND = 0x00,
   BOX = 0x01,
