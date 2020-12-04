@@ -112,13 +112,13 @@ export default class LevelScene extends Phaser.Scene {
       },
     })
 
-    const worldCompleted = !!nextWorld && await allLevelsCompleted(this.gameWorld)
+    const hasNextWorld = !!nextWorld
 
     new ButtonSmall(this, initialX + 150 * 5 - 50, initialY + 125, {
       name: BUTTON.RIGHT,
-      prefix: !!worldCompleted ? BUTTON_PREFIX.NORMAL : BUTTON_PREFIX.BLOCKED,
+      prefix: hasNextWorld ? BUTTON_PREFIX.NORMAL : BUTTON_PREFIX.BLOCKED,
       onClick: () => {
-        if (worldCompleted) {
+        if (hasNextWorld) {
           this.scene.restart(nextWorld)
         }
       },
