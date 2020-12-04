@@ -8,7 +8,9 @@
     "start": "webpack-dev-server --config webpack/webpack.dev.js --port 3000",
     "start:android": "cordova run android -- --webpack.config webpack/webpack.cordova.js",
     "build": "webpack --config webpack/webpack.prod.js",
+    "webpack:cordova": "webpack --config webpack/webpack.cordova.js",
     "build:cordova": "cordova prepare && cordova build android -- --webpack.config webpack/webpack.cordova.js",
+    "build:cordova:release": "cordova prepare && cordova build android --release --buildConfig=build.json -- --webpack.config webpack/webpack.cordova.js",
     "serve": "serve dist",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
@@ -38,6 +40,9 @@
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^5.1.1",
     "cordova": "^10.0.0",
+    "cordova-android": "^9.0.0",
+    "cordova-browser": "^6.0.0",
+    "cordova-ios": "^6.1.1",
     "cordova-plugin-device": "^2.0.3",
     "cordova-plugin-insomnia": "^4.3.0",
     "cordova-plugin-network-information": "^2.0.2",
@@ -58,9 +63,6 @@
   },
   "dependencies": {
     "axios": "^0.21.0",
-    "cordova-android": "^9.0.0",
-    "cordova-browser": "^6.0.0",
-    "cordova-ios": "^6.1.1",
     "cordova-plugin-whitelist": "^1.3.4",
     "phaser": "^3.24.1",
     "phaser3-rex-plugins": "^1.1.29",
@@ -68,9 +70,9 @@
   },
   "cordova": {
     "platforms": [
+      "ios",
       "android",
-      "browser",
-      "ios"
+      "browser"
     ],
     "plugins": {
       "cordova-plugin-whitelist": {},

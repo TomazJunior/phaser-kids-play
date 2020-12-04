@@ -10,3 +10,5 @@ notes
 .serverless
 .aws
 .build
+/*.keystore
+build.json
