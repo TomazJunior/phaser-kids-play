@@ -12,6 +12,14 @@ import {
 
 export default class PauseScene extends Phaser.Scene {
   private config: PauseSceneConfig
+  background: BackgroundParallax
+  frame: Phaser.GameObjects.Image
+  textTitle: Phaser.GameObjects.Text
+  soundButton: ButtonSmall
+  bgSoundButton: any
+  homeButton: ButtonSmall
+  restartButton: ButtonSmall
+  resumeButton: ButtonBig
 
   constructor() {
     super({ key: SCENES.PAUSE_SCENE })
@@ -23,68 +31,90 @@ export default class PauseScene extends Phaser.Scene {
 
   create() {
     const { width, height } = this.scale
-    this.scene.bringToTop()
+    this.scene.bringToTop(SCENES.PAUSE_SCENE)
 
-    new BackgroundParallax(this, false, false)
+    if (!this.background) this.background = new BackgroundParallax(this, false, false)
 
-    const frame = this.add.image(width * 0.5, height * 0.5, 'small-frame-window').setOrigin(0.5, 0.5)
+    if (!this.frame) this.frame = this.add.image(width * 0.5, height * 0.5, 'small-frame-window').setOrigin(0.5, 0.5)
 
-    const textTitle = this.add
-      .text(frame.x, frame.y - frame.displayHeight * 0.5 + 50, 'PAUSED', {
-        fontFamily: FONTS.ALLOY_INK,
-        fontSize: '58px',
-      })
-      .setOrigin(0.5, 0.5)
+    if (!this.textTitle) {
+      this.textTitle = this.add
+        .text(this.frame.x, this.frame.y - this.frame.displayHeight * 0.5 + 50, 'PAUSED', {
+          fontFamily: FONTS.ALLOY_INK,
+          fontSize: '58px',
+        })
+        .setOrigin(0.5, 0.5)
+    }
 
-    this.createSoundButton(
-      frame.x - frame.displayWidth * 0.5 + 150,
-      frame.y - frame.displayHeight * 0.5 + 210,
-      BUTTON.SOUND_BG,
-      isBackgroundSoundEnabled,
-      setBackgroundSoundEnabled
-    )
+    if (!this.bgSoundButton) {
+      this.bgSoundButton = this.createSoundButton(
+        this.frame.x - this.frame.displayWidth * 0.5 + 150,
+        this.frame.y - this.frame.displayHeight * 0.5 + 210,
+        BUTTON.SOUND_BG,
+        isBackgroundSoundEnabled,
+        setBackgroundSoundEnabled
+      )
+    }
 
-    this.createSoundButton(
-      frame.x - frame.displayWidth * 0.5 + 300,
-      frame.y - frame.displayHeight * 0.5 + 210,
-      BUTTON.SOUND,
-      isSoundEnabled,
-      setSoundEnabled
-    )
+    if (!this.soundButton) {
+      this.soundButton = this.createSoundButton(
+        this.frame.x - this.frame.displayWidth * 0.5 + 300,
+        this.frame.y - this.frame.displayHeight * 0.5 + 210,
+        BUTTON.SOUND,
+        isSoundEnabled,
+        setSoundEnabled
+      )
+    }
 
-    new ButtonSmall(this, frame.x - frame.displayWidth * 0.5 + 150, frame.y - frame.displayHeight * 0.5 + 350, {
-      name: BUTTON.HOME,
-      scale: {
-        x: 0.7,
-        y: 0.7,
-      },
-      onClick: this.config.onHome,
-    }).setOrigin(0.5, 0.5)
+    if (!this.homeButton) {
+      this.homeButton = new ButtonSmall(
+        this,
+        this.frame.x - this.frame.displayWidth * 0.5 + 150,
+        this.frame.y - this.frame.displayHeight * 0.5 + 350,
+        {
+          name: BUTTON.HOME,
+          scale: {
+            x: 0.7,
+            y: 0.7,
+          },
+          onClick: this.config.onHome,
+        }
+      ).setOrigin(0.5, 0.5)
+    }
 
-    new ButtonSmall(this, frame.x - frame.displayWidth * 0.5 + 300, frame.y - frame.displayHeight * 0.5 + 350, {
-      name: BUTTON.RESTART,
-      scale: {
-        x: 0.7,
-        y: 0.7,
-      },
-      onClick: this.config.onRestart,
-    }).setOrigin(0.5, 0.5)
+    if (!this.restartButton) {
+      this.restartButton = new ButtonSmall(
+        this,
+        this.frame.x - this.frame.displayWidth * 0.5 + 300,
+        this.frame.y - this.frame.displayHeight * 0.5 + 350,
+        {
+          name: BUTTON.RESTART,
+          scale: {
+            x: 0.7,
+            y: 0.7,
+          },
+          onClick: this.config.onRestart,
+        }
+      ).setOrigin(0.5, 0.5)
+    }
 
-    new ButtonBig(this, frame.x - 5, frame.y - frame.displayHeight * 0.5 + 480, {
-      scale: {
-        x: 0.6,
-        y: 0.6,
-      },
-      text: {
-        title: 'RESUME',
-        fontSize: '46px',
-        padding: {
-          x: 20,
-          y: 10,
+    if (!this.resumeButton) {
+      this.resumeButton = new ButtonBig(this, this.frame.x - 5, this.frame.y - this.frame.displayHeight * 0.5 + 480, {
+        scale: {
+          x: 0.6,
+          y: 0.6,
         },
-      },
-      onClick: this.config.onResume,
-    }).setOrigin(0.5, 0.5)
+        text: {
+          title: 'RESUME',
+          fontSize: '46px',
+          padding: {
+            x: 20,
+            y: 10,
+          },
+        },
+        onClick: this.config.onResume,
+      }).setOrigin(0.5, 0.5)
+    }
   }
 
   createSoundButton(
@@ -93,7 +123,7 @@ export default class PauseScene extends Phaser.Scene {
     name: BUTTON,
     handleIsSoundEnabled: () => boolean,
     handleSetConfigState: (state: boolean) => void
-  ) {
+  ): ButtonSmall {
     const buttonEnabled = handleIsSoundEnabled()
     const button = new ButtonSmall(this, x, y, {
       name,
@@ -110,5 +140,7 @@ export default class PauseScene extends Phaser.Scene {
         button.changeTexture(buttonEnabledState ? BUTTON_PREFIX.NORMAL : BUTTON_PREFIX_EXTRA.INACTIVE)
       },
     }).setOrigin(0.5, 0.5)
+
+    return button
   }
 }

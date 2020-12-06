@@ -1,6 +1,7 @@
 import { FONTS, SCENES, SPRITE_NAME } from '../utils/constants'
 
 export default class BootScene extends Phaser.Scene {
+  background: Phaser.GameObjects.Rectangle
   constructor() {
     super(SCENES.BOOT_SCENE)
   }
@@ -18,7 +19,6 @@ export default class BootScene extends Phaser.Scene {
       .setOrigin(0.5, 0.5)
       .setStroke('#048001', 20)
 
-    this.load.image('background', 'assets/img/background.png')
     this.load.image('background-forest', 'assets/img/background-forest.png')
     this.load.image('background-forest-2nd-layer', 'assets/img/background-forest-2nd-layer.png')
 
@@ -38,14 +38,16 @@ export default class BootScene extends Phaser.Scene {
 
   private createBackground = () => {
     const { width, height } = this.scale
-    const background = this.add.rectangle(width * 0.5, height * 0.5, 500, 500, 0xffffff).setInteractive()
-    let scaleX = width / background.width
-    let scaleY = height / background.height
+    this.background = this.add.rectangle(width * 0.5, height * 0.5, 500, 500, 0xffffff).setInteractive()
+    let scaleX = width / this.background.width
+    let scaleY = height / this.background.height
     let scale = Math.max(scaleX, scaleY)
-    background.setScale(scale).setScrollFactor(0)
+    this.background.setScale(scale).setScrollFactor(0)
   }
 
   create() {
+    this.background.destroy(true)
+    this.scene.stop(SCENES.BOOT_SCENE)
     this.scene.start(SCENES.PRELOAD_SCENE)
   }
 }

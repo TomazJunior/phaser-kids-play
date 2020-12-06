@@ -1,4 +1,5 @@
 import { MAX_TIMER_DURATION } from '../utils/constants'
+import { FPSController } from './fpsController'
 
 export class Timer {
   private timerEvent: Phaser.Time.TimerEvent | undefined
@@ -22,11 +23,13 @@ export class Timer {
     }
   }
 
-  update() {
+  update(time, delta) {
     if (!this.timerEvent) {
       return
     }
-
+    if (!FPSController.getInstance().shouldUpdate('timer', delta)) {
+      return
+    }
     const elapsed = this.timerEvent.getElapsed()
     this._seconds = elapsed / 1000
     this._seconds = Math.round(this._seconds * 100) / 100

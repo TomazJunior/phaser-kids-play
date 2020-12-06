@@ -64,6 +64,7 @@ export default class SelectItemsScene extends Phaser.Scene {
         await removeSkillItems(selectedSkillItems)
         await this.storeSkillItemUsedInfo(selectedSkillItems)
 
+        this.background.close()
         this.scene.stop(SCENES.SELECT_ITEMS_SCENE)
         this.scene.start(SCENES.MAIN_SCENE, <MainSceneConfig>{
           gameWorld: this.gameWorld,
@@ -78,6 +79,8 @@ export default class SelectItemsScene extends Phaser.Scene {
     this.backButton = new ButtonSmall(this, 50, 50, {
       name: BUTTON.LEFT,
       onClick: () => {
+        this.background.close()
+        this.scene.stop(SCENES.SELECT_ITEMS_SCENE)
         this.scene.start(SCENES.LEVEL_SCENE, this.gameWorld)
       },
     }).setOrigin(0.5, 0.5)

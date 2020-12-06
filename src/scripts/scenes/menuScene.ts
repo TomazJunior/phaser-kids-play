@@ -14,6 +14,8 @@ export default class MenuScene extends Phaser.Scene {
         title: 'START',
       },
       onClick: () => {
+        background.close()
+        this.scene.stop(SCENES.MENU_SCENE)
         this.scene.start(SCENES.LEVEL_SCENE)
       },
     }).setOrigin(0.5, 0.5)
@@ -23,6 +25,8 @@ export default class MenuScene extends Phaser.Scene {
         fontSize: '60px',
       },
       onClick: () => {
+        background.close()
+        this.scene.stop(SCENES.MENU_SCENE)
         this.scene.start(SCENES.CONFIG_SCENE)
       },
     }).setOrigin(0.5, 0.5)

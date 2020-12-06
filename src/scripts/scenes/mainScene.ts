@@ -174,7 +174,7 @@ export default class MainScene extends Phaser.Scene {
     this.player.on(PLAYER_REACHED_INITIAL_POS, this.handlePlayerReachedInitialPosition)
     this.player.on(PLAYER_REACHED_FINAL_POS, this.handlePlayerReachedFinalPosition)
 
-    this.physics.add.collider(this.player, this.targetGroup, undefined, undefined, this)
+    // this.physics.add.collider(this.player, this.targetGroup, undefined, undefined, this)
 
     this.timer = new Timer(this, (seconds: number) => {
       this.frameLevel.timer = seconds
@@ -201,6 +201,7 @@ export default class MainScene extends Phaser.Scene {
     this.scene.pause(SCENES.MAIN_SCENE)
     this.sound.pauseAll()
 
+    this.scene.bringToTop(SCENES.PAUSE_SCENE)
     this.scene.run(SCENES.PAUSE_SCENE, <PauseSceneConfig>{
       onResume: this.resumePausedScene,
       onHome: () => {
@@ -243,7 +244,8 @@ export default class MainScene extends Phaser.Scene {
   }
 
   resumePausedScene = () => {
-    this.scene.stop(SCENES.PAUSE_SCENE)
+    this.scene.pause(SCENES.PAUSE_SCENE)
+    this.scene.moveDown(SCENES.PAUSE_SCENE)
     this.scene.resume(SCENES.MAIN_SCENE)
     playSound(this, getOrAddAudio(this, SOUNDS.BACKGROUND))
   }

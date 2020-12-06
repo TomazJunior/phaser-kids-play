@@ -29,6 +29,8 @@ export default class LevelScene extends Phaser.Scene {
     new ButtonSmall(this, 50, 50, {
       name: BUTTON.LEFT,
       onClick: () => {
+        this.background.close()
+        this.scene.stop(SCENES.LEVEL_SCENE)
         this.scene.start(SCENES.MENU_SCENE)
       },
     }).setOrigin(0.5, 0.5)
@@ -83,6 +85,8 @@ export default class LevelScene extends Phaser.Scene {
       const button = new ButtonSmall(this, posX, posY, {
         name: BUTTON.EMPTY,
         onClick: () => {
+          this.background.close()
+          this.scene.stop(SCENES.LEVEL_SCENE)
           this.scene.start(SCENES.SELECT_ITEMS_SCENE, <CurrentWorldAndLevelConfig>{
             gameWorld: this.gameWorld,
             level,
@@ -107,6 +111,7 @@ export default class LevelScene extends Phaser.Scene {
       prefix: !!previousWorld ? BUTTON_PREFIX.NORMAL : BUTTON_PREFIX.BLOCKED,
       onClick: () => {
         if (previousWorld) {
+          this.background.close()
           this.scene.restart(previousWorld)
         }
       },
@@ -119,6 +124,7 @@ export default class LevelScene extends Phaser.Scene {
       prefix: hasNextWorld ? BUTTON_PREFIX.NORMAL : BUTTON_PREFIX.BLOCKED,
       onClick: () => {
         if (hasNextWorld) {
+          this.background.close()
           this.scene.restart(nextWorld)
         }
       },

@@ -11,6 +11,7 @@ import {
 } from '../utils/gameInfoData'
 
 export default class ConfigScene extends Phaser.Scene {
+  background: BackgroundParallax
   
   constructor() {
     super({ key: SCENES.CONFIG_SCENE })
@@ -20,7 +21,7 @@ export default class ConfigScene extends Phaser.Scene {
     const { width, height } = this.scale
     this.scene.bringToTop()
     
-    new BackgroundParallax(this, false, false)
+    this.background = new BackgroundParallax(this, false, false)
 
     const frame = this.add.image(width * 0.5, height * 0.5, 'small-frame-window').setOrigin(0.5, 0.5)
 
@@ -55,6 +56,7 @@ export default class ConfigScene extends Phaser.Scene {
         y: 0.7,
       },
       onClick: () => {
+        this.background.close()
         this.scene.stop(SCENES.CONFIG_SCENE)
         this.scene.start(SCENES.MENU_SCENE)
       },

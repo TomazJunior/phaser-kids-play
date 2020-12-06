@@ -28,6 +28,10 @@ const config: Phaser.Types.Core.GameConfig = {
       gravity: { y: 0 },
     },
   },
+  fps: {
+    target: 30,
+    // forceSetTimeOut: true,
+  },
 }
 
 const onPause = (game: Phaser.Game) => {
@@ -62,7 +66,6 @@ const initStore = (game: Phaser.Game) => {
 
   window.store.error(function (error) {
     console.error('ERROR ' + error.code + ': ' + error.message)
-    alert('ERROR ' + error.code + ': ' + error.message)
   })
 
   window.store.refresh()
