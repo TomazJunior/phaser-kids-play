@@ -19,7 +19,7 @@ export class LevelHandler {
   addLevel = async (req, res) => {
     req.log.debug('LevelHandler.addLevel', 'Process started')
     const { userId } = req.params
-    const { gems, stars, worldId, level } = req.body
+    const { gems, stars, worldId, level, attempts } = req.body
 
     // no need to update if there is no gem to be updated
     if (gems > 0) {
@@ -41,13 +41,13 @@ export class LevelHandler {
     const levelData = user.levels.find((item) => item.worldId === worldId && item.level === level)
     if (levelData) {
       levelData.stars = Math.max(levelData.stars, stars)
-      levelData.attempts++
+      levelData.attempts += attempts;
     } else {
       user.levels.push({
         worldId,
         level,
         stars,
-        attempts: 1,
+        attempts,
       })
     }
 

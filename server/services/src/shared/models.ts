@@ -80,8 +80,8 @@ const LevelSchema = {
   level: joi.number().required(),
   gems: joi.number().required(),
   stars: joi.number().required(),
-  time: joi.date().required(),
-  rounds: joi.array().items(RoundSchema),
+  time: joi.date().allow(null),
+  // rounds: joi.array().items(RoundSchema),
 }
 
 export const Level = dynogels.define(process.env.levelsTableName!, {

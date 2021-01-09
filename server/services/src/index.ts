@@ -4,6 +4,8 @@ import { initialize as initializeUser } from './user/user.router'
 import { initialize as initializeDevice } from './device/device.router'
 import { initialize as initializeLevel } from './level/level.router'
 import { initialize as initializeSkillItem } from './skillItem/skillItem.router'
+import { initialize as initializeHealth } from './health/health.router'
+
 
 export async function handler(event: any, context: any) {
   const router = require('lambda-api')({
@@ -37,6 +39,7 @@ export async function handler(event: any, context: any) {
   await initializeDevice(router)
   await initializeLevel(router)
   await initializeSkillItem(router)
+  await initializeHealth(router)
 
   return router.run(event, context)
 }

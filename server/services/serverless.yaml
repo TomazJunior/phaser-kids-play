@@ -59,6 +59,11 @@ functions:
               - X-Amz-Date
               - X-Api-Key
               - X-Amz-Security-Token
+              - X-Unity-Version
+              - Accept
+              - X-Access-Token
+              - X-Application-Name
+              - X-Request-Sent-Time
       - http:
           path: /user
           method: any
@@ -73,6 +78,11 @@ functions:
               - X-Amz-Date
               - X-Api-Key
               - X-Amz-Security-Token
+              - X-Unity-Version
+              - Accept
+              - X-Access-Token
+              - X-Application-Name
+              - X-Request-Sent-Time
       - http:
           path: /device/{proxy+}
           method: any
@@ -87,6 +97,30 @@ functions:
               - X-Amz-Date
               - X-Api-Key
               - X-Amz-Security-Token
+              - X-Unity-Version
+              - Accept
+              - X-Access-Token
+              - X-Application-Name
+              - X-Request-Sent-Time
+      - http:
+          path: /ping
+          method: get
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+              - Content-Length
+              - X-Requested-With
+              - User-Id
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Unity-Version
+              - Accept
+              - X-Access-Token
+              - X-Application-Name
+              - X-Request-Sent-Time              
 resources:
   Resources:
     UsersTableName:

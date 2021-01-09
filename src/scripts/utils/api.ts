@@ -43,7 +43,7 @@ export class ServiceApi {
       userId,
       worldId: level.key,
       level: level.level,
-      rounds: level.rounds,
+      // rounds: level.rounds,
       gems: level.gems,
       stars: level.stars,
       time: level.time,
