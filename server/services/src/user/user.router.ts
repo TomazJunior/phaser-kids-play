@@ -9,4 +9,8 @@ export const initialize = (router) => {
     const userHandler = new UserHandler(req.log)
     return userHandler.create(req, res)
   })
+  router.post('user/:userId/gems/:gems', async (req, res) => {
+    const userHandler = new UserHandler(req.log)
+    return userHandler.buyGems(req, res)
+  })
 }

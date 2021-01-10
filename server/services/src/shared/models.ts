@@ -4,6 +4,8 @@ import { DynamoDBService } from './dynamodb.service'
 
 //TODO: move to a shared place
 export enum GEM_AUDIT_TYPE {
+  GEMS_BOUGHT = 'gems_bought',
+  GEMS_ADS = 'gems_ads',
   LEVEL_COMPLETED = 'level_completed',
   ITEM_PURCHASED = 'item_purchased',
   ITEM_USED = 'item_used',
