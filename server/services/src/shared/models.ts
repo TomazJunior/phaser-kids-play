@@ -83,6 +83,7 @@ const LevelSchema = {
   gems: joi.number().required(),
   stars: joi.number().required(),
   time: joi.date().allow(null),
+  attempts: joi.number().required()
   // rounds: joi.array().items(RoundSchema),
 }
 
