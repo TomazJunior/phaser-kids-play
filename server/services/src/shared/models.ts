@@ -123,3 +123,21 @@ export const User = dynogels.define(process.env.usersTableName!, {
   tableName: process.env.usersTableName,
 })
 User.config({ dynamodb: DynamoDBService.getInstance().dynamoDB })
+
+const PurchaseSchema = {
+  id: dynogels.types.uuid(),
+  userId: joi.string().required(),
+  gems: joi.number().default(0),
+  transactionID: joi.string().allow(null),
+  receipt: joi.string().allow(null),
+  time: joi.date().allow(null),
+}
+
+export const Purchase = dynogels.define(process.env.purchasesTableName!, {
+  hashKey: 'userId',
+  rangeKey: 'id',
+  timestamps: true,
+  schema: PurchaseSchema,
+  tableName: process.env.purchasesTableName,
+})
+Purchase.config({ dynamodb: DynamoDBService.getInstance().dynamoDB })

@@ -11,6 +11,6 @@ export const initialize = (router) => {
   })
   router.post('user/:userId/gems/:gems', async (req, res) => {
     const userHandler = new UserHandler(req.log)
-    return userHandler.buyGems(req, res)
+    return userHandler.buyGemsViaAds(req, res)
   })
 }

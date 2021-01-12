@@ -38,10 +38,9 @@ export class UserHandler {
     req.log.debug('UserHandler.create', 'Process completed')
   }
 
-  buyGems = async (req: any, res: any) => {
+  buyGemsViaAds = async (req: any, res: any) => {
     req.log.debug('UserHandler.buyGems', 'Process started')
     const { userId, gems } = req.params
-    const { ads } = req.query
     const user = await this.userService.getOne(userId)
 
     // no need to update if there is no gem to be updated
@@ -52,7 +51,7 @@ export class UserHandler {
       await this.gemAuditService.add(
         new GemAudit({
           userId,
-          recordType: ads === '1' ? GEM_AUDIT_TYPE.GEMS_ADS : GEM_AUDIT_TYPE.GEMS_BOUGHT,
+          recordType: GEM_AUDIT_TYPE.GEMS_ADS,
           originId: userId,
           gems: gems,
         })

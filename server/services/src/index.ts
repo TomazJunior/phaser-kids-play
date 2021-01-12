@@ -5,6 +5,7 @@ import { initialize as initializeDevice } from './device/device.router'
 import { initialize as initializeLevel } from './level/level.router'
 import { initialize as initializeSkillItem } from './skillItem/skillItem.router'
 import { initialize as initializeHealth } from './health/health.router'
+import { initialize as initializePurchase } from './purchase/purchase.router'
 
 
 export async function handler(event: any, context: any) {
@@ -40,6 +41,7 @@ export async function handler(event: any, context: any) {
   await initializeLevel(router)
   await initializeSkillItem(router)
   await initializeHealth(router)
+  await initializePurchase(router)
 
   return router.run(event, context)
 }

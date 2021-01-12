@@ -6,6 +6,7 @@ devicesTableName: memory-devices-dev
 levelsTableName: memory-levels-dev
 gemAuditTableName: memory-gem-audit-dev
 skillItemAuditTableName: memory-skill-item-audit-dev
+purchasesTableName: memory-purchases-dev
 dynamoDBaccessKey: ""
 dynamoDBaccessSecret: ""
 LoggerLevel: debug

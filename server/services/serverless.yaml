@@ -24,6 +24,7 @@ provider:
     levelsTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):levelsTableName}
     gemAuditTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):gemAuditTableName}
     skillItemAuditTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):skillItemAuditTableName}
+    purchasesTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):purchasesTableName}
     dynamoDBEndpoint: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBEndpoint}
     dynamoDBaccessKey: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBaccessKey}
     dynamoDBaccessSecret: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBaccessSecret}
@@ -200,7 +201,22 @@ resources:
             KeyType: 'HASH'
           - AttributeName: 'id'
             KeyType: 'RANGE'
-        BillingMode: PAY_PER_REQUEST                    
+        BillingMode: PAY_PER_REQUEST      
+    PurchasesTableName:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        TableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):purchasesTableName}
+        AttributeDefinitions:
+          - AttributeName: 'userId'
+            AttributeType: 'S'
+          - AttributeName: 'id'
+            AttributeType: 'S'
+        KeySchema:
+          - AttributeName: 'userId'
+            KeyType: 'HASH'
+          - AttributeName: 'id'
+            KeyType: 'RANGE'
+        BillingMode: PAY_PER_REQUEST                          
 plugins:
   - serverless-plugin-typescript
   - serverless-offline
