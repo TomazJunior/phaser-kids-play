@@ -25,6 +25,7 @@ provider:
     gemAuditTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):gemAuditTableName}
     skillItemAuditTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):skillItemAuditTableName}
     purchasesTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):purchasesTableName}
+    settingsTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):settingsTableName}
     dynamoDBEndpoint: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBEndpoint}
     dynamoDBaccessKey: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBaccessKey}
     dynamoDBaccessSecret: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBaccessSecret}
@@ -103,6 +104,25 @@ functions:
               - X-Access-Token
               - X-Application-Name
               - X-Request-Sent-Time
+      - http:
+          path: /settings/{proxy+}
+          method: any
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+              - Content-Length
+              - X-Requested-With
+              - User-Id
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Unity-Version
+              - Accept
+              - X-Access-Token
+              - X-Application-Name
+              - X-Request-Sent-Time              
       - http:
           path: /ping
           method: get
@@ -216,7 +236,18 @@ resources:
             KeyType: 'HASH'
           - AttributeName: 'id'
             KeyType: 'RANGE'
-        BillingMode: PAY_PER_REQUEST                          
+        BillingMode: PAY_PER_REQUEST    
+    SettingsTableName:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        TableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):settingsTableName}
+        AttributeDefinitions:
+          - AttributeName: 'key'
+            AttributeType: 'S'
+        KeySchema:
+          - AttributeName: 'key'
+            KeyType: 'HASH'
+        BillingMode: PAY_PER_REQUEST                                 
 plugins:
   - serverless-plugin-typescript
   - serverless-offline

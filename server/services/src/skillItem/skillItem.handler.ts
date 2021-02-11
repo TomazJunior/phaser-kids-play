@@ -51,6 +51,32 @@ export class SkillItemHandler {
     req.log.debug('SkillItemHandler.purchase', 'Process completed')
   }
 
+  reward = async (req, res) => {
+    req.log.debug('SkillItemHandler.reward', 'Process started')
+    const { userId } = req.params
+    const { skin, quantity } = req.body
+    if (!userId) return Promise.reject('userId property is required')
+    if (!skin) return Promise.reject('skin property is required')
+    if (!quantity) return Promise.reject('quantity property is required')
+
+    const updatedData = await this.skillItemService.add(new SkillItemAudit({ ...req.body, userId, gems: 0 }))
+    
+    const user = await this.userService.getOne(userId)
+    
+    if (!user.skillItems) user.skillItems = []
+    const skillItem = user.skillItems.find((item) => item.skin === skin)
+    if (skillItem) {
+      skillItem.quantity += quantity
+    } else {
+      user.skillItems.push({ quantity, skin })
+    }
+
+    await this.userService.update(userId, { skillItems: user.skillItems })
+
+    res.json(new Response(updatedData))
+    req.log.debug('SkillItemHandler.reward', 'Process completed')
+  }
+
   useItem = async (req, res) => {
     req.log.debug('SkillItemHandler.useItem', 'Process started')
     const { userId } = req.params

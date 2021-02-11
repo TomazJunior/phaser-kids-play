@@ -141,3 +141,16 @@ export const Purchase = dynogels.define(process.env.purchasesTableName!, {
   tableName: process.env.purchasesTableName,
 })
 Purchase.config({ dynamodb: DynamoDBService.getInstance().dynamoDB })
+
+const SettingsSchema = {
+  key: joi.string().required(),
+  value: joi.string().allow(null),
+}
+
+export const Settings = dynogels.define(process.env.settingsTableName!, {
+  hashKey: 'key',
+  timestamps: false,
+  schema: SettingsSchema,
+  tableName: process.env.settingsTableName,
+})
+Settings.config({ dynamodb: DynamoDBService.getInstance().dynamoDB })
