@@ -13,4 +13,8 @@ export const initialize = (router) => {
     const userHandler = new UserHandler(req.log)
     return userHandler.buyGemsViaAds(req, res)
   })
+  router.post('user/:userId/blue-gems/:gems', async (req, res) => {
+    const userHandler = new UserHandler(req.log)
+    return userHandler.buyBlueGemsViaAds(req, res)
+  })
 }

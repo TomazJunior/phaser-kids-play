@@ -4,8 +4,10 @@ import { DynamoDBService } from './dynamodb.service'
 
 //TODO: move to a shared place
 export enum GEM_AUDIT_TYPE {
+  MINI_GAME_COMPLETED = 'mini_game_completed',
   GEMS_BOUGHT = 'gems_bought',
   GEMS_ADS = 'gems_ads',
+  BLUE_GEMS_ADS = 'blue_gems_ads',
   LEVEL_COMPLETED = 'level_completed',
   ITEM_PURCHASED = 'item_purchased',
   ITEM_USED = 'item_used',
@@ -111,6 +113,8 @@ export const UserLevelSchema = {
 export const UserSchema = {
   id: dynogels.types.uuid(),
   gems: joi.number().default(0),
+  blueGems: joi.number().default(0),
+  score: joi.number().default(0),
   skillItems: joi.array().items(UserSkillItemSchema).default([]),
   levels: joi.array().items(UserLevelSchema).default([]),
   active: joi.bool().default(true),
@@ -154,3 +158,39 @@ export const Settings = dynogels.define(process.env.settingsTableName!, {
   tableName: process.env.settingsTableName,
 })
 Settings.config({ dynamodb: DynamoDBService.getInstance().dynamoDB })
+
+const MiniGameSchema = {
+  id: dynogels.types.uuid(),
+  userId: joi.string().required(),
+  miniGameId: joi.number().required(),
+  score: joi.number().required(),
+  blueGems: joi.number().required(),
+  time: joi.date().allow(null)
+}
+
+export const MiniGame = dynogels.define(process.env.miniGameTableName!, {
+  hashKey: 'userId',
+  rangeKey: 'id',
+  timestamps: true,
+  schema: MiniGameSchema,
+  tableName: process.env.miniGameTableName,
+})
+Level.config({ dynamodb: DynamoDBService.getInstance().dynamoDB })
+
+const MiniGameHighScoreSchema = {
+  userId: joi.string().required(),
+  miniGameId: joi.number().required(),
+  highscore: joi.number().default(0)
+}
+
+export const MiniGameHighScore = dynogels.define(process.env.miniGameHighScoreTableName!, {
+  hashKey: 'userId',
+  rangeKey: 'miniGameId',
+  timestamps: true,
+  schema: MiniGameHighScoreSchema,
+  tableName: process.env.miniGameHighScoreTableName,
+  indexes: [
+    { hashKey: 'miniGameId', name: 'miniGameIdIndex', type: 'global' }
+  ]
+})
+Level.config({ dynamodb: DynamoDBService.getInstance().dynamoDB })

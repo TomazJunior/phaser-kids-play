@@ -65,4 +65,33 @@ export class UserHandler {
     )
     req.log.debug('UserHandler.buyGems', 'Process completed')
   }
+
+
+  buyBlueGemsViaAds = async (req: any, res: any) => {
+    req.log.debug('UserHandler.buyBlueGemsViaAds', 'Process started')
+    const { userId, gems } = req.params
+    const user = await this.userService.getOne(userId)
+
+    // no need to update if there is no gem to be updated
+    if (parseInt(gems) > 0) {
+      user.blueGems += parseInt(gems)
+      await this.userService.update(userId, { blueGems: user.blueGems })
+
+      await this.gemAuditService.add(
+        new GemAudit({
+          userId,
+          recordType: GEM_AUDIT_TYPE.BLUE_GEMS_ADS,
+          originId: userId,
+          gems: gems,
+        })
+      )
+    }
+
+    res.json(
+      new Response({
+        status: 'ok',
+      })
+    )
+    req.log.debug('UserHandler.buyBlueGemsViaAds', 'Process completed')
+  }
 }

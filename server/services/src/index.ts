@@ -7,6 +7,7 @@ import { initialize as initializeSkillItem } from './skillItem/skillItem.router'
 import { initialize as initializeHealth } from './health/health.router'
 import { initialize as initializePurchase } from './purchase/purchase.router'
 import { initialize as initializeSettings } from './settings/settings.router'
+import { initialize as initializeMiniGame } from './minigame/minigame.router'
 
 
 export async function handler(event: any, context: any) {
@@ -44,6 +45,7 @@ export async function handler(event: any, context: any) {
   await initializeHealth(router)
   await initializePurchase(router)
   await initializeSettings(router)
+  await initializeMiniGame(router)
 
   return router.run(event, context)
 }

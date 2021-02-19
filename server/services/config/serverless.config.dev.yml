@@ -8,6 +8,8 @@ gemAuditTableName: memory-gem-audit-dev
 skillItemAuditTableName: memory-skill-item-audit-dev
 purchasesTableName: memory-purchases-dev
 settingsTableName: memory-settings-dev
+miniGameTableName: memory-mini-game-dev
+miniGameHighScoreTableName: memory-mini-game-high-score-dev
 dynamoDBaccessKey: ""
 dynamoDBaccessSecret: ""
 LoggerLevel: debug
