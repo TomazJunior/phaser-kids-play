@@ -38,6 +38,39 @@ export class UserHandler {
     req.log.debug('UserHandler.create', 'Process completed')
   }
 
+  updatePlayerDefinition =  async (req, res) => {
+    req.log.debug('UserHandler.updatePlayerDefinition', 'Process started')
+    const { userId, playerDefinitionKey, gems } = req.params
+    if (!userId) return Promise.reject('userId property is required')
+    if (!playerDefinitionKey) return Promise.reject('playerDefinitionKey property is required')
+
+    const user = await this.userService.getOne(userId)
+    user.playerDefinitionKey = playerDefinitionKey;
+    if (!user.playerDefinitionKeys) user.playerDefinitionKeys = [];
+    if (!user.playerDefinitionKeys.includes(playerDefinitionKey)) {
+      if (gems == null || parseInt(gems) <= 0) return Promise.reject('gems property is required');
+      
+      user.blueGems -= parseInt(gems)
+      await this.userService.update(userId, { blueGems: user.blueGems })
+
+      await this.gemAuditService.add(
+        new GemAudit({
+          userId,
+          recordType: GEM_AUDIT_TYPE.CHAR_PURCHASED,
+          originId: userId,
+          gems: gems,
+        })
+      )
+
+      user.playerDefinitionKeys.push(user.playerDefinitionKey);
+    }
+    
+    await this.userService.update(userId, { playerDefinitionKey, playerDefinitionKeys: user.playerDefinitionKeys });
+
+    res.json(new Response({ status: 'ok' }))
+    req.log.debug('UserHandler.updatePlayerDefinition', 'Process completed')
+  }
+
   buyGemsViaAds = async (req: any, res: any) => {
     req.log.debug('UserHandler.buyGems', 'Process started')
     const { userId, gems } = req.params

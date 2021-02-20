@@ -7,6 +7,7 @@ export enum GEM_AUDIT_TYPE {
   MINI_GAME_COMPLETED = 'mini_game_completed',
   GEMS_BOUGHT = 'gems_bought',
   GEMS_ADS = 'gems_ads',
+  CHAR_PURCHASED = 'char_purchased',
   BLUE_GEMS_ADS = 'blue_gems_ads',
   LEVEL_COMPLETED = 'level_completed',
   ITEM_PURCHASED = 'item_purchased',
@@ -117,6 +118,8 @@ export const UserSchema = {
   score: joi.number().default(0),
   skillItems: joi.array().items(UserSkillItemSchema).default([]),
   levels: joi.array().items(UserLevelSchema).default([]),
+  playerDefinitionKey: joi.string().allow(null),
+  playerDefinitionKeys: joi.array().items(joi.string()).default([]),
   active: joi.bool().default(true),
 }
 
