@@ -99,7 +99,6 @@ export class UserHandler {
     req.log.debug('UserHandler.buyGems', 'Process completed')
   }
 
-
   buyBlueGemsViaAds = async (req: any, res: any) => {
     req.log.debug('UserHandler.buyBlueGemsViaAds', 'Process started')
     const { userId, gems } = req.params
@@ -127,4 +126,25 @@ export class UserHandler {
     )
     req.log.debug('UserHandler.buyBlueGemsViaAds', 'Process completed')
   }
+
+  updatePlayScore = async (req: any, res: any) => {
+    req.log.debug('UserHandler.updatePlayScore', 'Process started')
+    const { userId, score } = req.params
+    const user = await this.userService.getOne(userId)
+
+    // no need to update if there is no score to be updated
+    if (parseInt(score) > 0) {
+      user.score = parseInt(score)
+      await this.userService.update(userId, { score: user.score })
+    }
+
+    res.json(
+      new Response({
+        status: 'ok',
+      })
+    )
+    req.log.debug('UserHandler.updatePlayScore', 'Process completed')
+  }
+
+  
 }

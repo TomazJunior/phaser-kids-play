@@ -21,4 +21,8 @@ export const initialize = (router) => {
     const userHandler = new UserHandler(req.log)
     return userHandler.buyBlueGemsViaAds(req, res)
   })
+  router.put('user/:userId/score/:score', async (req, res) => {
+    const userHandler = new UserHandler(req.log)
+    return userHandler.updatePlayScore(req, res)
+  })
 }

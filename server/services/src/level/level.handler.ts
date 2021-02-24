@@ -19,7 +19,7 @@ export class LevelHandler {
   addLevel = async (req, res) => {
     req.log.debug('LevelHandler.addLevel', 'Process started')
     const { userId } = req.params
-    const { gems, stars, worldId, level, attempts } = req.body
+    const { gems, stars, worldId, level, attempts, score } = req.body
 
     // no need to update if there is no gem to be updated
     if (gems > 0) {
@@ -35,7 +35,12 @@ export class LevelHandler {
     }
 
     const user = await this.userService.getOne(userId)
+    if (!user.gems) user.gems = 0
+    if (!user.score) user.score = 0
     user.gems += gems
+    if (score > 0) {
+      user.score += score
+    }
 
     if (!user.levels) user.levels = []
     const levelData = user.levels.find((item) => item.worldId === worldId && item.level === level)
@@ -51,7 +56,7 @@ export class LevelHandler {
       })
     }
 
-    await this.userService.update(userId, { gems: user.gems, levels: user.levels })
+    await this.userService.update(userId, { gems: user.gems, levels: user.levels, score: user.score })
 
     res.json(
       new Response({
